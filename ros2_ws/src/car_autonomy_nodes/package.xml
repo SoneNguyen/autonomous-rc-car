@@ -10,6 +10,7 @@
   <buildtool_depend>ament_cmake_python</buildtool_depend>
 
   <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>python3-jsonschema</exec_depend>
   <exec_depend>python3-numpy</exec_depend>

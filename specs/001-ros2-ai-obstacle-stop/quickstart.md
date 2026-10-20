@@ -130,8 +130,8 @@ unchanged SDF source target of 30 Hz. The first ROS one-minute probe received
 amended to a minimum average of 20 ROS-delivered frames/s over a simulated
 minute in server-only headless mode, preserving 2x headroom over the planned
 10 Hz detector; the other periodic streams retain their 90%-of-declared-rate
-requirement. The original probe clears the revised camera floor, but the full
-sensor suite must pass its rerun before P1 is complete. GUI mode is visual
+requirement. The full automated sensor suite passed again on 2026-10-20 during
+the P2 regression run. GUI mode is visual
 inspection only and its lower rate is not an acceptance result. Rates may vary
 with host/render load; do not claim the configured 30 Hz source rate is achieved
 as delivered ROS throughput.
@@ -150,7 +150,7 @@ From a second sourced terminal, send a slow bounded request:
 ```bash
 ros2 topic pub --rate 10 /autonomy/cmd_vel_request \
   geometry_msgs/msg/Twist \
-  "{linear: {x: 1.0}, angular: {z: 0.1}}"
+  "{linear: {x: 0.75}, angular: {z: 0.1}}"
 ```
 
 While it is moving, inspect both sides of the bridge:
@@ -163,11 +163,45 @@ gz topic -i -t /model/gazebo_truck/cmd_vel
 Expected: the vehicle moves forward and turns; ROS reports exactly one
 publisher on the bridged command topic, `safe_drive_controller`, and Gazebo
 Transport reports exactly one writer (the launch's bridge path), with no
-additional command writer. Stop the
-request publisher with Ctrl+C. The final command becomes zero within 0.5
-simulated seconds and odometry reaches the configured rest condition within 2
-simulated seconds after expiry. The launch test also checks that no GUI
-keyboard writer is active.
+additional command writer. Stop the request publisher with Ctrl+C. The final
+command becomes zero within 0.5 simulated seconds and odometry reaches the
+configured rest condition within 2 simulated seconds after expiry. The
+controller schedules zero at 0.45 sim seconds to leave one 20 Hz output tick of
+margin against the 0.5-second maximum lease. The launch test also checks that
+no GUI keyboard writer is active.
+
+Autonomous launch uses a temporary full copy of `simulation/models/car` in
+`GZ_SIM_RESOURCE_PATH`, with exactly the five dormant keyboard-trigger
+`TriggeredPublisher` plugins removed. The tracked model and world are never
+modified; the overlay is deleted after Gazebo exits. Launch fails closed if
+the plugin count differs from five. The controller also refuses startup unless
+the bridge is the only Gazebo command writer and exits the launch if a
+competing ROS or Gazebo writer appears.
+
+Run the focused P2 launch check and controller unit checks with:
+
+```bash
+source /opt/ros/lyrical/setup.bash
+cd ~/src/gz-ws/ros2_ws
+colcon test --packages-select car_autonomy_nodes --event-handlers console_direct+
+colcon test --packages-select car_bringup \
+  --ctest-args -R 'test_runtime_overlay|test_command_timeout' \
+  --event-handlers console_direct+
+colcon test-result --verbose
+```
+
+Expected: the controller unit and runtime-overlay tests pass; the live test
+sees one ROS publisher named `safe_drive_controller`, one Gazebo Twist writer,
+no keyboard-topic publisher, forward/turn motion, zero by 0.5 sim seconds, and
+rest by 2 sim seconds. The full P1/P2 regression checkpoint is:
+
+```bash
+colcon test --packages-select car_bringup car_autonomy_nodes --event-handlers console_direct+
+colcon test-result --verbose
+```
+
+It passes all bringup and autonomy tests, including the one-minute P1 sensor
+rate acceptance. Do not proceed to P3 until the P2 checkpoint commit is made.
 
 ## 5. P3: verify lidar-only obstacle stopping
 

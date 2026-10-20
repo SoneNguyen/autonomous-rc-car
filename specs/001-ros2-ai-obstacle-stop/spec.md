@@ -1,6 +1,6 @@
 # Feature Specification: ROS 2 Sensor Integration and AI-Assisted Obstacle Stop
 
-**Feature Branch**: Not created (workspace is not initialized as a Git repository)
+**Feature Branch**: `001-ros2-ai-obstacle-stop`
 
 **Created**: 2026-10-19
 
@@ -18,6 +18,7 @@
 ### Session 2026-10-20
 
 - Q: Should P1 require 90% of the camera's 30 Hz SDF target on the tested WSL2 host? → A: Keep 30 Hz as the configured Gazebo source target, but set the P1 ROS-delivery floor to 20 Hz average over one simulated minute in server-only headless mode; keep the 90%-of-declared-rate requirement for point cloud, IMU, and odometry. Rationale: measured camera delivery was about 22-25 Hz headless and 14-16 Hz with WSLg open, and the planned live detector processes at 10 Hz. GUI mode remains for visual inspection, not rate acceptance.
+- Q: How should P2 preserve the protected model while preventing its dormant keyboard-trigger plugins from competing with ROS? → A: The user authorized a temporary runtime-filtered model copy for autonomous launches. The copy removes exactly the five `TriggeredPublisher` command plugins; the tracked `simulation/models/car/` and `simulation/worlds/` remain unchanged. GUI sensor inspection continues to use the original model. The launch fails closed if the expected plugin count changes.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -366,5 +367,5 @@ distances, and can be regenerated from the documented WSL setup.
 - Results apply only to the current truck-scale prototype with starter physics;
   they do not predict passenger-car or real-road performance.
 - Out of scope: steering or full-course navigation, reinforcement learning,
-  real hardware, vehicle-model or world-file changes, physics calibration, the
+  real hardware, tracked vehicle-model or world-file changes, physics calibration, the
   simple car-demo world, and multi-vehicle scenarios.

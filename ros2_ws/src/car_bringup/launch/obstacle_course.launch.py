@@ -14,17 +14,27 @@ from launch.actions import (
     OpaqueFunction,
     RegisterEventHandler,
     SetEnvironmentVariable,
+    Shutdown,
+    TimerAction,
 )
-from launch.event_handlers import OnProcessStart
+from launch.event_handlers import OnProcessExit, OnProcessStart
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 from car_bringup.scenario import load_scenario
+from car_bringup.runtime_overlay import create_filtered_model_overlay
 
 
 GAZEBO_VERSION = "10.5.0"
 AUTONOMOUS_MODES = {"command_test", "lidar", "ai", "evaluation"}
-IMPLEMENTED_MODES = {"sensors"}
+IMPLEMENTED_MODES = {"sensors", "command_test"}
+_ACTIVE_RUNTIME_OVERLAYS = []
+
+
+def _cleanup_runtime_overlays(_context, *_args, **_kwargs):
+    while _ACTIVE_RUNTIME_OVERLAYS:
+        _ACTIVE_RUNTIME_OVERLAYS.pop().cleanup()
+    return []
 
 
 def _find_repository_root(package_share: Path) -> Path:
@@ -94,9 +104,16 @@ def _launch_setup(context, *_args, **_kwargs):
     if not world_path.is_file():
         raise RuntimeError(f"scenario world does not exist: {world_path}")
 
-    models_path = str(repository_root / "simulation" / "models")
+    source_models_path = repository_root / "simulation" / "models"
+    models_paths = []
+    runtime_overlay = None
+    if mode in AUTONOMOUS_MODES:
+        runtime_overlay = create_filtered_model_overlay(source_models_path / "car")
+        _ACTIVE_RUNTIME_OVERLAYS.append(runtime_overlay)
+        models_paths.append(str(runtime_overlay.models_dir))
+    models_paths.append(str(source_models_path))
     inherited_path = os.environ.get("GZ_SIM_RESOURCE_PATH", "")
-    resource_path = os.pathsep.join(part for part in (models_path, inherited_path) if part)
+    resource_path = os.pathsep.join([*models_paths, inherited_path] if inherited_path else models_paths)
     bridge_config = package_share / "config" / "ros_gz_bridge.yaml"
 
     gz_args = [
@@ -133,10 +150,50 @@ def _launch_setup(context, *_args, **_kwargs):
         )
     )
 
+    event_handlers = [start_bridge_after_gazebo]
+    if mode == "command_test":
+        controller = Node(
+            package="car_autonomy_nodes",
+            executable="safe_drive_controller",
+            name="safe_drive_controller",
+            parameters=[{"use_sim_time": True}],
+            output="screen",
+        )
+        start_controller_after_bridge = RegisterEventHandler(
+            OnProcessStart(
+                target_action=bridge,
+                on_start=[
+                    LogInfo(msg="Bridge process started; checking authority before controller startup"),
+                    TimerAction(period=2.0, actions=[controller]),
+                ],
+            )
+        )
+        shutdown_if_controller_exits = RegisterEventHandler(
+            OnProcessExit(
+                target_action=controller,
+                on_exit=[Shutdown(reason="safe_drive_controller exited; autonomous run stopped")],
+            )
+        )
+        event_handlers.extend([start_controller_after_bridge, shutdown_if_controller_exits])
+    if runtime_overlay is not None:
+        event_handlers.append(
+            RegisterEventHandler(
+                OnProcessExit(
+                    target_action=gazebo,
+                    on_exit=[OpaqueFunction(function=_cleanup_runtime_overlays)],
+                )
+            )
+        )
+
     return [
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", resource_path),
-        LogInfo(msg=f"Scenario {scenario['scenario_id']} seed={scenario['seed']}"),
-        start_bridge_after_gazebo,
+        LogInfo(
+            msg=(
+                f"Scenario {scenario['scenario_id']} seed={scenario['seed']}"
+                + ("; autonomous model copy filters exactly five keyboard-trigger plugins" if runtime_overlay else "")
+            )
+        ),
+        *event_handlers,
         gazebo,
     ]
 

@@ -75,6 +75,31 @@ deliberately bumps an obstacle to verify the event. WSLg GUI is for visual
 inspection only; autonomous runs use headless rendering to keep keyboard
 control out of the command path.
 
+To test P2 ROS driving, keep the ROS setup sourced and launch the headless
+command scenario from `~/src/gz-ws/ros2_ws`:
+
+```bash
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=command_test scenario:=training/command_smoke headless:=true
+```
+
+In a second sourced terminal, publish a slow forward-and-turn request:
+
+```bash
+ros2 topic pub --rate 10 /autonomy/cmd_vel_request \
+  geometry_msgs/msg/Twist \
+  "{linear: {x: 0.75}, angular: {z: 0.1}}"
+```
+
+The vehicle should move and turn. `safe_drive_controller` is the only ROS
+publisher to `/model/gazebo_truck/cmd_vel`; the configured bridge is the only
+Gazebo Transport writer. Stop the request publisher with Ctrl+C: the controller
+sends zero within 0.5 simulation seconds and odometry settles within two more
+simulation seconds. The headless launch filters the five dormant keyboard
+trigger plugins from a temporary copy of the model; tracked model/world files
+are unchanged. See the [P2 quickstart](specs/001-ros2-ai-obstacle-stop/quickstart.md#4-p2-command-via-the-single-controller)
+for both-topic authority checks and automated test commands.
+
 ## Repository layout
 
 ```text
