@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
@@ -21,13 +21,14 @@ from launch.event_handlers import OnProcessExit, OnProcessStart
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
-from car_bringup.scenario import load_scenario
+from car_bringup.scenario import load_scenario, validate_scenario_obstacle
 from car_bringup.runtime_overlay import create_filtered_model_overlay
 
 
 GAZEBO_VERSION = "10.5.0"
 AUTONOMOUS_MODES = {"command_test", "lidar", "ai", "evaluation"}
 IMPLEMENTED_MODES = {"sensors", "command_test"}
+IMPLEMENTED_MODES.update({"lidar", "evaluation"})
 _ACTIVE_RUNTIME_OVERLAYS = []
 
 
@@ -103,6 +104,7 @@ def _launch_setup(context, *_args, **_kwargs):
         raise RuntimeError("scenario world must remain inside the repository") from exc
     if not world_path.is_file():
         raise RuntimeError(f"scenario world does not exist: {world_path}")
+    validate_scenario_obstacle(scenario, world_path)
 
     source_models_path = repository_root / "simulation" / "models"
     models_paths = []
@@ -115,6 +117,24 @@ def _launch_setup(context, *_args, **_kwargs):
     inherited_path = os.environ.get("GZ_SIM_RESOURCE_PATH", "")
     resource_path = os.pathsep.join([*models_paths, inherited_path] if inherited_path else models_paths)
     bridge_config = package_share / "config" / "ros_gz_bridge.yaml"
+    pose_action = None
+    if mode in AUTONOMOUS_MODES:
+        pose = scenario["start_pose"]
+        pose_executable = Path(get_package_prefix("car_bringup")) / "lib" / "car_bringup" / "set_model_pose"
+        pose_action = ExecuteProcess(
+            cmd=[
+                "python3", str(pose_executable),
+                "--world", "sensor_obstacle_course",
+                "--x", str(pose["x_m"]),
+                "--y", str(pose["y_m"]),
+                "--z", str(pose["z_m"]),
+                "--roll", str(pose["roll_rad"]),
+                "--pitch", str(pose["pitch_rad"]),
+                "--yaw", str(pose["yaw_rad"]),
+            ],
+            cwd=str(repository_root),
+            output="screen",
+        )
 
     gz_args = [
         "sim",
@@ -143,28 +163,84 @@ def _launch_setup(context, *_args, **_kwargs):
         parameters=[{"config_file": str(bridge_config)}, {"use_sim_time": True}],
         output="screen",
     )
-    start_bridge_after_gazebo = RegisterEventHandler(
-        OnProcessStart(
-            target_action=gazebo,
-            on_start=[LogInfo(msg="Gazebo started; starting ros_gz_bridge"), bridge],
+    event_handlers = []
+    if pose_action is not None:
+        start_pose_after_gazebo = RegisterEventHandler(
+            OnProcessStart(
+                target_action=gazebo,
+                on_start=[LogInfo(msg="Gazebo started; applying scenario vehicle pose"), pose_action],
+            )
         )
-    )
+        start_bridge_after_pose = RegisterEventHandler(
+            OnProcessExit(
+                target_action=pose_action,
+                on_exit=lambda event, context: (
+                    [LogInfo(msg="Scenario pose applied; starting ros_gz_bridge"), bridge]
+                    if event.returncode == 0
+                    else [Shutdown(reason="failed to apply the checked-in scenario start pose")]
+                ),
+            )
+        )
+        event_handlers.extend([start_pose_after_gazebo, start_bridge_after_pose])
+    else:
+        start_bridge_after_gazebo = RegisterEventHandler(
+            OnProcessStart(
+                target_action=gazebo,
+                on_start=[LogInfo(msg="Gazebo started; starting ros_gz_bridge"), bridge],
+            )
+        )
+        event_handlers.append(start_bridge_after_gazebo)
 
-    event_handlers = [start_bridge_after_gazebo]
-    if mode == "command_test":
+    if mode in {"command_test", "lidar", "evaluation"}:
         controller = Node(
             package="car_autonomy_nodes",
             executable="safe_drive_controller",
             name="safe_drive_controller",
-            parameters=[{"use_sim_time": True}],
+            parameters=[
+                {
+                    "use_sim_time": True,
+                    "mode": mode,
+                    "commanded_speed_mps": scenario["commanded_speed_mps"],
+                    "stop_distance_m": scenario["stop_distance_m"],
+                    "corridor_half_width_m": scenario["corridor_half_width_m"],
+                    "ground_z_min_m": scenario["ground_z_min_m"],
+                }
+            ],
             output="screen",
         )
+        start_actions = [controller]
+        if mode in {"lidar", "evaluation"}:
+            logger = Node(
+                package="car_autonomy_nodes",
+                executable="run_logger",
+                name="run_logger",
+                parameters=[
+                    {
+                        "use_sim_time": True,
+                        "scenario_path": str(resolved_scenario),
+                        "mode": mode,
+                        "output_csv": LaunchConfiguration("output"),
+                        "repository_root": str(repository_root),
+                        "runtime_lighting_id": scenario["lighting_id"],
+                    }
+                ],
+                output="screen",
+            )
+            start_actions.insert(0, logger)
+            event_handlers.append(
+                RegisterEventHandler(
+                    OnProcessExit(
+                        target_action=logger,
+                        on_exit=[Shutdown(reason="run_logger persisted the trial")],
+                    )
+                )
+            )
         start_controller_after_bridge = RegisterEventHandler(
             OnProcessStart(
                 target_action=bridge,
                 on_start=[
                     LogInfo(msg="Bridge process started; checking authority before controller startup"),
-                    TimerAction(period=2.0, actions=[controller]),
+                    TimerAction(period=2.0, actions=start_actions),
                 ],
             )
         )
@@ -215,6 +291,11 @@ def generate_launch_description():
                 "headless",
                 default_value="false",
                 description="true enables server-only headless rendering; false is GUI inspection",
+            ),
+            DeclareLaunchArgument(
+                "output",
+                default_value="",
+                description="Optional CSV path for lidar/evaluation run logger",
             ),
             OpaqueFunction(function=_launch_setup),
         ]

@@ -12,11 +12,19 @@ foreach(directory launch config)
   endif()
 endforeach()
 
+install(PROGRAMS car_bringup/set_model_pose.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME set_model_pose
+)
+
 if(BUILD_TESTING)
   find_package(ament_cmake_pytest REQUIRED)
   find_package(launch_testing_ament_cmake REQUIRED)
 
   ament_add_pytest_test(test_scenario test/test_scenario.py)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/test_model_pose.py")
+    ament_add_pytest_test(test_model_pose test/test_model_pose.py)
+  endif()
   ament_add_pytest_test(test_bridge_contract test/test_bridge_contract.py)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/test_runtime_overlay.py")
     ament_add_pytest_test(test_runtime_overlay test/test_runtime_overlay.py)
@@ -25,6 +33,10 @@ if(BUILD_TESTING)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/test_contact_event.py")
     add_launch_test(test/test_contact_event.py TARGET test_contact_event TIMEOUT 300)
     list(APPEND launch_tests test_contact_event)
+  endif()
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/test_contact_coverage.launch.py")
+    add_launch_test(test/test_contact_coverage.launch.py TARGET test_contact_coverage TIMEOUT 360)
+    list(APPEND launch_tests test_contact_coverage)
   endif()
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/test_sensor_bridge.py")
     add_launch_test(test/test_sensor_bridge.py TARGET test_sensor_bridge TIMEOUT 360)

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import pytest
+
 from car_autonomy_nodes.safe_drive_controller import DriveSafetyState
 
 
@@ -53,6 +55,22 @@ def test_stale_sensor_blocks_and_clears_active_command():
     assert state.command is None
 
 
+@pytest.mark.parametrize("sensor", ("lidar", "odometry", "imu"))
+def test_each_required_sensor_fails_closed_when_stale(sensor):
+    state = _ready_state()
+    state.sensors[sensor] = 20 * NS - 500_000_001
+    assert not state.accept_request(_twist(linear_x=1.0), 20 * NS, 101 * NS)
+    assert state.command_for_tick(20 * NS, 101 * NS) == (0.0, 0.0)
+
+
+@pytest.mark.parametrize("sensor", ("lidar", "odometry", "imu"))
+def test_each_required_sensor_rejects_invalid_and_future_timestamps(sensor):
+    state = _ready_state()
+    assert not state.update_sensor(sensor, 0, 20 * NS)
+    assert not state.update_sensor(sensor, 21 * NS, 20 * NS)
+    assert state.sensors[sensor] == 20 * NS
+
+
 def test_clock_rollback_clears_command_and_sensor_history():
     state = _ready_state()
     assert state.accept_request(_twist(linear_x=1.0), 20 * NS, 101 * NS)
@@ -72,3 +90,27 @@ def test_stalled_clock_blocks_commands_until_clock_and_sensors_refresh():
     for name in SENSORS:
         state.update_sensor(name, 20 * NS + 1, 20 * NS + 1)
     assert state.accept_request(_twist(linear_x=1.0), 20 * NS + 1, 1_001 * NS)
+
+
+def test_pause_resume_rejects_pre_pause_request_until_every_sensor_is_fresh():
+    state = _ready_state()
+    assert state.accept_request(_twist(linear_x=1.0), 20 * NS, 101 * NS)
+    state.check_clock_stall(101 * NS + 400_000_001)
+    assert state.command_for_tick(20 * NS, 101 * NS + 400_000_001) == (0.0, 0.0)
+
+    resumed_sim_ns = 20 * NS + 1
+    resumed_wall_ns = 101 * NS + 500_000_000
+    state.update_clock(resumed_sim_ns, resumed_wall_ns)
+    assert state.command_for_tick(resumed_sim_ns, resumed_wall_ns) == (0.0, 0.0)
+    for name in SENSORS:
+        state.update_sensor(name, resumed_sim_ns, resumed_sim_ns)
+    assert state.accept_request(
+        _twist(linear_x=1.0), resumed_sim_ns, resumed_wall_ns
+    )
+
+
+def test_future_sensor_stamp_is_rejected_and_never_refreshes_old_data():
+    state = _ready_state()
+    assert not state.update_sensor("lidar", 21 * NS, 20 * NS)
+    assert state.sensors["lidar"] == 20 * NS
+    assert not state.update_sensor("odometry", 0, 20 * NS)

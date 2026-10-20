@@ -10,6 +10,10 @@ install(PROGRAMS car_autonomy_nodes/safe_drive_controller.py
   DESTINATION lib/${PROJECT_NAME}
   RENAME safe_drive_controller
 )
+install(PROGRAMS car_autonomy_nodes/run_logger.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME run_logger
+)
 
 if(BUILD_TESTING)
   find_package(ament_cmake_pytest REQUIRED)
@@ -24,10 +28,10 @@ if(BUILD_TESTING)
       ament_add_pytest_test(${test_name} "test/${test_name}.py")
     endif()
   endforeach()
-  foreach(test_name test_command_timeout test_lidar_stop test_ai_fallback)
+  foreach(test_name test_command_timeout test_lidar_stop test_lidar_immediate test_lidar_fail_safe test_ai_fallback)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/${test_name}.launch.py")
       add_launch_test("test/${test_name}.launch.py" TARGET ${test_name} TIMEOUT 360)
-      if(test_name STREQUAL "test_command_timeout")
+      if(test_name STREQUAL "test_command_timeout" OR test_name STREQUAL "test_lidar_stop" OR test_name STREQUAL "test_lidar_immediate" OR test_name STREQUAL "test_lidar_fail_safe")
         set_tests_properties(${test_name} PROPERTIES RUN_SERIAL TRUE)
       endif()
     endif()

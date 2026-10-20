@@ -4,7 +4,11 @@ import copy
 
 import pytest
 
-from car_bringup.scenario import ScenarioValidationError, validate_scenario
+from car_bringup.scenario import (
+    ScenarioValidationError,
+    validate_scenario,
+    validate_scenario_obstacle,
+)
 
 
 VALID_SCENARIO = {
@@ -87,3 +91,33 @@ def test_rejects_unknown_fields_to_keep_scenarios_auditable():
     scenario["seed_override"] = 1702
     with pytest.raises(ScenarioValidationError, match="Additional properties"):
         validate_scenario(scenario)
+
+
+def test_scenario_obstacle_pose_matches_world_without_rewriting_sdf(tmp_path):
+    world = tmp_path / "world.sdf"
+    world.write_text(
+        "<sdf version='1.10'><gz:policies/><world name='test'><model name='course_obstacles'>"
+        "<link name='link'><collision name='barrier_collision'>"
+        "<pose>-80 -10 0.5 0 0 0</pose></collision></link></model></world></sdf>",
+        encoding="utf-8",
+    )
+    before = world.read_bytes()
+
+    validate_scenario_obstacle(VALID_SCENARIO, world)
+
+    assert world.read_bytes() == before
+
+
+def test_scenario_obstacle_pose_mismatch_is_rejected(tmp_path):
+    world = tmp_path / "world.sdf"
+    world.write_text(
+        "<sdf><world name='test'><model name='course_obstacles'><link name='link'>"
+        "<collision name='barrier_collision'><pose>-80 -10 0.5 0 0 0</pose>"
+        "</collision></link></model></world></sdf>",
+        encoding="utf-8",
+    )
+    scenario = copy.deepcopy(VALID_SCENARIO)
+    scenario["obstacle"]["pose"]["x_m"] = -79.0
+
+    with pytest.raises(ScenarioValidationError, match="does not match protected SDF"):
+        validate_scenario_obstacle(scenario, world)

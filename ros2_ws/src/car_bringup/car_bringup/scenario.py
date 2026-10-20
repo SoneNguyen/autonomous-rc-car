@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
+import re
+import xml.etree.ElementTree as ET
 from typing import Any
 
 import jsonschema
@@ -75,3 +77,65 @@ def load_scenario(path: Path | str) -> dict[str, Any]:
     except (OSError, yaml.YAMLError) as exc:
         raise ScenarioValidationError(f"cannot load scenario {scenario_path}: {exc}") from exc
     return validate_scenario(data)
+
+
+def validate_scenario_obstacle(scenario: dict[str, Any], world_path: Path | str) -> None:
+    """Ensure the scenario's named static obstacle and pose match the SDF.
+
+    This lets runs select only existing protected-world obstacles; it does not
+    create, move, or rewrite world entities.
+    """
+    source = Path(world_path)
+    try:
+        # SDF permits Gazebo extension elements with the ``gz:`` prefix but
+        # some checked-in worlds omit an XML namespace declaration for it.
+        # ElementTree is stricter than libsdformat, so normalize element names
+        # only in this in-memory validation copy; never rewrite the world.
+        xml_text = source.read_text(encoding="utf-8")
+        xml_text = re.sub(r"(<\/?)(gz:)", r"\1", xml_text)
+        root = ET.fromstring(xml_text)
+    except (OSError, ET.ParseError) as exc:
+        raise ScenarioValidationError(f"cannot parse scenario world {source}: {exc}") from exc
+
+    obstacle = scenario["obstacle"]
+    target_model = next(
+        (model for model in root.iter("model") if model.get("name") == obstacle["entity"]),
+        None,
+    )
+    if target_model is None:
+        raise ScenarioValidationError(
+            f"world {source} has no model named {obstacle['entity']!r}"
+        )
+    collision = next(
+        (item for item in target_model.iter("collision") if item.get("name") == obstacle["collision"]),
+        None,
+    )
+    if collision is None:
+        raise ScenarioValidationError(
+            f"model {obstacle['entity']!r} has no collision named {obstacle['collision']!r}"
+        )
+    pose_element = collision.find("pose")
+    try:
+        actual = [0.0] * 6 if pose_element is None or not (pose_element.text or "").strip() else [
+            float(value) for value in pose_element.text.split()
+        ]
+    except ValueError as exc:
+        raise ScenarioValidationError(
+            f"SDF collision {obstacle['collision']!r} pose must contain numeric values"
+        ) from exc
+    if len(actual) != 6:
+        raise ScenarioValidationError(
+            f"SDF collision {obstacle['collision']!r} pose must contain six values"
+        )
+    pose = obstacle["pose"]
+    keys = ("x_m", "y_m", "z_m", "roll_rad", "pitch_rad", "yaw_rad")
+    mismatches = [
+        f"{key}: config={pose[key]} SDF={value}"
+        for key, value in zip(keys, actual)
+        if not math.isclose(float(pose[key]), value, rel_tol=0.0, abs_tol=1e-6)
+    ]
+    if mismatches:
+        raise ScenarioValidationError(
+            f"scenario obstacle pose does not match protected SDF collision {obstacle['collision']!r}: "
+            + "; ".join(mismatches)
+        )

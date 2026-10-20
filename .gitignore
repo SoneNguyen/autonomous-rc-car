@@ -28,5 +28,10 @@ ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
 
+# Colcon outputs when its workspace is built from the repository root
+/build/
+/install/
+/log/
+
 # Generated datasets, model weights, and evaluation outputs
 /artifacts/

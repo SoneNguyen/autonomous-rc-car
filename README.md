@@ -100,6 +100,38 @@ trigger plugins from a temporary copy of the model; tracked model/world files
 are unchanged. See the [P2 quickstart](specs/001-ros2-ai-obstacle-stop/quickstart.md#4-p2-command-via-the-single-controller)
 for both-topic authority checks and automated test commands.
 
+## P3 lidar obstacle-stop baseline (WSL2)
+
+Run the training-only stop smoke scenario from `~/src/gz-ws` after sourcing
+`/opt/ros/lyrical/setup.bash` and `ros2_ws/install/setup.bash`:
+
+```bash
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=lidar scenario:=training/stop_smoke headless:=true
+```
+
+The same single controller uses the 16-layer point cloud, applies the checked-in
+start pose, and stops in the configured forward corridor. It fails safe on
+invalid/stale lidar, odometry, IMU, or simulation clock. The passive logger
+writes a per-run CSV under ignored `artifacts/runs/`. The P3 target is a tall
+existing gate: the roof lidar cannot reliably observe the short posts at the
+5 m trigger range. No vehicle/world source files are edited.
+
+After calibration, freeze the three parameter-disjoint scenario sets and run
+the ten read-only lidar outcomes once:
+
+```bash
+python3 ml/collect_dataset.py validate-splits --freeze-evaluation
+python3 tools/run_evaluation.py --split evaluation --behavior lidar \
+  --output docs/evaluation/lidar-baseline.csv
+```
+
+The runner refuses to overwrite results, checks the sole ROS/Gazebo command
+writer, preserves timed-out/aborted attempts, and writes a Markdown summary.
+See the [P3 procedure](specs/001-ros2-ai-obstacle-stop/quickstart.md#5-p3-verify-lidar-only-obstacle-stopping)
+and [evaluation record semantics](docs/evaluation/README.md). Evaluation
+outcomes are read-only and must not feed tuning.
+
 ## Repository layout
 
 ```text
@@ -168,4 +200,5 @@ only the Windows-native Gazebo path. See
 - [Implementation report](docs/implementation-report.md)
 - [Spec-driven development guide](docs/spec-driven-development.md)
 - [WSL2 ROS/Gazebo setup](docs/wsl-setup.md)
+- [Obstacle-stop evaluation guide](docs/evaluation/README.md)
 - [Mesh export tool](tools/blender/export_gazebo_parts.py)

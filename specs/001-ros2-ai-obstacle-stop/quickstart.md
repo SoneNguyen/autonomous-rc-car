@@ -205,14 +205,72 @@ rate acceptance. Do not proceed to P3 until the P2 checkpoint commit is made.
 
 ## 5. P3: verify lidar-only obstacle stopping
 
-Run the frozen scenario smoke test in server-only headless-rendering mode:
+The P3 baseline uses the full 16-layer PointCloud2, transforms the verified
+`gazebo_truck/chassis/front_lidar` frame into `base_link` using the unchanged
+SDF pose, filters a forward corridor, and rejects ground-height returns. The
+controller drives straight at the scenario's bounded speed and latches a zero
+command when the nearest obstacle reaches `stop_distance_m`; stale or invalid
+cloud/odometry/IMU/clock data also produces zero. The passive logger records
+sim-time detection and stop stamps, odometry stopping travel, contact pairs,
+collision coverage, stale events, and completion status.
+
+Use the training-only tall-gate calibration scenario first, then the stop smoke
+scenario. Both are checked in and may be changed only before evaluation freeze:
+
+```bash
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=lidar scenario:=training/calibration headless:=true
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=lidar scenario:=training/stop_smoke headless:=true
+```
+
+The short posts are not a safe P3 target: the roof lidar's downward
+beam limit creates a near-field blind zone for their 3 m height. The course's
+existing 6 m gate is visible at the configured 5 m front-plane trigger range.
+Neither the model nor world is changed.
 
 ```bash
 ros2 launch car_bringup obstacle_course.launch.py \
   mode:=lidar scenario:=training/stop_smoke headless:=true
 ```
 
-Expected: on this training-only calibration scenario, lidar detects the obstacle in the configured forward corridor, requests zero before contact, and the logger records measured stopping distance. Any change to the 5.0 m trigger distance is allowed only here, never from evaluation outcomes.
+Expected: Gazebo applies the configured start pose, then starts the bridge and
+single-authority controller. The lidar detects `gate_left_collision`, the
+controller requests zero before contact, and the logger writes a
+`completed/rest_and_flush` row under `artifacts/runs/`. The measured braking
+travel is recorded separately from the 5.0 m trigger distance. Only adjust that
+trigger using `training/stop_smoke`; never tune from validation or evaluation
+outcomes.
+
+To test the immediate-stop edge case, run the scenario that starts already
+inside the trigger range:
+
+```bash
+ros2 launch car_bringup.obstacle_course.launch.py \
+  mode:=lidar scenario:=training/inside_stop_distance headless:=true
+```
+
+It must detect the gate, issue zero without a forward drive pulse, settle, and
+record no collision. The automated P3 integration checks are:
+
+```bash
+cd ~/src/gz-ws/ros2_ws
+colcon test --packages-select car_autonomy_nodes \
+  --ctest-args -R 'test_lidar_stop|test_lidar_immediate' \
+  --event-handlers console_direct+
+colcon test --packages-select car_bringup \
+  --ctest-args -R test_contact_coverage \
+  --event-handlers console_direct+
+colcon test-result --verbose
+```
+
+The lidar test expects a detected, pre-contact stop, `completed` status,
+verified coverage, and `no_collision`; the immediate-stop test expects the same
+with near-zero travel. The coverage test deliberately contacts the selected
+evaluation gate with the existing chassis-only sensor and must report its
+allowlisted pair. Ground contacts are excluded. `collision_status=no_collision`
+is permitted only for obstacle classes whose chassis coverage has been
+verified; otherwise the logger reports `unknown`, which fails acceptance.
 
 Freeze the scenario split and ten evaluation config hashes before the first evaluation run and before model training:
 
@@ -222,6 +280,12 @@ python3 ml/collect_dataset.py validate-splits --freeze-evaluation
 
 Expected: all three sets are disjoint by the full `(start pose, obstacle placement, speed)` tuple, and the ten evaluation scenarios are hashed/frozen. Any later change invalidates the frozen evaluation and requires restarting the feature before model training.
 
+At this checkpoint the checked-in sets contain six training, three validation,
+and ten evaluation configs. Training uses the left gate for calibration;
+evaluation uses the opposite right gate, tagged as an unseen obstacle
+placement. The manifest is generated under ignored `artifacts/`; seeds alone
+never make otherwise identical scenario tuples disjoint.
+
 Run the ten baseline evaluation trials once as a read-only P3 outcome pass. Do not use evaluation samples or outcomes to tune the controller, feature pipeline, model, threshold, or scenario parameters:
 
 ```bash
@@ -230,6 +294,13 @@ python3 tools/run_evaluation.py --split evaluation --behavior lidar \
 ```
 
 Expected: ten planned rows with the ten frozen config hashes; at least nine stop before contact, and every row has verified collision coverage with `collision_status=no_collision`. Scenario simulation-time limit expiry is `timed_out`; reset, shutdown, competing command writer, or lighting mismatch before completion is `aborted`. Both remain records and count as failures. Run the stale-lidar, already-inside-stop-distance, pause/resume, and reset-mid-run launch tests; a reset aborts the old record, starts a new run ID, and stale command/model data cannot move the car after resume.
+
+The runner refuses to overwrite an existing results file, checks the ROS and
+Gazebo command-topic authorities before/during each run, aborts on a competing
+writer, and persists all ten planned scenario rows. The Markdown summary groups
+the tagged unseen-placement cases; a timed-out, aborted, collision, or unknown
+coverage row prevents an acceptance pass. Review the output in
+[`docs/evaluation/README.md`](../../docs/evaluation/README.md).
 
 The bringup wrapper starts Gazebo server-only with `--force-version 10.5.0 -v 4 -s -r --headless-rendering`, while loading the seed, pose, obstacle, and speed from the named scenario config. Do not start a feature run with standalone `gz sim`, which bypasses the scenario configuration. If EGL cannot initialize in WSL2, retry the same scenario through the wrapper with software rendering:
 
