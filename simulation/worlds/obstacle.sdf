@@ -1,0 +1,229 @@
+<?xml version="1.0" ?>
+<!--
+  A local perception / control test course for the Gazebo truck.
+
+  The vehicle starts in the right-hand lane (y = -10). It can use the dashed
+  white guide line for line following, the yellow centre divider and white road
+  edges for lane detection, and the camera / lidar to avoid the physical red
+  barriers and orange marker posts.
+-->
+<sdf version="1.10">
+  <world name="sensor_obstacle_course">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"/>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- The default Gazebo camera opens near the world origin, while this
+         truck starts 105 m away. Keep the view definition with the course so
+         every machine opens a useful driving-scene overview with the same
+         Ogre2 renderer as the camera and GPU lidar. -->
+    <gz:policies>
+      <include_gui_default_plugins>true</include_gui_default_plugins>
+    </gz:policies>
+    <gui fullscreen="0">
+      <plugin filename="MinimalScene" name="3D View">
+        <gz-gui>
+          <!-- Default Gazebo widgets anchor to this title. -->
+          <title>3D View</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="string" key="state">docked</property>
+        </gz-gui>
+        <engine>ogre2</engine>
+        <scene>scene</scene>
+        <ambient_light>0.45 0.45 0.45 1</ambient_light>
+        <background_color>0.52 0.70 0.92 1</background_color>
+        <!-- Looks down the road from behind/right of the truck's start. -->
+        <camera_pose>-150 -100 160 0 0.75 0.59</camera_pose>
+        <camera_clip><near>0.1</near><far>1000</far></camera_clip>
+      </plugin>
+
+      <!-- Live first-person feedback makes lane-marking and obstacle
+           visibility testable without a separate topic viewer. -->
+      <plugin filename="ImageDisplay" name="Front camera display">
+        <gz-gui>
+          <title>Front camera: lane and obstacle view</title>
+          <property key="state" type="string">docked</property>
+        </gz-gui>
+        <topic>/model/gazebo_truck/sensors/front_camera/image</topic>
+        <topic_picker>false</topic_picker>
+      </plugin>
+
+      <!-- Enables keyboard events for the small manual-control baseline
+           defined on the vehicle model. Focus the 3D View before use. -->
+      <plugin filename="KeyPublisher" name="Key publisher">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">5</property>
+          <property key="height" type="double">5</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+          <anchors target="3D View">
+            <line own="right" target="right"/>
+            <line own="top" target="top"/>
+          </anchors>
+        </gz-gui>
+      </plugin>
+    </gui>
+
+    <scene>
+      <ambient>0.35 0.35 0.35 1</ambient>
+      <background>0.52 0.70 0.92 1</background>
+      <grid>false</grid>
+      <origin_visual>false</origin_visual>
+      <shadows>true</shadows>
+    </scene>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 60 0 0 0</pose>
+      <diffuse>0.85 0.85 0.85 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.4 0.2 -0.9</direction>
+    </light>
+
+    <!-- The collision plane stays at z = 0. Everything painted on the road
+         below is visual-only so lane markings do not disturb wheel physics. -->
+    <model name="ground">
+      <static>true</static>
+      <link name="link">
+        <collision name="ground_collision">
+          <geometry><plane><normal>0 0 1</normal><size>320 160</size></plane></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="grass_visual">
+          <geometry><plane><normal>0 0 1</normal><size>320 160</size></plane></geometry>
+          <material>
+            <ambient>0.12 0.32 0.10 1</ambient>
+            <diffuse>0.18 0.45 0.14 1</diffuse>
+            <specular>0.02 0.02 0.02 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="asphalt_road">
+      <static>true</static>
+      <link name="link">
+        <visual name="road_surface">
+          <pose>0 0 0.005 0 0 0</pose>
+          <geometry><box><size>280 50 0.01</size></box></geometry>
+          <material>
+            <ambient>0.075 0.085 0.10 1</ambient>
+            <diffuse>0.14 0.16 0.19 1</diffuse>
+            <specular>0.04 0.04 0.04 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_markings">
+      <static>true</static>
+      <link name="link">
+        <!-- Decal planes stay just above the asphalt visual. They deliberately
+             have no collision and avoid overlapping 3-D boxes / z-fighting. -->
+        <visual name="right_edge_line">
+          <pose>0 -20 0.012 0 0 0</pose>
+          <geometry><plane><normal>0 0 1</normal><size>280 0.35</size></plane></geometry>
+          <cast_shadows>false</cast_shadows>
+          <material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material>
+        </visual>
+        <visual name="left_edge_line">
+          <pose>0 20 0.012 0 0 0</pose>
+          <geometry><plane><normal>0 0 1</normal><size>280 0.35</size></plane></geometry>
+          <cast_shadows>false</cast_shadows>
+          <material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material>
+        </visual>
+        <visual name="centre_divider">
+          <pose>0 0 0.012 0 0 0</pose>
+          <geometry><plane><normal>0 0 1</normal><size>280 0.35</size></plane></geometry>
+          <cast_shadows>false</cast_shadows>
+          <material><ambient>0.8 0.55 0.02 1</ambient><diffuse>1 0.7 0.03 1</diffuse></material>
+        </visual>
+        <visual name="start_line">
+          <pose>-95 0 0.012 0 0 0</pose>
+          <geometry><plane><normal>0 0 1</normal><size>0.6 40</size></plane></geometry>
+          <cast_shadows>false</cast_shadows>
+          <material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material>
+        </visual>
+        <visual name="finish_line">
+          <pose>115 0 0.012 0 0 0</pose>
+          <geometry><plane><normal>0 0 1</normal><size>0.6 40</size></plane></geometry>
+          <cast_shadows>false</cast_shadows>
+          <material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material>
+        </visual>
+
+        <!-- White dashed guide centred in the truck's starting lane. -->
+        <visual name="guide_01"><pose>-112 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_02"><pose>-96 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_03"><pose>-80 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_04"><pose>-64 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_05"><pose>-48 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_06"><pose>-32 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_07"><pose>-16 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_08"><pose>0 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_09"><pose>16 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_10"><pose>32 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_11"><pose>48 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_12"><pose>64 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_13"><pose>80 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_14"><pose>96 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+        <visual name="guide_15"><pose>112 -10 0.012 0 0 0</pose><geometry><plane><normal>0 0 1</normal><size>7 0.3</size></plane></geometry><cast_shadows>false</cast_shadows><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>1 1 1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- All obstacles are static and have collision as well as visual geometry,
+         so both physics and the lidar / camera can use them. -->
+    <model name="course_obstacles">
+      <static>true</static>
+      <link name="link">
+        <!-- Two lane-blocking barriers require a controlled lane change. -->
+        <collision name="barrier_right_collision"><pose>-20 -10 2 0 0 0</pose><geometry><box><size>3 8 4</size></box></geometry></collision>
+        <visual name="barrier_right_visual"><pose>-20 -10 2 0 0 0</pose><geometry><box><size>3 8 4</size></box></geometry><material><ambient>0.7 0.05 0.02 1</ambient><diffuse>0.9 0.08 0.03 1</diffuse></material></visual>
+        <visual name="barrier_right_stripe"><pose>-21.51 -10 2 0 0 0</pose><geometry><box><size>0.03 8.1 0.55</size></box></geometry><material><diffuse>1 1 1 1</diffuse></material></visual>
+
+        <collision name="barrier_left_collision"><pose>40 10 2 0 0 0</pose><geometry><box><size>3 8 4</size></box></geometry></collision>
+        <visual name="barrier_left_visual"><pose>40 10 2 0 0 0</pose><geometry><box><size>3 8 4</size></box></geometry><material><ambient>0.7 0.05 0.02 1</ambient><diffuse>0.9 0.08 0.03 1</diffuse></material></visual>
+        <visual name="barrier_left_stripe"><pose>38.49 10 2 0 0 0</pose><geometry><box><size>0.03 8.1 0.55</size></box></geometry><material><diffuse>1 1 1 1</diffuse></material></visual>
+
+        <!-- Orange posts warn of the first barrier and form a slalom section. -->
+        <collision name="post_01_collision"><pose>-42 -2 1.5 0 0 0</pose><geometry><cylinder><radius>1</radius><length>3</length></cylinder></geometry></collision>
+        <visual name="post_01_visual"><pose>-42 -2 1.5 0 0 0</pose><geometry><cylinder><radius>1</radius><length>3</length></cylinder></geometry><material><ambient>0.8 0.22 0.01 1</ambient><diffuse>1 0.35 0.02 1</diffuse></material></visual>
+        <collision name="post_02_collision"><pose>5 7 1.5 0 0 0</pose><geometry><cylinder><radius>1</radius><length>3</length></cylinder></geometry></collision>
+        <visual name="post_02_visual"><pose>5 7 1.5 0 0 0</pose><geometry><cylinder><radius>1</radius><length>3</length></cylinder></geometry><material><ambient>0.8 0.22 0.01 1</ambient><diffuse>1 0.35 0.02 1</diffuse></material></visual>
+        <collision name="post_03_collision"><pose>62 -7 1.5 0 0 0</pose><geometry><cylinder><radius>1</radius><length>3</length></cylinder></geometry></collision>
+        <visual name="post_03_visual"><pose>62 -7 1.5 0 0 0</pose><geometry><cylinder><radius>1</radius><length>3</length></cylinder></geometry><material><ambient>0.8 0.22 0.01 1</ambient><diffuse>1 0.35 0.02 1</diffuse></material></visual>
+
+        <!-- Finish gate: 27 m clearance between the inner faces, ample for the
+             10.7 m wide truck while still being a clear lidar landmark. -->
+        <collision name="gate_left_collision"><pose>80 15 3 0 0 0</pose><geometry><box><size>3 3 6</size></box></geometry></collision>
+        <visual name="gate_left_visual"><pose>80 15 3 0 0 0</pose><geometry><box><size>3 3 6</size></box></geometry><material><ambient>0.05 0.15 0.65 1</ambient><diffuse>0.08 0.25 0.95 1</diffuse></material></visual>
+        <collision name="gate_right_collision"><pose>80 -15 3 0 0 0</pose><geometry><box><size>3 3 6</size></box></geometry></collision>
+        <visual name="gate_right_visual"><pose>80 -15 3 0 0 0</pose><geometry><box><size>3 3 6</size></box></geometry><material><ambient>0.05 0.15 0.65 1</ambient><diffuse>0.08 0.25 0.95 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Rear tyre geometry is the lowest point. This small clearance avoids a
+         large startup drop while letting the physics settle deterministically. -->
+    <include>
+      <uri>model://car</uri>
+      <name>gazebo_truck</name>
+      <pose>-105 -10 1.96 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

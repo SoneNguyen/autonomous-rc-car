@@ -1,0 +1,16 @@
+scenario_id: validation/val_gate_left_slow
+split: validation
+world: simulation/worlds/obstacle.sdf
+seed: 2701
+lighting_id: obstacle_world_default
+unseen_condition_tags: []
+start_pose: {x_m: 61.0, y_m: 15.0, z_m: 1.96, roll_rad: 0.0, pitch_rad: 0.0, yaw_rad: 0.0}
+obstacle:
+  entity: course_obstacles
+  collision: gate_left_collision
+  pose: {x_m: 80.0, y_m: 15.0, z_m: 3.0, roll_rad: 0.0, pitch_rad: 0.0, yaw_rad: 0.0}
+commanded_speed_mps: 0.6
+stop_distance_m: 5.0
+corridor_half_width_m: 5.5
+ground_z_min_m: 0.2
+run_timeout_sim_s: 60.0

@@ -1,0 +1,423 @@
+<?xml version="1.0"?>
+<sdf version="1.10">
+  <!--
+    Source dimensions are retained in metres. The model frame is halfway
+    between the axles at their average hub height. Mesh metadata is in
+    meshes/mesh_manifest.json.
+  -->
+  <model name="gazebo_truck">
+    <self_collide>false</self_collide>
+
+    <link name="chassis">
+      <inertial>
+        <!-- Starter inertial values for a large truck-scale asset. Tune these
+             together with collision geometry for a specific use case. -->
+        <pose>0 0 1.2 0 0 0</pose>
+        <mass>8000</mass>
+        <inertia>
+          <ixx>27840</ixx>
+          <iyy>77340</iyy>
+          <izz>97500</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <visual name="chassis_visual">
+        <geometry>
+          <mesh>
+            <uri>model://car/meshes/chassis.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.12 0.24 0.56 1</ambient>
+          <diffuse>0.12 0.24 0.56 1</diffuse>
+          <specular>0.25 0.25 0.25 1</specular>
+        </material>
+      </visual>
+
+      <!-- A primitive collision body is deliberate: the detailed visual mesh
+           has hundreds of loose decorative islands and is not suited to a
+           stable dynamic collision shape. -->
+      <collision name="chassis_collision">
+        <pose>0 0 1.2 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>10.5 6.0 2.4</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <!-- A pass / fail signal for safety experiments. This intentionally
+           watches the body collision rather than wheel/road contacts. -->
+      <sensor name="bumper_contact" type="contact">
+        <contact>
+          <collision>chassis_collision</collision>
+          <topic>/model/gazebo_truck/sensors/bumper_contact</topic>
+        </contact>
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+      </sensor>
+
+      <!-- Perception suite. The local obstacle-course world loads the Sensors
+           system; these explicit topics make downstream controllers portable. -->
+      <sensor name="front_camera" type="camera">
+        <!-- +X is the vehicle's forward axis. A small positive pitch looks
+             toward the road surface without hiding the horizon. -->
+        <pose>7.5 0 2.6 0 0.30 0</pose>
+        <topic>/model/gazebo_truck/sensors/front_camera/image</topic>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>false</visualize>
+        <camera>
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>120</far>
+          </clip>
+        </camera>
+      </sensor>
+
+      <!-- GPU lidar is supported by gz-sim's Sensors system on this install.
+           Keep multiple vertical beams: this roof-mounted sensor is above the
+           course barriers, so a single horizontal beam would pass over them. -->
+      <sensor name="front_lidar" type="gpu_lidar">
+        <pose>7.2 0 3.5 0 0 0</pose>
+        <topic>/model/gazebo_truck/sensors/front_lidar/scan</topic>
+        <always_on>1</always_on>
+        <update_rate>15</update_rate>
+        <visualize>false</visualize>
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>720</samples>
+              <resolution>1</resolution>
+              <min_angle>-1.5707963</min_angle>
+              <max_angle>1.5707963</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>16</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.261799</min_angle>
+              <max_angle>0.261799</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.2</min>
+            <max>120</max>
+            <resolution>0.02</resolution>
+          </range>
+        </lidar>
+      </sensor>
+
+      <sensor name="imu" type="imu">
+        <pose>0 0 1.2 0 0 0</pose>
+        <topic>/model/gazebo_truck/sensors/imu</topic>
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+        <visualize>false</visualize>
+      </sensor>
+    </link>
+
+    <link name="front_left_steering">
+      <pose>5.806106 4.249218 0.066042 0 0 0</pose>
+      <inertial>
+        <mass>40</mass>
+        <inertia>
+          <ixx>10</ixx>
+          <iyy>10</iyy>
+          <izz>10</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <link name="front_right_steering">
+      <pose>5.806106 -4.249218 0.066042 0 0 0</pose>
+      <inertial>
+        <mass>40</mass>
+        <inertia>
+          <ixx>10</ixx>
+          <iyy>10</iyy>
+          <izz>10</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <link name="wheel_fl">
+      <pose>5.806106 4.249218 0.066042 0 0 0</pose>
+      <inertial>
+        <mass>300</mass>
+        <inertia>
+          <ixx>387</ixx>
+          <iyy>529</iyy>
+          <izz>387</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <visual name="wheel_visual">
+        <geometry>
+          <mesh>
+            <uri>model://car/meshes/wheel_fl.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.04 0.04 0.04 1</ambient>
+          <diffuse>0.04 0.04 0.04 1</diffuse>
+          <specular>0.3 0.3 0.3 1</specular>
+        </material>
+      </visual>
+      <collision name="wheel_collision">
+        <!-- SDF cylinders point along +Z by default; roll it onto the axle. -->
+        <pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>1.878</radius>
+            <length>2.213</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode><mu>1.5</mu><mu2>1.5</mu2></ode>
+            <bullet><friction>1.5</friction><friction2>1.5</friction2></bullet>
+          </friction>
+        </surface>
+      </collision>
+    </link>
+
+    <link name="wheel_fr">
+      <pose>5.806106 -4.249218 0.066042 0 0 0</pose>
+      <inertial>
+        <mass>300</mass>
+        <inertia>
+          <ixx>387</ixx>
+          <iyy>529</iyy>
+          <izz>387</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <visual name="wheel_visual">
+        <geometry>
+          <mesh>
+            <uri>model://car/meshes/wheel_fr.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.04 0.04 0.04 1</ambient>
+          <diffuse>0.04 0.04 0.04 1</diffuse>
+          <specular>0.3 0.3 0.3 1</specular>
+        </material>
+      </visual>
+      <collision name="wheel_collision">
+        <pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>1.878</radius>
+            <length>2.213</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode><mu>1.5</mu><mu2>1.5</mu2></ode>
+            <bullet><friction>1.5</friction><friction2>1.5</friction2></bullet>
+          </friction>
+        </surface>
+      </collision>
+    </link>
+
+    <link name="wheel_rl">
+      <pose>-5.806106 4.249218 -0.066042 0 0 0</pose>
+      <inertial>
+        <mass>300</mass>
+        <inertia>
+          <ixx>387</ixx>
+          <iyy>529</iyy>
+          <izz>387</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <visual name="wheel_visual">
+        <geometry>
+          <mesh>
+            <uri>model://car/meshes/wheel_rl.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.04 0.04 0.04 1</ambient>
+          <diffuse>0.04 0.04 0.04 1</diffuse>
+          <specular>0.3 0.3 0.3 1</specular>
+        </material>
+      </visual>
+      <collision name="wheel_collision">
+        <pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>1.878</radius>
+            <length>2.213</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode><mu>1.5</mu><mu2>1.5</mu2></ode>
+            <bullet><friction>1.5</friction><friction2>1.5</friction2></bullet>
+          </friction>
+        </surface>
+      </collision>
+    </link>
+
+    <link name="wheel_rr">
+      <pose>-5.806106 -4.249218 -0.066042 0 0 0</pose>
+      <inertial>
+        <mass>300</mass>
+        <inertia>
+          <ixx>387</ixx>
+          <iyy>529</iyy>
+          <izz>387</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <visual name="wheel_visual">
+        <geometry>
+          <mesh>
+            <uri>model://car/meshes/wheel_rr.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.04 0.04 0.04 1</ambient>
+          <diffuse>0.04 0.04 0.04 1</diffuse>
+          <specular>0.3 0.3 0.3 1</specular>
+        </material>
+      </visual>
+      <collision name="wheel_collision">
+        <pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>1.878</radius>
+            <length>2.213</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode><mu>1.5</mu><mu2>1.5</mu2></ode>
+            <bullet><friction>1.5</friction><friction2>1.5</friction2></bullet>
+          </friction>
+        </surface>
+      </collision>
+    </link>
+
+    <joint name="front_left_steering_joint" type="revolute">
+      <parent>chassis</parent>
+      <child>front_left_steering</child>
+      <axis>
+        <xyz expressed_in="__model__">0 0 1</xyz>
+        <limit><lower>-0.6</lower><upper>0.6</upper><effort>100000</effort><velocity>1</velocity></limit>
+      </axis>
+    </joint>
+
+    <joint name="front_right_steering_joint" type="revolute">
+      <parent>chassis</parent>
+      <child>front_right_steering</child>
+      <axis>
+        <xyz expressed_in="__model__">0 0 1</xyz>
+        <limit><lower>-0.6</lower><upper>0.6</upper><effort>100000</effort><velocity>1</velocity></limit>
+      </axis>
+    </joint>
+
+    <joint name="wheel_fl_joint" type="revolute">
+      <parent>front_left_steering</parent>
+      <child>wheel_fl</child>
+      <axis>
+        <xyz expressed_in="front_left_steering">0 1 0</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper><effort>100000</effort><velocity>100</velocity></limit>
+      </axis>
+    </joint>
+
+    <joint name="wheel_fr_joint" type="revolute">
+      <parent>front_right_steering</parent>
+      <child>wheel_fr</child>
+      <axis>
+        <xyz expressed_in="front_right_steering">0 1 0</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper><effort>100000</effort><velocity>100</velocity></limit>
+      </axis>
+    </joint>
+
+    <joint name="wheel_rl_joint" type="revolute">
+      <parent>chassis</parent>
+      <child>wheel_rl</child>
+      <axis>
+        <xyz expressed_in="chassis">0 1 0</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper><effort>100000</effort><velocity>100</velocity></limit>
+      </axis>
+    </joint>
+
+    <joint name="wheel_rr_joint" type="revolute">
+      <parent>chassis</parent>
+      <child>wheel_rr</child>
+      <axis>
+        <xyz expressed_in="chassis">0 1 0</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper><effort>100000</effort><velocity>100</velocity></limit>
+      </axis>
+    </joint>
+
+    <plugin filename="gz-sim-ackermann-steering-system" name="gz::sim::systems::AckermannSteering">
+      <left_joint>wheel_fl_joint</left_joint>
+      <left_joint>wheel_rl_joint</left_joint>
+      <right_joint>wheel_fr_joint</right_joint>
+      <right_joint>wheel_rr_joint</right_joint>
+      <left_steering_joint>front_left_steering_joint</left_steering_joint>
+      <right_steering_joint>front_right_steering_joint</right_steering_joint>
+      <kingpin_width>8.498437</kingpin_width>
+      <steering_limit>0.5</steering_limit>
+      <wheel_base>11.612212</wheel_base>
+      <wheel_separation>8.498437</wheel_separation>
+      <wheel_radius>1.878</wheel_radius>
+      <min_velocity>-20</min_velocity>
+      <max_velocity>20</max_velocity>
+      <min_acceleration>-3</min_acceleration>
+      <max_acceleration>3</max_acceleration>
+    </plugin>
+
+    <!-- Manual baseline for repeatable sensor checks. The obstacle-course
+         GUI publishes keypresses; focus its 3D View and use W / X / A / D / S.
+         Autonomous controllers should publish to the same cmd_vel topic. -->
+    <plugin filename="gz-sim-triggered-publisher-system" name="gz::sim::systems::TriggeredPublisher">
+      <input type="gz.msgs.Int32" topic="/keyboard/keypress"><match field="data">87</match></input>
+      <output type="gz.msgs.Twist" topic="/model/gazebo_truck/cmd_vel">linear: {x: 2.0}, angular: {z: 0.0}</output>
+    </plugin>
+    <plugin filename="gz-sim-triggered-publisher-system" name="gz::sim::systems::TriggeredPublisher">
+      <input type="gz.msgs.Int32" topic="/keyboard/keypress"><match field="data">88</match></input>
+      <output type="gz.msgs.Twist" topic="/model/gazebo_truck/cmd_vel">linear: {x: -1.0}, angular: {z: 0.0}</output>
+    </plugin>
+    <plugin filename="gz-sim-triggered-publisher-system" name="gz::sim::systems::TriggeredPublisher">
+      <input type="gz.msgs.Int32" topic="/keyboard/keypress"><match field="data">65</match></input>
+      <output type="gz.msgs.Twist" topic="/model/gazebo_truck/cmd_vel">linear: {x: 1.5}, angular: {z: 0.12}</output>
+    </plugin>
+    <plugin filename="gz-sim-triggered-publisher-system" name="gz::sim::systems::TriggeredPublisher">
+      <input type="gz.msgs.Int32" topic="/keyboard/keypress"><match field="data">68</match></input>
+      <output type="gz.msgs.Twist" topic="/model/gazebo_truck/cmd_vel">linear: {x: 1.5}, angular: {z: -0.12}</output>
+    </plugin>
+    <plugin filename="gz-sim-triggered-publisher-system" name="gz::sim::systems::TriggeredPublisher">
+      <input type="gz.msgs.Int32" topic="/keyboard/keypress"><match field="data">83</match></input>
+      <output type="gz.msgs.Twist" topic="/model/gazebo_truck/cmd_vel">linear: {x: 0.0}, angular: {z: 0.0}</output>
+    </plugin>
+  </model>
+</sdf>

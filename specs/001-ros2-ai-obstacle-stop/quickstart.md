@@ -1,0 +1,367 @@
+# Quickstart and Validation Guide
+
+This guide documents the supported WSL workflow. Keep it and the root README synchronized as each story is implemented.
+
+## 1. Install the supported WSL runtime
+
+From Windows PowerShell, install WSL2 Ubuntu 26.04 if it is not already present:
+
+```powershell
+wsl --list --online
+wsl --install Ubuntu-26.04
+```
+
+Restart Windows if prompted, launch the Ubuntu-26.04 distribution, and create its Linux user. Keep the repository on the WSL Linux filesystem (for example under `~/src`), not on `/mnt/c`.
+
+```bash
+mkdir -p ~/src
+cd ~/src
+git clone https://github.com/SoneNguyen/autonomous-rc-car.git gz-ws
+cd ~/src/gz-ws
+```
+
+Keep the clone in the WSL Linux filesystem; do not use a Windows absolute path or `/mnt/c` for ROS work.
+
+Enable the official ROS 2 apt repository by following the current [Lyrical Ubuntu deb installation guide](https://docs.ros.org/en/lyrical/Installation/Ubuntu-Install-Debs.html), then check package candidates before installing:
+
+```bash
+sudo apt update
+apt-cache policy ros-lyrical-desktop ros-lyrical-ros-gz python3-torch
+```
+
+Expected: candidates exist from Ubuntu Resolute / `packages.ros.org`; ROS Index lists the Lyrical + Jetty binary pairing. If a pinned package is unavailable, stop; do not substitute Jazzy/Harmonic or source builds.
+
+Install the runtime, build/test tools, and Python model dependency through apt:
+
+```bash
+sudo apt install -y \
+  ros-lyrical-desktop \
+  ros-lyrical-ros-gz \
+  ros-lyrical-gz-sim-vendor \
+  ros-lyrical-launch-testing \
+  ros-lyrical-launch-testing-ros \
+  ros-lyrical-launch-testing-ament-cmake \
+  ros-lyrical-ament-cmake-pytest \
+  ros-lyrical-vision-msgs \
+  ros-lyrical-sensor-msgs-py \
+  ros-dev-tools \
+  python3-colcon-common-extensions \
+  python3-pytest \
+  python3-torch
+```
+
+Expected: ROS 2 Lyrical setup files exist at `/opt/ros/lyrical/setup.bash`; `ros_gz_bridge` and `gz sim` are installed; Ubuntu `python3-torch` imports under the same system Python used by ROS. Record exact apt package versions in `docs/wsl-setup.md` and the run manifest.
+
+```bash
+source /opt/ros/lyrical/setup.bash
+printf 'ROS_DISTRO=%s\n' "$ROS_DISTRO"
+ros2 pkg prefix ros_gz_bridge
+ros2 pkg xml ros_gz_bridge | grep -m1 '<version>'
+gz sim --versions
+dpkg-query -W ros-lyrical-ros-gz ros-lyrical-gz-sim-vendor \
+  ros-dev-tools python3-colcon-common-extensions python3-torch
+gz sim --help
+python3 -c 'import torch; print(torch.__version__)'
+```
+
+Expected: `ROS_DISTRO=lyrical`; the bridge prefix is under `/opt/ros/lyrical`; `ros_gz_bridge` reports version `3.0.10`; `gz sim --versions` lists `10.5.0`; the full apt revisions are recorded and match the pinned research; and Torch reports the apt-managed 2.9.1 series. Stop on a mismatch. The launch file forces Gazebo Sim 10.5.0 rather than selecting an arbitrary installed major.
+
+## 2. Build and run checks
+
+In each new WSL terminal:
+
+```bash
+source /opt/ros/lyrical/setup.bash
+cd ~/src/gz-ws/ros2_ws
+colcon build --symlink-install --base-paths src
+source install/setup.bash
+colcon test --event-handlers console_direct+
+colcon test-result --verbose
+```
+
+Expected: both ROS packages build; unit and `launch_testing` checks pass. A failing build/test is a story checkpoint failure; do not proceed to the next story.
+
+## 3. P1: inspect the five sensor interfaces
+
+Start the WSLg GUI launch for visualization and sensor inspection only:
+
+```bash
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=sensors scenario:=training/sensor_smoke headless:=false
+```
+
+Expected: Gazebo opens through WSLg, model resources resolve from `simulation/models`, and ROS topics appear. From a second sourced terminal:
+
+```bash
+ros2 topic list
+ros2 topic hz /model/gazebo_truck/sensors/front_camera/image
+ros2 topic hz /model/gazebo_truck/sensors/front_lidar/scan/points
+ros2 topic hz /model/gazebo_truck/sensors/imu
+ros2 topic hz /model/gazebo_truck/odometry
+ros2 topic echo --once /clock
+ros2 topic info -v /model/gazebo_truck/sensors/bumper_contact
+```
+
+Expected: all five sensor interfaces (camera, lidar, IMU, odometry, and contact topic) are available within five wall-clock minutes. Gazebo remains configured to produce camera frames at 30 Hz, point cloud at 15 Hz with multiple vertical layers, IMU at 100 Hz, and odometry at about 50 Hz. In the automated server-only headless one-minute rate test, ROS camera delivery must average at least 20 Hz; point cloud, IMU, and odometry must each deliver at least 90% of their declared samples; timestamps advance with simulation time. WSLg GUI is for visual inspection and is not the rate-acceptance mode. Contact is an event signal: inspect its type/QoS here, then induce one low-speed obstacle contact in the dedicated contact test and verify the allowlisted obstacle collision pair appears. Do not require a continuous contact event while the truck is not touching anything.
+
+The bridge also exposes `/model/gazebo_truck/sensors/front_lidar/scan` as `sensor_msgs/msg/LaserScan`; use it for display only. The bridge retains the middle vertical row, so the controller uses the `/scan/points` PointCloud2.
+
+SC-001 measures declared rates only for the four periodic streams. Contact passes through topic availability and delivery of the induced allowlisted obstacle event; idle contact frames are not expected.
+
+Run the contact check independently with:
+
+```bash
+colcon test --packages-select car_bringup --ctest-args -R test_contact_event \
+  --event-handlers console_direct+
+```
+
+It relocates the truck at runtime to the fixed training `contact_smoke`
+scenario and bumps the existing `post_01_collision`; no model or world file is
+modified. The straight `barrier_right_collision` is wheel-first: the front
+wheel geometry reaches it about 2.43 m before the chassis collision, while the
+existing bumper sensor watches only `chassis_collision`. Do not use that
+barrier to claim complete collision coverage; P3 must report collision status
+as unknown for any trial whose wheel-only coverage is not verified.
+
+Measured WSL2 rates on the tested RTX A2000 laptop: Gazebo Transport `gz topic
+-f` measured roughly 22-25 Hz headless and 14-16 Hz with WSLg GUI, versus the
+unchanged SDF source target of 30 Hz. The first ROS one-minute probe received
+1,379 camera frames (~23.0 Hz). On 2026-10-20 the P1 camera acceptance was
+amended to a minimum average of 20 ROS-delivered frames/s over a simulated
+minute in server-only headless mode, preserving 2x headroom over the planned
+10 Hz detector; the other periodic streams retain their 90%-of-declared-rate
+requirement. The full automated sensor suite passed again on 2026-10-20 during
+the P2 regression run. GUI mode is visual
+inspection only and its lower rate is not an acceptance result. Rates may vary
+with host/render load; do not claim the configured 30 Hz source rate is achieved
+as delivered ROS throughput.
+
+## 4. P2: command via the single controller
+
+Launch the controller test in headless mode:
+
+```bash
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=command_test scenario:=training/command_smoke headless:=true
+```
+
+From a second sourced terminal, send a slow bounded request:
+
+```bash
+ros2 topic pub --rate 10 /autonomy/cmd_vel_request \
+  geometry_msgs/msg/Twist \
+  "{linear: {x: 0.75}, angular: {z: 0.1}}"
+```
+
+While it is moving, inspect both sides of the bridge:
+
+```bash
+ros2 topic info -v /model/gazebo_truck/cmd_vel
+gz topic -i -t /model/gazebo_truck/cmd_vel
+```
+
+Expected: the vehicle moves forward and turns; ROS reports exactly one
+publisher on the bridged command topic, `safe_drive_controller`, and Gazebo
+Transport reports exactly one writer (the launch's bridge path), with no
+additional command writer. Stop the request publisher with Ctrl+C. The final
+command becomes zero within 0.5 simulated seconds and odometry reaches the
+configured rest condition within 2 simulated seconds after expiry. The
+controller schedules zero at 0.45 sim seconds to leave one 20 Hz output tick of
+margin against the 0.5-second maximum lease. The launch test also checks that
+no GUI keyboard writer is active.
+
+Autonomous launch uses a temporary full copy of `simulation/models/car` in
+`GZ_SIM_RESOURCE_PATH`, with exactly the five dormant keyboard-trigger
+`TriggeredPublisher` plugins removed. The tracked model and world are never
+modified; the overlay is deleted after Gazebo exits. Launch fails closed if
+the plugin count differs from five. The controller also refuses startup unless
+the bridge is the only Gazebo command writer and exits the launch if a
+competing ROS or Gazebo writer appears.
+
+Run the focused P2 launch check and controller unit checks with:
+
+```bash
+source /opt/ros/lyrical/setup.bash
+cd ~/src/gz-ws/ros2_ws
+colcon test --packages-select car_autonomy_nodes --event-handlers console_direct+
+colcon test --packages-select car_bringup \
+  --ctest-args -R 'test_runtime_overlay|test_command_timeout' \
+  --event-handlers console_direct+
+colcon test-result --verbose
+```
+
+Expected: the controller unit and runtime-overlay tests pass; the live test
+sees one ROS publisher named `safe_drive_controller`, one Gazebo Twist writer,
+no keyboard-topic publisher, forward/turn motion, zero by 0.5 sim seconds, and
+rest by 2 sim seconds. The full P1/P2 regression checkpoint is:
+
+```bash
+colcon test --packages-select car_bringup car_autonomy_nodes --event-handlers console_direct+
+colcon test-result --verbose
+```
+
+It passes all bringup and autonomy tests, including the one-minute P1 sensor
+rate acceptance. Do not proceed to P3 until the P2 checkpoint commit is made.
+
+## 5. P3: verify lidar-only obstacle stopping
+
+The P3 baseline uses the full 16-layer PointCloud2, transforms the verified
+`gazebo_truck/chassis/front_lidar` frame into `base_link` using the unchanged
+SDF pose, filters a forward corridor, and rejects ground-height returns. The
+controller drives straight at the scenario's bounded speed and latches a zero
+command when the nearest obstacle reaches `stop_distance_m`; stale or invalid
+cloud/odometry/IMU/clock data also produces zero. The passive logger records
+sim-time detection and stop stamps, odometry stopping travel, contact pairs,
+collision coverage, stale events, and completion status.
+
+Use the training-only tall-gate calibration scenario first, then the stop smoke
+scenario. Both are checked in and may be changed only before evaluation freeze:
+
+```bash
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=lidar scenario:=training/calibration headless:=true
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=lidar scenario:=training/stop_smoke headless:=true
+```
+
+The short posts are not a safe P3 target: the roof lidar's downward
+beam limit creates a near-field blind zone for their 3 m height. The course's
+existing 6 m gate is visible at the configured 5 m front-plane trigger range.
+Neither the model nor world is changed.
+
+```bash
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=lidar scenario:=training/stop_smoke headless:=true
+```
+
+Expected: Gazebo applies the configured start pose, then starts the bridge and
+single-authority controller. The lidar detects `gate_left_collision`, the
+controller requests zero before contact, and the logger writes a
+`completed/rest_and_flush` row under `artifacts/runs/`. The measured braking
+travel is recorded separately from the 5.0 m trigger distance. Only adjust that
+trigger using `training/stop_smoke`; never tune from validation or evaluation
+outcomes.
+
+To test the immediate-stop edge case, run the scenario that starts already
+inside the trigger range:
+
+```bash
+ros2 launch car_bringup.obstacle_course.launch.py \
+  mode:=lidar scenario:=training/inside_stop_distance headless:=true
+```
+
+It must detect the gate, issue zero without a forward drive pulse, settle, and
+record no collision. The automated P3 integration checks are:
+
+```bash
+cd ~/src/gz-ws/ros2_ws
+colcon test --packages-select car_autonomy_nodes \
+  --ctest-args -R 'test_lidar_stop|test_lidar_immediate' \
+  --event-handlers console_direct+
+colcon test --packages-select car_bringup \
+  --ctest-args -R test_contact_coverage \
+  --event-handlers console_direct+
+colcon test-result --verbose
+```
+
+The lidar test expects a detected, pre-contact stop, `completed` status,
+verified coverage, and `no_collision`; the immediate-stop test expects the same
+with near-zero travel. The coverage test deliberately contacts the selected
+evaluation gate with the existing chassis-only sensor and must report its
+allowlisted pair. Ground contacts are excluded. `collision_status=no_collision`
+is permitted only for obstacle classes whose chassis coverage has been
+verified; otherwise the logger reports `unknown`, which fails acceptance.
+
+Freeze the scenario split and ten evaluation config hashes before the first evaluation run and before model training:
+
+```bash
+python3 ml/collect_dataset.py validate-splits --freeze-evaluation
+```
+
+Expected: all three sets are disjoint by the full `(start pose, obstacle placement, speed)` tuple, and the ten evaluation scenarios are hashed/frozen. Any later change invalidates the frozen evaluation and requires restarting the feature before model training.
+
+At this checkpoint the checked-in sets contain six training, three validation,
+and ten evaluation configs. Training uses the left gate for calibration;
+evaluation uses the opposite right gate, tagged as an unseen obstacle
+placement. The manifest is generated under ignored `artifacts/`; seeds alone
+never make otherwise identical scenario tuples disjoint.
+
+Run the ten baseline evaluation trials once as a read-only P3 outcome pass. Do not use evaluation samples or outcomes to tune the controller, feature pipeline, model, threshold, or scenario parameters:
+
+```bash
+python3 tools/run_evaluation.py --split evaluation --behavior lidar \
+  --output docs/evaluation/lidar-baseline.csv
+```
+
+Expected: ten planned rows with the ten frozen config hashes; at least nine stop before contact, and every row has verified collision coverage with `collision_status=no_collision`. Scenario simulation-time limit expiry is `timed_out`; reset, shutdown, competing command writer, or lighting mismatch before completion is `aborted`. Both remain records and count as failures. Run the stale-lidar, already-inside-stop-distance, pause/resume, and reset-mid-run launch tests; a reset aborts the old record, starts a new run ID, and stale command/model data cannot move the car after resume.
+
+The runner refuses to overwrite an existing results file, checks the ROS and
+Gazebo command-topic authorities before/during each run, aborts on a competing
+writer, and persists all ten planned scenario rows. The Markdown summary groups
+the tagged unseen-placement cases; a timed-out, aborted, collision, or unknown
+coverage row prevents an acceptance pass. Review the output in
+[`docs/evaluation/README.md`](../../docs/evaluation/README.md).
+
+The bringup wrapper starts Gazebo server-only with `--force-version 10.5.0 -v 4 -s -r --headless-rendering`, while loading the seed, pose, obstacle, and speed from the named scenario config. Do not start a feature run with standalone `gz sim`, which bypasses the scenario configuration. If EGL cannot initialize in WSL2, retry the same scenario through the wrapper with software rendering:
+
+```bash
+LIBGL_ALWAYS_SOFTWARE=1 ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=lidar scenario:=training/stop_smoke headless:=true
+```
+
+Verify camera/lidar data and rates before accepting the software-rendering run.
+
+## 6. P4: collect, train, select, and evaluate the camera model
+
+The evaluation split was frozen in P3. Verify its hashes, then collect training and validation data separately; train/select the model checkpoint and classifier threshold using validation only:
+
+```bash
+python3 ml/collect_dataset.py validate-splits --require-frozen
+python3 ml/collect_dataset.py collect --split training
+python3 ml/collect_dataset.py collect --split validation
+python3 ml/train_detector.py --train-split training --validation-split validation
+```
+
+Expected: generated training/validation images and weights remain under `artifacts/`; every label is linked to a valid synchronized point cloud and the documented `stop_distance_m` trigger rule. No evaluation samples or outcomes are used to tune the controller, feature pipeline, model/checkpoint, threshold, or scenario parameters.
+
+Only after the model and decision threshold are frozen, collect/read the held-out evaluation frames in read-only mode and compute the final detector metrics:
+
+```bash
+python3 ml/collect_dataset.py collect --split evaluation --frozen-only
+python3 ml/evaluate_detector.py --split evaluation --model artifacts/models/latest --read-only
+```
+
+Expected: the first command writes held-out frames/labels under `artifacts/` without changing configs/model; the second reports sample count, precision, recall, confusion counts, and the validation-selected threshold. The held-out set must contain at least 100 valid images of each class overall and at least five of each class from every evaluation scenario; otherwise scoring fails as insufficient support. The `too_close` recall target is at least 90%. These are read-only P4 scoring uses; neither command can update model weights or threshold, and no result feeds tuning.
+
+Run the live AI-assisted behavior:
+
+```bash
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=ai scenario:=evaluation/eval_01 headless:=true \
+  model:=artifacts/models/latest
+```
+
+Expected: detector publishes `/autonomy/obstacle_detection`; `too_close` can request a stop, `clear` cannot override lidar, and stale/missing or pre-reset AI output switches to lidar-only mode. Perception has no drive-command publisher.
+
+## 7. P5: paired comparison
+
+Run lidar and AI on the exact same ten frozen scenarios, seeds, start poses, obstacle placements, and speeds:
+
+```bash
+python3 tools/run_evaluation.py \
+  --split evaluation \
+  --behaviors lidar,ai \
+  --model artifacts/models/latest \
+  --paired
+```
+
+Expected: one planned row for each of ten scenarios and each behavior (20 planned rows) in `docs/evaluation/results.csv` and a short `docs/evaluation/summary.md`. Each pair has matching config hash and seed and includes detection, pre-contact stop, measured stopping travel, trial status, `lighting_id`, condition tags, collision status, and coverage. An uninterrupted pass requires the lidar 9/10 and AI 8/10 stop goals plus verified coverage and `no_collision` on every row; an unknown collision or incomplete trial fails acceptance. The summary reports unseen-obstacle-placement subgroups separately and makes no lighting-generalization claim. Results apply only to the truck-scale Gazebo prototype.
+
+## Reproducibility and safety checklist
+
+- Use only checked-in scenario YAMLs and fixed seeds. Do not alter the evaluation files after manifest freeze.
+- Capture `use_sim_time=true` on every node and record scenario hash, seed, package versions, and run mode.
+- Autonomous runs are server-only/headless. Do not launch GUI keyboard control alongside autonomy.
+- Autonomous/evaluation launches must use server-only rendering with Gazebo 10.5.0 forced; reject GUI mode for autonomous runs and verify the sole command authority before each trial.
+- Generated images, labels, and model weights stay under git-ignored `artifacts/`; regenerated by the scripts above.
+- If the existing chassis bumper sensor misses a wheel-only collision, pause evaluation and revise the spec/plan before adding a topic or editing protected assets.

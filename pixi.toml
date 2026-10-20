@@ -1,0 +1,15 @@
+[workspace]
+authors = ["SoneNguyen <ngocbinhson2000@gmail.com>"]
+channels = ["conda-forge"]
+name = "gz-ws"
+platforms = ["win-64"]
+version = "0.1.0"
+
+[tasks]
+
+[target.win-64.activation.env]
+QT_QPA_PLATFORM_PLUGIN_PATH="%CONDA_PREFIX%\\Library\\lib\\qt6\\plugins\\platforms"
+QML2_IMPORT_PATH="%CONDA_PREFIX%\\Library\\lib\\qt6\\qml"
+
+[dependencies]
+gz-sim = "10.*"
