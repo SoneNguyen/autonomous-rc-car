@@ -1,0 +1,86 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://example.invalid/autonomous-vehicle/scenario.schema.yaml
+title: Deterministic Gazebo obstacle-course scenario
+type: object
+additionalProperties: false
+required:
+  - scenario_id
+  - split
+  - world
+  - seed
+  - lighting_id
+  - unseen_condition_tags
+  - start_pose
+  - obstacle
+  - commanded_speed_mps
+  - stop_distance_m
+  - corridor_half_width_m
+  - ground_z_min_m
+  - run_timeout_sim_s
+properties:
+  scenario_id:
+    type: string
+    minLength: 1
+    pattern: ^[a-zA-Z0-9][a-zA-Z0-9_/-]*$
+  split:
+    enum: [training, validation, evaluation]
+  world:
+    const: simulation/worlds/obstacle.sdf
+  seed:
+    type: integer
+    minimum: 0
+  lighting_id:
+    const: obstacle_world_default
+  unseen_condition_tags:
+    type: array
+    uniqueItems: true
+    items:
+      enum: [unseen_obstacle_placement]
+  start_pose:
+    type: object
+    additionalProperties: false
+    required: [x_m, y_m, z_m, roll_rad, pitch_rad, yaw_rad]
+    properties:
+      x_m: {type: number}
+      y_m: {type: number}
+      z_m: {type: number}
+      roll_rad: {type: number}
+      pitch_rad: {type: number}
+      yaw_rad: {type: number}
+  obstacle:
+    type: object
+    additionalProperties: false
+    required: [entity, collision, pose]
+    properties:
+      entity:
+        type: string
+        minLength: 1
+      collision:
+        type: string
+        minLength: 1
+      pose:
+        type: object
+        additionalProperties: false
+        required: [x_m, y_m, z_m, roll_rad, pitch_rad, yaw_rad]
+        properties:
+          x_m: {type: number}
+          y_m: {type: number}
+          z_m: {type: number}
+          roll_rad: {type: number}
+          pitch_rad: {type: number}
+          yaw_rad: {type: number}
+  commanded_speed_mps:
+    type: number
+    exclusiveMinimum: 0
+    maximum: 2.0
+  stop_distance_m:
+    type: number
+    exclusiveMinimum: 0
+  corridor_half_width_m:
+    type: number
+    exclusiveMinimum: 0
+  ground_z_min_m:
+    type: number
+  run_timeout_sim_s:
+    type: number
+    exclusiveMinimum: 0

@@ -40,6 +40,8 @@ sudo apt install -y \
   ros-lyrical-gz-sim-vendor \
   ros-lyrical-launch-testing \
   ros-lyrical-launch-testing-ros \
+  ros-lyrical-launch-testing-ament-cmake \
+  ros-lyrical-ament-cmake-pytest \
   ros-lyrical-vision-msgs \
   ros-lyrical-sensor-msgs-py \
   ros-dev-tools \
@@ -72,9 +74,9 @@ In each new WSL terminal:
 
 ```bash
 source /opt/ros/lyrical/setup.bash
-cd ~/src/gz-ws
-colcon build --symlink-install --base-paths ros2_ws/src
-source ros2_ws/install/setup.bash
+cd ~/src/gz-ws/ros2_ws
+colcon build --symlink-install --base-paths src
+source install/setup.bash
 colcon test --event-handlers console_direct+
 colcon test-result --verbose
 ```

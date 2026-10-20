@@ -46,9 +46,9 @@ After setup, build and test from Ubuntu:
 
 ```bash
 source /opt/ros/lyrical/setup.bash
-cd ~/src/gz-ws
-colcon build --symlink-install --base-paths ros2_ws/src
-source ros2_ws/install/setup.bash
+cd ~/src/gz-ws/ros2_ws
+colcon build --symlink-install --base-paths src
+source install/setup.bash
 colcon test --event-handlers console_direct+
 colcon test-result --verbose
 ```

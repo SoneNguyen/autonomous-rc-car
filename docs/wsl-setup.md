@@ -45,6 +45,8 @@ sudo apt install -y \
   ros-lyrical-ros-gz \
   ros-lyrical-launch-testing \
   ros-lyrical-launch-testing-ros \
+  ros-lyrical-launch-testing-ament-cmake \
+  ros-lyrical-ament-cmake-pytest \
   ros-lyrical-vision-msgs \
   ros-lyrical-sensor-msgs-py \
   ros-dev-tools \
@@ -76,7 +78,8 @@ dpkg-query -W \
   ros-lyrical-gz-msgs-vendor ros-lyrical-gz-sensors-vendor \
   ros-lyrical-gz-rendering-vendor ros-lyrical-gz-physics-vendor \
   ros-lyrical-gz-common-vendor ros-lyrical-launch-testing \
-  ros-lyrical-launch-testing-ros ros-lyrical-vision-msgs \
+  ros-lyrical-launch-testing-ros ros-lyrical-launch-testing-ament-cmake \
+  ros-lyrical-ament-cmake-pytest ros-lyrical-vision-msgs \
   ros-lyrical-sensor-msgs-py ros-dev-tools \
   python3-colcon-common-extensions python3-pytest python3-torch
 ```
@@ -105,6 +108,8 @@ failure and must be resolved in `research.md` before implementation continues.
 | `ros-lyrical-gz-common-vendor` | `0.3.8-1resolute.20260827.143639` |
 | `ros-lyrical-launch-testing` | `3.9.8-1resolute.20260728.175423` |
 | `ros-lyrical-launch-testing-ros` | `0.29.9-1resolute.20260915.073741` |
+| `ros-lyrical-launch-testing-ament-cmake` | `3.9.8-1resolute.20260728.205136` |
+| `ros-lyrical-ament-cmake-pytest` | `2.8.8-1resolute.20260728.175653` |
 | `ros-lyrical-vision-msgs` | `4.2.0-3resolute.20260915.050641` |
 | `ros-lyrical-sensor-msgs-py` | `5.9.3-1resolute.20260915.052909` |
 | `ros-dev-tools` | `1.0.3` |
@@ -119,9 +124,9 @@ In each WSL terminal:
 
 ```bash
 source /opt/ros/lyrical/setup.bash
-cd ~/src/gz-ws
-colcon build --symlink-install --base-paths ros2_ws/src
-source ros2_ws/install/setup.bash
+cd ~/src/gz-ws/ros2_ws
+colcon build --symlink-install --base-paths src
+source install/setup.bash
 colcon test --event-handlers console_direct+
 colcon test-result --verbose
 ```

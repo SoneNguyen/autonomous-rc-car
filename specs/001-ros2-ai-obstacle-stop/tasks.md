@@ -29,11 +29,11 @@ description: "Implementation tasks for ROS 2 sensor integration and AI-assisted 
 
 **Purpose**: Create the two buildable ROS packages and a shared tested scenario-config foundation before story work.
 
-- [ ] T007 [P] Scaffold the Python `car_bringup` ROS package, ament metadata, resource marker, and launch/config/test directories under `ros2_ws/src/car_bringup/`.
-- [ ] T008 [P] Scaffold the Python `car_autonomy_nodes` ROS package, ament metadata, resource marker, node/test directories, and `pytest` configuration under `ros2_ws/src/car_autonomy_nodes/`.
-- [ ] T009 Implement the shared YAML scenario loader and schema checks for world path, fixed seed, start pose, obstacle identity/pose, speed, stopping distance, corridor, and simulation-time timeout in `ros2_ws/src/car_bringup/car_bringup/scenario.py`, `ros2_ws/src/car_bringup/config/scenario.schema.yaml`, and `ros2_ws/src/car_bringup/test/test_scenario.py`.
-- [ ] T010 Declare only the pinned runtime and test dependencies in `ros2_ws/src/car_bringup/package.xml` and `ros2_ws/src/car_autonomy_nodes/package.xml`; register `pytest`/`launch_testing` with the package test targets.
-- [ ] T011 Foundational checkpoint: run `source /opt/ros/lyrical/setup.bash && colcon build --symlink-install --base-paths ros2_ws/src && source ros2_ws/install/setup.bash && colcon test --event-handlers console_direct+ && colcon test-result --verbose`; expected: both packages build, scenario-schema tests pass, and the test summary has zero failures. Then commit with `git add ros2_ws/src/car_bringup ros2_ws/src/car_autonomy_nodes specs/001-ros2-ai-obstacle-stop/tasks.md && git commit -m "build: scaffold ROS 2 workspace packages"`.
+- [X] T007 [P] Scaffold the Python `car_bringup` ROS package, ament metadata, resource marker, and launch/config/test directories under `ros2_ws/src/car_bringup/`.
+- [X] T008 [P] Scaffold the Python `car_autonomy_nodes` ROS package, ament metadata, resource marker, node/test directories, and `pytest` configuration under `ros2_ws/src/car_autonomy_nodes/`.
+- [X] T009 Implement the shared YAML scenario loader and schema checks for world path, fixed seed, start pose, obstacle identity/pose, speed, stopping distance, corridor, and simulation-time timeout in `ros2_ws/src/car_bringup/car_bringup/scenario.py`, `ros2_ws/src/car_bringup/config/scenario.schema.yaml`, and `ros2_ws/src/car_bringup/test/test_scenario.py`.
+- [X] T010 Declare only the pinned runtime and test dependencies in `ros2_ws/src/car_bringup/package.xml` and `ros2_ws/src/car_autonomy_nodes/package.xml`; register `pytest`/`launch_testing` with the package test targets.
+- [X] T011 Foundational checkpoint: run from `~/src/gz-ws/ros2_ws`: `source /opt/ros/lyrical/setup.bash && colcon build --symlink-install --base-paths src && source install/setup.bash && colcon test --event-handlers console_direct+ && colcon test-result --verbose`; expected: both packages build, scenario-schema tests pass, and the test summary has zero failures. Then commit with `git add ros2_ws/src/car_bringup ros2_ws/src/car_autonomy_nodes README.md docs/wsl-setup.md specs/001-ros2-ai-obstacle-stop/quickstart.md specs/001-ros2-ai-obstacle-stop/tasks.md && git commit -m "build: scaffold ROS 2 workspace packages"`.
 
 ## Phase 3: User Story 1 - Inspect vehicle sensors through ROS 2 (Priority: P1)
 
