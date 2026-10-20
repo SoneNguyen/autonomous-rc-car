@@ -55,8 +55,25 @@ colcon test-result --verbose
 
 The scenario-backed P1 sensor launch and exact expected rates are documented
 in the [feature quickstart](specs/001-ros2-ai-obstacle-stop/quickstart.md).
-WSLg GUI is for sensor inspection only; autonomous runs use headless rendering
-to keep Gazebo keyboard control out of the command path.
+To start P1 sensor inspection from the WSL clone root, use:
+
+```bash
+source /opt/ros/lyrical/setup.bash
+cd ~/src/gz-ws/ros2_ws
+source install/setup.bash
+ros2 launch car_bringup obstacle_course.launch.py \
+  mode:=sensors scenario:=training/sensor_smoke headless:=false
+```
+
+In a second sourced WSL terminal, inspect the camera topic (SDF source target
+30 Hz), multi-layer lidar point cloud (15 Hz), IMU (100 Hz), odometry (50 Hz),
+contact topic, and `/clock`; see the linked quickstart for exact topic commands
+and measured WSL rates. P1's camera delivery floor is 20 Hz averaged over one
+simulated minute in server-only headless mode; point cloud, IMU, and odometry
+retain a 90%-of-declared-rate floor. Contact is event-only; the dedicated test
+deliberately bumps an obstacle to verify the event. WSLg GUI is for visual
+inspection only; autonomous runs use headless rendering to keep keyboard
+control out of the command path.
 
 ## Repository layout
 

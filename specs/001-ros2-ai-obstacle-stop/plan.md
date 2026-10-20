@@ -20,7 +20,7 @@ No tracked model, world, source asset, Blender tooling, or Pixi file is changed 
 **Testing**: `colcon test` with pytest and `launch_testing`; pure unit tests for corridor filtering, freshness, arbitration, labels, and metrics; repeatable headless simulation runs for command response, timeout, and stopping.  
 **Target Platform**: WSL2 Ubuntu 26.04 (Resolute), ROS 2 Lyrical, Gazebo Sim 10 (Jetty); WSLg GUI for visualization and OGRE2 EGL headless rendering for autonomous runs.  
 **Project Type**: Two-package ROS 2 workspace plus separated ML scripts and run orchestration.  
-**Performance Goals**: Controller tick 20 Hz; camera source 30 Hz; lidar scan/point cloud 15 Hz; IMU 100 Hz; default Ackermann odometry 50 Hz. CNN target inference 10 Hz on CPU after resizing frames to 160x120, using latest-frame processing rather than a growing queue.  
+**Performance Goals**: Controller tick 20 Hz; camera source remains configured at 30 Hz, with a P1 delivery floor of 20 ROS frames/s averaged over one simulated minute in server-only headless WSL2; lidar scan/point cloud 15 Hz, IMU 100 Hz, and default Ackermann odometry 50 Hz each retain a 90%-of-declared-samples P1 floor. CNN target inference is 10 Hz on CPU after resizing frames to 160x120, using latest-frame processing rather than a growing queue. The camera floor amendment is based on measured delivery of 1,379 frames/minute (~23.0 Hz) in the first ROS probe and Gazebo-native 22-25 Hz headless versus 14-16 Hz with WSLg GUI; the GUI is not the acceptance-rate mode.
 **Constraints**: All ROS nodes use sim time. Exactly one node publishes the Gazebo drive topic. Commands are bounded to 2.0 m/s and 0.15 rad/s by default; command expiry is 0.5 simulated seconds. Camera-model output is stale after three expected 10 Hz periods and can only request a stop. The existing 16-layer PointCloud2 is authoritative for obstacle geometry; the LaserScan conversion keeps only the middle vertical row.  
 **Scale/Scope**: Five sequential stories; the ten frozen evaluation scenarios have a P3 read-only lidar-baseline outcome pass, P4 read-only detector scoring/live-inference verification, and ten planned P5 pairs (10 lidar-only + 10 AI-assisted records). Additional repeats/retries retain the frozen scenario parameters and seed, receive a new unique `run_id`, and are appended rather than replacing earlier records; no `run_index` field is required.
 
@@ -62,7 +62,7 @@ Resolved technical questions and cited evidence are in [research.md](research.md
 
 ### Spec alignment resolution
 
-SC-001 now applies the 90% sample-rate check to the four periodic streams (camera, point cloud, IMU, and odometry). Body contact is event-based: P1 verifies topic availability and a delivered allowlisted obstacle-contact event rather than requiring idle messages. Do not synthesize messages or count a quiet contact topic as a failed sensor.
+SC-001 checks the camera separately: at least 20 ROS-delivered frames/s averaged over one simulated minute in server-only headless mode, while point cloud, IMU, and odometry each must deliver at least 90% of their declared samples. The 30 Hz SDF camera source setting is unchanged. This host-informed floor leaves 2x headroom for the planned 10 Hz detector; GUI observations are not used for rate acceptance. Body contact is event-based: P1 verifies topic availability and a delivered allowlisted obstacle-contact event rather than requiring idle messages. Do not synthesize messages or count a quiet contact topic as a failed sensor.
 
 ### Planned repository structure
 
@@ -89,7 +89,7 @@ specs/001-ros2-ai-obstacle-stop/   # plan, research, model, contracts, quickstar
 
 | Story | Independent evidence required before next story |
 |---|---|
-| P1 | From launch, verify all five sensor interfaces and `/clock` are available within five wall-clock minutes; verify at least 90% of declared samples for the four periodic streams over one simulated minute; induce a controlled contact to verify event delivery. |
+| P1 | From launch, verify all five sensor interfaces and `/clock` are available within five wall-clock minutes; in headless mode verify at least 20 ROS camera frames/s averaged over one simulated minute and at least 90% of declared samples for point cloud, IMU, and odometry; induce a controlled contact to verify event delivery. |
 | P2 | Publish bounded request through the controller; confirm forward/turn response; stop request publisher and confirm final zero within 0.5 sim seconds and rest within 2 sim seconds. Confirm the controller is the sole ROS command-topic publisher and bridge the sole Gazebo writer. |
 | P3 | Calibrate only on the training `stop_smoke` scenario, freeze config/threshold hashes, then run fixed evaluation scenarios headless without using any evaluation samples/outcomes to tune; record measured stopping travel, tri-state collision status/coverage, stale-lidar, immediate-stop, pause, and reset results. |
 | P4 | Generate training/validation data only for training/model selection; tune on validation; freeze weights and classifier threshold; collect/read evaluation data in read-only mode and record held-out recall/precision/sample count; test model-stale fallback and `clear` vs lidar stop arbitration. No evaluation samples or outcomes feed any tuning. |

@@ -46,8 +46,6 @@ sudo apt install -y \
   ros-lyrical-sensor-msgs-py \
   ros-dev-tools \
   python3-colcon-common-extensions \
-  ros-dev-tools \
-  python3-colcon-common-extensions \
   python3-pytest \
   python3-torch
 ```
@@ -104,11 +102,39 @@ ros2 topic echo --once /clock
 ros2 topic info -v /model/gazebo_truck/sensors/bumper_contact
 ```
 
-Expected: all five sensor interfaces (camera, lidar, IMU, odometry, and contact topic) are available within five wall-clock minutes. Camera is about 30 Hz, point cloud about 15 Hz with multiple vertical layers, IMU about 100 Hz, and odometry about 50 Hz; each periodic stream delivers at least 90% of its declared samples over one simulated minute, and timestamps advance with simulation time. Contact is an event signal: inspect its type/QoS here, then induce one low-speed obstacle contact in the dedicated contact test and verify the allowlisted obstacle collision pair appears. Do not require a continuous contact event while the truck is not touching anything.
+Expected: all five sensor interfaces (camera, lidar, IMU, odometry, and contact topic) are available within five wall-clock minutes. Gazebo remains configured to produce camera frames at 30 Hz, point cloud at 15 Hz with multiple vertical layers, IMU at 100 Hz, and odometry at about 50 Hz. In the automated server-only headless one-minute rate test, ROS camera delivery must average at least 20 Hz; point cloud, IMU, and odometry must each deliver at least 90% of their declared samples; timestamps advance with simulation time. WSLg GUI is for visual inspection and is not the rate-acceptance mode. Contact is an event signal: inspect its type/QoS here, then induce one low-speed obstacle contact in the dedicated contact test and verify the allowlisted obstacle collision pair appears. Do not require a continuous contact event while the truck is not touching anything.
 
 The bridge also exposes `/model/gazebo_truck/sensors/front_lidar/scan` as `sensor_msgs/msg/LaserScan`; use it for display only. The bridge retains the middle vertical row, so the controller uses the `/scan/points` PointCloud2.
 
 SC-001 measures declared rates only for the four periodic streams. Contact passes through topic availability and delivery of the induced allowlisted obstacle event; idle contact frames are not expected.
+
+Run the contact check independently with:
+
+```bash
+colcon test --packages-select car_bringup --ctest-args -R test_contact_event \
+  --event-handlers console_direct+
+```
+
+It relocates the truck at runtime to the fixed training `contact_smoke`
+scenario and bumps the existing `post_01_collision`; no model or world file is
+modified. The straight `barrier_right_collision` is wheel-first: the front
+wheel geometry reaches it about 2.43 m before the chassis collision, while the
+existing bumper sensor watches only `chassis_collision`. Do not use that
+barrier to claim complete collision coverage; P3 must report collision status
+as unknown for any trial whose wheel-only coverage is not verified.
+
+Measured WSL2 rates on the tested RTX A2000 laptop: Gazebo Transport `gz topic
+-f` measured roughly 22-25 Hz headless and 14-16 Hz with WSLg GUI, versus the
+unchanged SDF source target of 30 Hz. The first ROS one-minute probe received
+1,379 camera frames (~23.0 Hz). On 2026-10-20 the P1 camera acceptance was
+amended to a minimum average of 20 ROS-delivered frames/s over a simulated
+minute in server-only headless mode, preserving 2x headroom over the planned
+10 Hz detector; the other periodic streams retain their 90%-of-declared-rate
+requirement. The original probe clears the revised camera floor, but the full
+sensor suite must pass its rerun before P1 is complete. GUI mode is visual
+inspection only and its lower rate is not an acceptance result. Rates may vary
+with host/render load; do not claim the configured 30 Hz source rate is achieved
+as delivered ROS throughput.
 
 ## 4. P2: command via the single controller
 

@@ -15,6 +15,10 @@
 - Q: Must the live comparison scenarios also be held out from all training and threshold tuning? → A: Maintain three disjoint scenario sets: training scenarios for data collection, validation scenarios for model selection and detection-threshold choice, and ten evaluation scenarios frozen before training. Define disjointness by the full scenario-parameter tuple (start pose, obstacle placement, and speed), not merely by run or seed.
 - Q: Should the AI-assisted evaluation require zero obstacle collisions, in addition to stopping before contact in at least 8 of 10 runs? → A: Require zero obstacle collisions across all ten AI-assisted evaluation runs.
 
+### Session 2026-10-20
+
+- Q: Should P1 require 90% of the camera's 30 Hz SDF target on the tested WSL2 host? → A: Keep 30 Hz as the configured Gazebo source target, but set the P1 ROS-delivery floor to 20 Hz average over one simulated minute in server-only headless mode; keep the 90%-of-declared-rate requirement for point cloud, IMU, and odometry. Rationale: measured camera delivery was about 22-25 Hz headless and 14-16 Hz with WSLg open, and the planned live detector processes at 10 Hz. GUI mode remains for visual inspection, not rate acceptance.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Inspect vehicle sensors through ROS 2 (Priority: P1)
@@ -29,9 +33,10 @@ simulation data is available outside Gazebo.
 
 **Independent Test**: Follow the fresh-WSL setup and sensor-bridge launch and
 inspection commands in the feature quickstart. Expected: all five sensor
-interfaces are available within five wall-clock minutes; each of the four
-periodic streams delivers at least 90% of its declared samples over one
-simulated minute, and timestamps advance with simulation time. The contact topic is
+interfaces are available within five wall-clock minutes; camera delivery
+averages at least 20 Hz in headless mode over one simulated minute, while the
+point cloud, IMU, and odometry each deliver at least 90% of declared samples;
+timestamps advance with simulation time. The contact topic is
 available and delivers an allowlisted obstacle-contact event during a
 controlled test; idle contact samples are not required.
 
@@ -42,9 +47,10 @@ controlled test; idle contact samples are not required.
    lidar, IMU, odometry, and contact topic) are available to ROS 2 within five
    wall-clock minutes.
 2. **Given** the simulation is running, **When** I inspect periodic streams
-   over one simulated minute, **Then** the camera, point cloud, IMU, and
-   odometry meet their declared update rates and timestamps follow simulation
-   time; an induced non-ground obstacle contact is delivered on the contact
+   over one simulated minute, **Then** the camera delivers at least 20 Hz on
+   average in headless mode, point cloud, IMU, and odometry each deliver at
+   least 90% of declared samples, and timestamps follow simulation time; an
+   induced non-ground obstacle contact is delivered on the contact
    topic.
 
 ---
@@ -312,9 +318,11 @@ distances, and can be regenerated from the documented WSL setup.
 
 - **SC-001**: From a fresh supported WSL setup, all five sensor interfaces
   (camera, lidar, IMU, odometry, and contact topic) are available in ROS 2
-  within five wall-clock minutes. Each of the four periodic streams (camera,
-  point cloud, IMU, odometry) produces at least 90% of its declared samples
-  over one simulated minute with simulation-time timestamps. The contact topic
+  within five wall-clock minutes. Over one simulated minute in server-only
+  headless mode, the camera averages at least 20 ROS-delivered frames per
+  second; point cloud, IMU, and odometry each produce at least 90% of their
+  declared samples with simulation-time timestamps. The Gazebo camera source
+  remains configured for 30 Hz. The contact topic
   is available and delivers a named allowlisted obstacle event during a
   controlled contact test; idle periodic contact samples are not required.
 - **SC-002**: After command loss, a zero command is issued within 0.5 simulated
