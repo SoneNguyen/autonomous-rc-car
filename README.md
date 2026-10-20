@@ -34,27 +34,44 @@ $env:GZ_SIM_RESOURCE_PATH = Join-Path (Get-Location).Path 'simulation\models'
 pixi run gz sim -r -v 4 simulation/worlds/car_demo.sdf
 ```
 
-## ROS 2 development
+## ROS 2 quick start (WSL2)
 
-ROS 2 integration is not part of the current Pixi demo yet. For ROS work, keep
-the repository and ROS workspace inside WSL2 Ubuntu and install ROS 2 and Gazebo
-from apt; do not use the Windows Pixi environment from WSL. Each ROS feature's
-`research.md` will pin the required versions, and its `quickstart.md` will give
-fresh-WSL setup and run commands with expected results.
+ROS 2 and Gazebo run together in WSL2 Ubuntu 26.04 from apt. Keep the clone and
+workspace in the WSL Linux filesystem (for example `~/src/gz-ws`), never under
+`/mnt/c`; the existing Windows Pixi environment remains untouched and is not
+used for ROS. Follow the [fresh WSL setup and version checks](docs/wsl-setup.md)
+before building.
+
+After setup, build and test from Ubuntu:
+
+```bash
+source /opt/ros/lyrical/setup.bash
+cd ~/src/gz-ws
+colcon build --symlink-install --base-paths ros2_ws/src
+source ros2_ws/install/setup.bash
+colcon test --event-handlers console_direct+
+colcon test-result --verbose
+```
+
+The scenario-backed P1 sensor launch and exact expected rates are documented
+in the [feature quickstart](specs/001-ros2-ai-obstacle-stop/quickstart.md).
+WSLg GUI is for sensor inspection only; autonomous runs use headless rendering
+to keep Gazebo keyboard control out of the command path.
 
 ## Repository layout
 
 ```text
 assets/source/              Blender source and preserved legacy exports
-artifacts/                  Generated datasets, weights, and results (gitignored)
-docs/                       Setup, implementation, and research notes
-ml/                         ML training and inference code
-ros2_ws/                    ROS 2 packages (WSL2 filesystem only)
+artifacts/                  Generated datasets, weights, and run data (gitignored)
+docs/                       WSL setup, implementation, and evaluation reports
+ml/                         Dataset collection, training, and evaluation scripts
+ros2_ws/src/                car_bringup and car_autonomy_nodes ROS packages
 simulation/models/car/       Gazebo model, meshes, and model documentation
 simulation/worlds/           Gazebo demo and obstacle-course worlds
 specs/                       Spec Kit feature specifications
 .specify/                    Spec Kit templates, scripts, and project memory
 .agents/skills/              Spec Kit commands for Codex
+tools/                       Blender tools and evaluation orchestration
 tools/blender/               Blender mesh-export tooling
 pixi.toml, pixi.lock         Reproducible Gazebo Sim 10 environment
 ```
@@ -108,4 +125,5 @@ only the Windows-native Gazebo path. See
 - [Vehicle model guide](simulation/models/car/README.md)
 - [Implementation report](docs/implementation-report.md)
 - [Spec-driven development guide](docs/spec-driven-development.md)
+- [WSL2 ROS/Gazebo setup](docs/wsl-setup.md)
 - [Mesh export tool](tools/blender/export_gazebo_parts.py)

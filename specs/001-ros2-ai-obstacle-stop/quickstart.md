@@ -1,6 +1,6 @@
 # Quickstart and Validation Guide
 
-This is the target workflow for the feature after implementation. It is not yet executable in this workspace: the ROS packages and orchestration scripts are design outputs and have not been built. Keep this guide and the root README synchronized as each story is implemented.
+This guide documents the supported WSL workflow. Keep it and the root README synchronized as each story is implemented.
 
 ## 1. Install the supported WSL runtime
 
@@ -16,11 +16,11 @@ Restart Windows if prompted, launch the Ubuntu-26.04 distribution, and create it
 ```bash
 mkdir -p ~/src
 cd ~/src
-git clone <project-git-remote> gz-ws
+git clone https://github.com/SoneNguyen/autonomous-rc-car.git gz-ws
 cd ~/src/gz-ws
 ```
 
-The current workspace is not a Git repository and has no remote URL, so the project owner must replace `<project-git-remote>` after creating/publishing a Git remote. Do not use a Windows absolute path in the permanent README.
+Keep the clone in the WSL Linux filesystem; do not use a Windows absolute path or `/mnt/c` for ROS work.
 
 Enable the official ROS 2 apt repository by following the current [Lyrical Ubuntu deb installation guide](https://docs.ros.org/en/lyrical/Installation/Ubuntu-Install-Debs.html), then check package candidates before installing:
 
@@ -37,10 +37,13 @@ Install the runtime, build/test tools, and Python model dependency through apt:
 sudo apt install -y \
   ros-lyrical-desktop \
   ros-lyrical-ros-gz \
+  ros-lyrical-gz-sim-vendor \
   ros-lyrical-launch-testing \
   ros-lyrical-launch-testing-ros \
   ros-lyrical-vision-msgs \
   ros-lyrical-sensor-msgs-py \
+  ros-dev-tools \
+  python3-colcon-common-extensions \
   ros-dev-tools \
   python3-colcon-common-extensions \
   python3-pytest \
@@ -55,12 +58,13 @@ printf 'ROS_DISTRO=%s\n' "$ROS_DISTRO"
 ros2 pkg prefix ros_gz_bridge
 ros2 pkg xml ros_gz_bridge | grep -m1 '<version>'
 gz sim --versions
-dpkg-query -W -f='${binary:Package} ${Version}\n' ros-lyrical-ros-gz python3-torch
+dpkg-query -W ros-lyrical-ros-gz ros-lyrical-gz-sim-vendor \
+  ros-dev-tools python3-colcon-common-extensions python3-torch
 gz sim --help
 python3 -c 'import torch; print(torch.__version__)'
 ```
 
-Expected: `ROS_DISTRO=lyrical`; the bridge prefix is under `/opt/ros/lyrical`; `ros_gz_bridge` reports version `3.0.11`; `gz sim --versions` lists `10.5.0`; the full apt revisions are recorded and match the pinned research; and Torch reports the apt-managed 2.9.1 series. Stop on a mismatch. The launch file forces Gazebo Sim 10.5.0 rather than selecting an arbitrary installed major.
+Expected: `ROS_DISTRO=lyrical`; the bridge prefix is under `/opt/ros/lyrical`; `ros_gz_bridge` reports version `3.0.10`; `gz sim --versions` lists `10.5.0`; the full apt revisions are recorded and match the pinned research; and Torch reports the apt-managed 2.9.1 series. Stop on a mismatch. The launch file forces Gazebo Sim 10.5.0 rather than selecting an arbitrary installed major.
 
 ## 2. Build and run checks
 

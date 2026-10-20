@@ -1,6 +1,6 @@
 # Research: ROS 2 and AI Obstacle Stop
 
-**Research date**: 2026-10-19  
+**Research date**: 2026-10-20
 **Decision**: Continue with the user-mandated WSL2 Ubuntu 26.04 + ROS 2 Lyrical + Gazebo Sim 10 (Jetty) stack. Official ROS metadata identifies Lyrical/Jetty binary packages at `packages.ros.org`; Ubuntu documents `wsl --install Ubuntu-26.04`. The availability gate passes. No native Windows, RoboStack, Jazzy, or Harmonic fallback is considered.
 
 ## Decisions
@@ -13,14 +13,14 @@
 
 - Ubuntu 26.04 LTS / Resolute, WSL 2.
 - ROS 2 Lyrical.
-- `ros_gz` / `ros_gz_bridge` 3.0.11 (ROS Index version on this research date).
+- `ros_gz` / `ros_gz_bridge` 3.0.10 (`ros-lyrical-ros-gz` apt candidate `3.0.10-1resolute.20260930.020431`, verified from `packages.ros.org` on 2026-10-20; amended from 3.0.11 because that pinned version was unavailable).
 - Gazebo Sim 10.5.0, Jetty (Gazebo Sim API documents 10.5.0; major version 10 is fixed).
 - Use Gazebo Sim's `--seed <integer>` CLI option, documented in the current Gazebo Sim CLI/release documentation; preserve the seed in every scenario and record.
 - Ubuntu `python3-torch` 2.9.1+dfsg-1~exp1ubuntu2 for CPU training/inference. The exact Debian revision resolved by apt must be recorded with `dpkg-query` during setup; do not replace it with an untracked pip/Conda package.
 
-Before implementation, `gz sim --versions` must list `10.5.0`, `ros2 pkg xml ros_gz_bridge` must report upstream version `3.0.11`, and setup must record the full apt package revisions. All launch invocations force Gazebo Sim `10.5.0`; if that exact version is unavailable, stop rather than selecting another installed version.
+Before implementation, `gz sim --versions` must list `10.5.0`, `ros2 pkg xml ros_gz_bridge` must report upstream version `3.0.10`, and setup must record the full apt package revisions. The ROS apt repository is configured by `ros2-apt-source` 1.3.0 for Resolute. All launch invocations force Gazebo Sim `10.5.0`; if that exact version is unavailable, stop rather than selecting another installed version. This amendment changes only the ROS-Gazebo bridge patch version after an actual apt candidate check; it does not change ROS Lyrical, Ubuntu 26.04, or the Gazebo Sim major/minor pin.
 
-Package availability is confirmed from current official distro/package metadata, not by a live install in this Windows workspace: no WSL Ubuntu session is exposed here. The fresh-WSL quickstart therefore begins with `apt-cache policy` checks for both ROS meta-packages and Gazebo Sim 10, then requires a successful apt install and version check before any feature work. A missing package in the supported Resolute apt sources is a stop condition; it is not permission to switch distributions.
+The WSL2 Ubuntu 26.04.1 LTS distro is installed and reports codename `resolute`. `ros2-apt-source` 1.3.0 is installed, and apt fetched the Resolute index from `packages.ros.org`. The initial exact check found `ros-lyrical-ros-gz` 3.0.10 (not 3.0.11), which prompted the documented pin amendment. Setup installed the missing `ros-dev-tools` and `python3-colcon-common-extensions` packages from apt. The ROS bridge manifest reports 3.0.10, `gz sim --versions` reports 10.5.0, and apt `python3-torch` 2.9.1 imports under system Python. Full package revisions are recorded in `docs/wsl-setup.md`. A missing or mismatched Gazebo Sim 10.5.0 remains a stop condition; it is not permission to switch distributions or Gazebo major versions.
 
 **Rationale**: This is the requested ROS/Gazebo pairing and preserves compatibility with the existing Jetty model. It also keeps ROS and Gazebo under apt rather than mixing Windows Pixi, source builds, or RoboStack into the runtime.
 

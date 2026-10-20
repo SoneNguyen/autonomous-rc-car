@@ -1,7 +1,7 @@
 # Implementation Plan: ROS 2 Sensor Integration and AI-Assisted Obstacle Stop
 
-**Branch**: `001-ros2-ai-obstacle-stop` (not created; this workspace has no Git repository)  
-**Date**: 2026-10-19  
+**Branch**: `001-ros2-ai-obstacle-stop`
+**Date**: 2026-10-20
 **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification for staged ROS 2 integration, a lidar stopping baseline, camera classification, and paired evaluation.
@@ -15,7 +15,7 @@ No tracked model, world, source asset, Blender tooling, or Pixi file is changed 
 ## Technical Context
 
 **Language/Version**: Python 3.14 from Ubuntu 26.04; SDF 1.10 world/model remain unchanged.  
-**Primary Dependencies**: ROS 2 Lyrical, `ros_gz` 3.0.11 / `ros_gz_bridge`, Gazebo Sim 10.5.0 (Jetty), `rclpy`, `launch_testing`, `pytest`, `sensor_msgs_py`, `vision_msgs`, and Ubuntu apt `python3-torch` 2.9.1.  
+**Primary Dependencies**: ROS 2 Lyrical, `ros_gz` 3.0.10 / `ros_gz_bridge`, Gazebo Sim 10.5.0 (Jetty), `rclpy`, `launch_testing`, `pytest`, `sensor_msgs_py`, `vision_msgs`, and Ubuntu apt `python3-torch` 2.9.1. The bridge version was amended from 3.0.11 after WSL Resolute apt verification found only 3.0.10; ROS, Ubuntu, and Gazebo pins remain unchanged.
 **Storage**: YAML scenario configs and split manifest in `car_bringup`; lossless frame images plus CSV/JSONL metadata and PyTorch `state_dict` under git-ignored `artifacts/`; evaluation CSV and Markdown under `docs/evaluation/`.  
 **Testing**: `colcon test` with pytest and `launch_testing`; pure unit tests for corridor filtering, freshness, arbitration, labels, and metrics; repeatable headless simulation runs for command response, timeout, and stopping.  
 **Target Platform**: WSL2 Ubuntu 26.04 (Resolute), ROS 2 Lyrical, Gazebo Sim 10 (Jetty); WSLg GUI for visualization and OGRE2 EGL headless rendering for autonomous runs.  
@@ -33,13 +33,13 @@ No tracked model, world, source asset, Blender tooling, or Pixi file is changed 
 | I. Reproducible Simulation | Pass | Every launch names a checked-in scenario and fixed seed; logs contain scenario ID/hash, seed, package versions, mode, sim-time clock, and outcome. Evaluation reuses identical scenario config and seed for both behaviors. |
 | II. Existing Assets Are Stable | Pass with verification gate | No protected path or `pixi.toml` is changed by this plan. Use current model/world topics. Test contact coverage before final evaluation; if it requires another sensor topic, first update the spec to authorize the minimum protected-file change and record the reason. |
 | III. Single Control Authority, Safe Fallback | Pass | `safe_drive_controller` is the sole ROS publisher to the bridged command topic and `ros_gz_bridge` is the sole Gazebo Transport writer; launch and evaluator refuse/abort on competing writers. Watchdogs are inside the controller, not a second zero-command publisher. Perception and logger are non-commanding. Auto/eval launch is headless. |
-| IV. Incremental, Verified Delivery | Pass after repository prerequisite | Five story checkpoints each have independent tests in quickstart and tasks will order them. Git is absent in this workspace, so a Git checkout inside WSL is a prerequisite to implementation; each passing story must be committed there. |
+| IV. Incremental, Verified Delivery | Pass | The WSL Git checkout is on `001-ros2-ai-obstacle-stop` and has the configured GitHub remote. Setup, foundational, and story checkpoints each have independent tests and commits. |
 | V. Evidence-Based Claims | Pass | Auto-labels come from synchronized lidar point clouds; train/validation/evaluation tuples are disjoint; the evaluation set is frozen before training and its prespecified outputs are read-only, never feeding tuning; metrics and all run records are retained. Data/weights remain ignored and regenerable. Claims are prototype-only. |
 | VI. Simplicity | Pass | Only two ROS packages, one controller, one perception node, and one passive logger. A small CNN avoids pretrained downloads and extra frameworks; no custom ROS message package is needed. PyTorch and ROS 2 remain separate behind a standard message contract. |
 
 ## Phase 0: Research Decisions
 
-Resolved technical questions and cited evidence are in [research.md](research.md). The selected platform remains Lyrical + Jetty on Ubuntu 26.04; no fallback to Windows, RoboStack, Jazzy, or Harmonic is in this plan. ROS package metadata lists Lyrical/Jetty binaries from `packages.ros.org`, and the Ubuntu WSL guide names `wsl --install Ubuntu-26.04`. A package installation has not been executed from this Windows-only workspace; the first WSL setup must run the apt availability checks in [quickstart.md](quickstart.md) before implementation proceeds.
+Resolved technical questions and cited evidence are in [research.md](research.md). The selected platform remains Lyrical + Jetty on Ubuntu 26.04; no fallback to Windows, RoboStack, Jazzy, or Harmonic is in this plan. ROS package metadata lists Lyrical/Jetty binaries from `packages.ros.org`, and the Ubuntu WSL guide names `wsl --install Ubuntu-26.04`. The WSL runtime has now been installed and checked against the package baseline recorded in [docs/wsl-setup.md](../../docs/wsl-setup.md); P1 implementation can proceed in that WSL checkout.
 
 ## Phase 1: Design and Contracts
 
@@ -83,7 +83,7 @@ docs/evaluation/{results.csv,summary.md}
 specs/001-ros2-ai-obstacle-stop/   # plan, research, model, contracts, quickstart
 ```
 
-`README.md` is updated during implementation to include the WSL quickstart and this layout while retaining the existing Windows Pixi path. The active workspace has no `.git` directory and no remote URL, so the concrete clone command must be filled in when a Git origin is established; the ROS checkout must reside in the WSL Linux filesystem, not `/mnt/c`.
+`README.md` is updated during implementation to include the WSL quickstart and this layout while retaining the existing Windows Pixi path. The implementation checkout is the Git branch `001-ros2-ai-obstacle-stop` under `~/src/gz-ws`, with the configured repository remote. ROS work remains confined to that WSL Linux filesystem, not `/mnt/c`.
 
 ### Test sequence
 
