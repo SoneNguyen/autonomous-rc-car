@@ -1,0 +1,35 @@
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+# Python tooling and local virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local environment secrets (keep templates versionable)
+.env
+.env.*
+!.env.example
+
+# Blender's rolling backup files
+*.blend1
+
+# Agent runtime credentials and local session data
+.agents/**/auth/
+.agents/**/sessions/
+.agents/**/*.env
+
+# ROS 2 colcon build outputs
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+/build/
+/install/
+/log/
+
+# Generated datasets, model weights, and evaluation outputs
+/artifacts/

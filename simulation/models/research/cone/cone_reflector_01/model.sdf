@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<sdf version="1.10">
+  <model name="cone_reflector_01">
+    <static>true</static>
+    <link name="visual_link">
+      <visual name="detailed_visual">
+        <pose>0 0 0.035000 1.57079632679 0 0</pose>
+        <geometry><mesh><uri>model://research/cone/cone_reflector_01/cone_reflector_01.glb</uri><scale>0.02670000 0.02670000 0.02670000</scale></mesh></geometry><visibility_flags>1</visibility_flags></visual>
+      <collision name="cone_collision">
+        <pose>0 0 0.035000 0 0 0</pose>
+        <geometry><cylinder><radius>0.027000</radius><length>0.070000</length></cylinder></geometry>
+      </collision>
+    </link>
+    <plugin filename="gz-sim-label-system" name="gz::sim::systems::Label">
+      <label>10</label>
+    </plugin>
+  </model>
+</sdf>

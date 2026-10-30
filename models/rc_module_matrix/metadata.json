@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "model_id": "rc-module-matrix-frozen-detector-v1",
+  "model_type": "tiny_rgb_semantic_segmenter_to_boxes",
+  "class_index": {
+    "background": 0,
+    "cone": 1,
+    "pedestrian": 2,
+    "vehicle": 3
+  },
+  "input_name": "image",
+  "output_name": "class_logits",
+  "input_size_px": [
+    320,
+    240
+  ],
+  "confidence_threshold": 0.8,
+  "minimum_component_pixels": 3,
+  "model_sha256": "79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0",
+  "runtime_note": "Frozen inference baseline for the matrix; no retraining or threshold tuning is part of this project."
+}

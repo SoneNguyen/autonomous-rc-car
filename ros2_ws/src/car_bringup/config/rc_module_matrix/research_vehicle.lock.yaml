@@ -1,0 +1,20 @@
+schema_version: 1
+lock_id: rc-car-matrix-research-vehicle-20261029
+assets:
+  - asset_id: research_pickup_truck_01
+    class_id: rc_vehicle
+    source: Innerscene Free Parts Library
+    author: Innerscene
+    revision: asset-da45aa3f-2026-10-05
+    page_url: https://www.innerscene.com/tools/library/3d-parts/pickup-truck-da45aa3f
+    download_url: https://www.innerscene.com/api/library/pickup-truck-da45aa3f/download
+    license: CC0-1.0
+    license_url: https://www.innerscene.com/tools/library/terms
+    file_name: pickup-original.glb
+    file_sha256: c73afda8399ac408c7e66377a87d0ca3eb7663560e3a4d0522cf4fc23ca5d525
+    dimensions:
+      source_bounds_m: {value: [2.44, 1.82, 5.506], unit: m, provenance: measured, note: transformed GLB bounds in source X-width, Y-up, Z-length axes}
+      visual_scale_factor: {value: 0.08, unit: ratio, provenance: derived, note: 1:12.5 visual scale; gives 0.44 m body length and approximately RC wheelbase and tire diameter}
+      miniature_bounds_m: {value: [0.1952, 0.1456, 0.4405], unit: m, provenance: derived}
+    role: controlled_vehicle_visual_only
+    collision_source: simulation/models/rc_car/model.sdf

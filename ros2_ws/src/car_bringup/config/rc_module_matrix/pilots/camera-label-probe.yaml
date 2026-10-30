@@ -1,0 +1,168 @@
+schema_version: '1.0'
+module_id: camera
+scenario_id: camera/pilot-label-probe
+seed: 62000
+case_kind: condition
+run_purpose: tolerance_pilot
+quick_case: false
+world_id: rc_module_matrix
+world_path: simulation/worlds/rc_module_matrix.sdf
+start_pose:
+  x_m: -13.0
+  y_m: 0.0
+  z_m: 0.0675
+  roll_rad: 0.0
+  pitch_rad: 0.0
+  yaw_rad: 0.0
+vehicle_motion:
+  speed_profile:
+  - sim_time_s: 0.0
+    speed_mps: 0.0
+obstacle_placements:
+- entity_id: cone_far
+  pose:
+    x_m: -7.491673
+    y_m: -1.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+- entity_id: pedestrian_far
+  pose:
+    x_m: -7.4
+    y_m: 0.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+- entity_id: vehicle_far
+  pose:
+    x_m: -7.491673
+    y_m: 1.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+- entity_id: cone_middle
+  pose:
+    x_m: -9.470714
+    y_m: -0.7
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+- entity_id: pedestrian_middle
+  pose:
+    x_m: -9.4
+    y_m: 0.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+- entity_id: vehicle_middle
+  pose:
+    x_m: -9.470714
+    y_m: 0.7
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+- entity_id: cone_near
+  pose:
+    x_m: -11.441405
+    y_m: -0.35
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+- entity_id: pedestrian_near
+  pose:
+    x_m: -11.4
+    y_m: 0.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+- entity_id: vehicle_near
+  pose:
+    x_m: -11.441405
+    y_m: 0.35
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+setup:
+  quality_preset: high
+  lighting_preset: neutral_day
+  capture_detector: false
+  capture_duration_sim_s: 1.0
+  camera_ranges_m:
+    cone_far: 5.5
+    pedestrian_far: 5.5
+    vehicle_far: 5.5
+    cone_middle: 3.5
+    pedestrian_middle: 3.5
+    vehicle_middle: 3.5
+    cone_near: 1.5
+    pedestrian_near: 1.5
+    vehicle_near: 1.5
+  minimum_box_iou: 0.5
+  record_visible_pixel_boxes: true
+  distance_band_by_entity:
+    cone_far: far
+    pedestrian_far: far
+    vehicle_far: far
+    cone_middle: middle
+    pedestrian_middle: middle
+    vehicle_middle: middle
+    cone_near: near
+    pedestrian_near: near
+    vehicle_near: near
+ground_truth:
+  description: Each research model class is placed at each declared Euclidean camera-to-model-origin
+    range. Visible pixel bounds are measured from the instance label image.
+  references:
+  - path: simulation/worlds/rc_module_matrix.sdf
+    entity_id: cone_far
+  - path: simulation/worlds/rc_module_matrix.sdf
+    entity_id: pedestrian_far
+  - path: simulation/worlds/rc_module_matrix.sdf
+    entity_id: vehicle_far
+  - path: simulation/worlds/rc_module_matrix.sdf
+    entity_id: cone_middle
+  - path: simulation/worlds/rc_module_matrix.sdf
+    entity_id: pedestrian_middle
+  - path: simulation/worlds/rc_module_matrix.sdf
+    entity_id: vehicle_middle
+  - path: simulation/worlds/rc_module_matrix.sdf
+    entity_id: cone_near
+  - path: simulation/worlds/rc_module_matrix.sdf
+    entity_id: pedestrian_near
+  - path: simulation/worlds/rc_module_matrix.sdf
+    entity_id: vehicle_near
+measurements:
+- measurement_id: visible_boxes
+  source: /camera/labels
+  field: visible_instance_boxes
+  unit: px
+  frame_id: camera_link
+  configured_rate_hz: 30.0
+  sampling: inclusive bounds and visible pixel count per class instance
+tolerances: []
+source_refs:
+  vehicle_profile:
+    path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+    pointer: /presets/rc_car/sensors/camera
+  detector_id: rc-module-matrix-frozen-detector-v1
+  detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+  threshold: 0.8
+  protocols:
+  - matrix-camera-label-pilot-v1
+  - research-asset-locks-v1
+overlap_refs:
+  required: true
+  protocol_ids:
+  - matrix-unique-physical-set-v1
+expected_sensor_rates_hz:
+  /camera/image_raw: 30.0
+  /camera/labels: 30.0

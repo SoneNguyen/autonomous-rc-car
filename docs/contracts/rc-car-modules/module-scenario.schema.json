@@ -1,0 +1,621 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "module-scenario.schema.json",
+  "title": "matrix module scenario",
+  "description": "One fixed-seed matrix scenario. Hash the exact file externally; do not place a self-referential file hash in this document.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "module_id",
+    "scenario_id",
+    "seed",
+    "case_kind",
+    "run_purpose",
+    "world_id",
+    "world_path",
+    "start_pose",
+    "vehicle_motion",
+    "obstacle_placements",
+    "setup",
+    "ground_truth",
+    "measurements",
+    "tolerances",
+    "source_refs",
+    "overlap_refs"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "module_id": {
+      "enum": [
+        "lidar",
+        "camera",
+        "imu_odometry",
+        "contact_tf",
+        "command_path"
+      ]
+    },
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9/_-]*$",
+      "minLength": 3
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "case_kind": {
+      "enum": [
+        "nominal",
+        "boundary",
+        "fault",
+        "condition"
+      ]
+    },
+    "run_purpose": {
+      "enum": [
+        "tolerance_pilot",
+        "qualification"
+      ]
+    },
+    "quick_case": {
+      "type": "boolean",
+      "description": "Mark exactly one qualification scenario per module set for quick mode. Must be false or omitted for tolerance pilots."
+    },
+    "world_id": {
+      "const": "rc_module_matrix"
+    },
+    "world_path": {
+      "type": "string",
+      "pattern": "^simulation/worlds/[^/]+\\.sdf$"
+    },
+    "start_pose": {
+      "$ref": "#/$defs/pose"
+    },
+    "vehicle_motion": {
+      "type": "object",
+      "required": [
+        "speed_profile"
+      ],
+      "properties": {
+        "speed_profile": {
+          "type": "array",
+          "minItems": 1,
+          "contains": {
+            "properties": {
+              "sim_time_s": {
+                "const": 0
+              }
+            },
+            "required": [
+              "sim_time_s"
+            ]
+          },
+          "items": {
+            "$ref": "#/$defs/speedSample"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "obstacle_placements": {
+      "type": "array",
+      "description": "Initial obstacle placements in world coordinates. An empty array explicitly declares a no-obstacle scenario.",
+      "items": {
+        "type": "object",
+        "required": [
+          "entity_id",
+          "pose"
+        ],
+        "properties": {
+          "entity_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pose": {
+            "$ref": "#/$defs/pose"
+          },
+          "speed_profile": {
+            "type": "array",
+            "minItems": 1,
+            "contains": {
+              "properties": {
+                "sim_time_s": {
+                  "const": 0
+                }
+              },
+              "required": [
+                "sim_time_s"
+              ]
+            },
+            "items": {
+              "$ref": "#/$defs/speedSample"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "setup": {
+      "type": "object",
+      "description": "Module-specific fixture, motion, condition, or fault setup. It is declarative and cannot override protected models or controller parameters.",
+      "minProperties": 1
+    },
+    "ground_truth": {
+      "type": "object",
+      "required": [
+        "description",
+        "references"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "references": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object"
+          }
+        },
+        "expected_observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/expectedObservation"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "measurements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/measurement"
+      }
+    },
+    "tolerances": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "#/$defs/tolerance"
+      }
+    },
+    "source_refs": {
+      "type": "object",
+      "required": [
+        "vehicle_profile",
+        "protocols"
+      ],
+      "properties": {
+        "vehicle_profile": {
+          "$ref": "#/$defs/sourceReference"
+        },
+        "controller_bounds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceReference"
+          }
+        },
+        "detector_id": {
+          "enum": [
+            "rc-module-matrix-frozen-detector-v1"
+          ]
+        },
+        "detector_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "protocols": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "overlap_refs": {
+      "type": "object",
+      "required": [
+        "required",
+        "protocol_ids"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "protocol_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "const": "matrix-unique-physical-set-v1"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "condition_tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "expected_sensor_rates_hz": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    }
+  },
+  "$defs": {
+    "speedSample": {
+      "type": "object",
+      "required": [
+        "sim_time_s",
+        "speed_mps"
+      ],
+      "properties": {
+        "sim_time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "speed_mps": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "pose": {
+      "type": "object",
+      "required": [
+        "x_m",
+        "y_m",
+        "z_m",
+        "roll_rad",
+        "pitch_rad",
+        "yaw_rad"
+      ],
+      "properties": {
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "z_m": {
+          "type": "number"
+        },
+        "roll_rad": {
+          "type": "number"
+        },
+        "pitch_rad": {
+          "type": "number"
+        },
+        "yaw_rad": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourceReference": {
+      "type": "object",
+      "required": [
+        "path",
+        "pointer"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pointer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_value": {},
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "measurement": {
+      "type": "object",
+      "required": [
+        "measurement_id",
+        "source",
+        "field",
+        "unit",
+        "frame_id",
+        "sampling"
+      ],
+      "properties": {
+        "measurement_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frame_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "configured_rate_hz": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "sampling": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected": {}
+      },
+      "additionalProperties": false
+    },
+    "tolerance": {
+      "type": "object",
+      "required": [
+        "tolerance_id",
+        "measurement_id",
+        "unit",
+        "comparison",
+        "derivation"
+      ],
+      "properties": {
+        "tolerance_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "measurement_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "comparison": {
+          "enum": [
+            "absolute",
+            "interval",
+            "maximum",
+            "minimum",
+            "categorical"
+          ]
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "absolute_error": {
+          "type": "number",
+          "minimum": 0
+        },
+        "derivation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ref": {
+          "$ref": "#/$defs/sourceReference"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "comparison": {
+                "const": "interval"
+              }
+            },
+            "required": [
+              "comparison"
+            ]
+          },
+          "then": {
+            "required": [
+              "minimum",
+              "maximum"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "comparison": {
+                "const": "absolute"
+              }
+            },
+            "required": [
+              "comparison"
+            ]
+          },
+          "then": {
+            "required": [
+              "absolute_error"
+            ]
+          }
+        }
+      ]
+    },
+    "expectedObservation": {
+      "type": "object",
+      "required": [
+        "measurement_id",
+        "expected_value",
+        "unit"
+      ],
+      "properties": {
+        "measurement_id": {
+          "type": "string"
+        },
+        "expected_value": {},
+        "unit": {
+          "type": "string"
+        },
+        "frame_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "entity_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tolerance_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "module_id": {
+            "const": "camera"
+          }
+        },
+        "required": [
+          "module_id"
+        ]
+      },
+      "then": {
+        "properties": {
+          "source_refs": {
+            "required": [
+              "detector_id",
+              "detector_sha256",
+              "threshold"
+            ]
+          }
+        },
+        "required": [
+          "source_refs"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "module_id": {
+            "const": "command_path"
+          }
+        },
+        "required": [
+          "module_id"
+        ]
+      },
+      "then": {
+        "properties": {
+          "source_refs": {
+            "required": [
+              "controller_bounds"
+            ],
+            "properties": {
+              "controller_bounds": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "required": [
+          "source_refs"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "run_purpose": {
+            "const": "tolerance_pilot"
+          }
+        },
+        "required": [
+          "run_purpose"
+        ]
+      },
+      "then": {
+        "properties": {
+          "quick_case": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "run_purpose": {
+            "const": "qualification"
+          }
+        },
+        "required": [
+          "run_purpose"
+        ]
+      },
+      "then": {
+        "properties": {
+          "tolerances": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "run_purpose": {
+            "const": "tolerance_pilot"
+          }
+        },
+        "required": [
+          "run_purpose"
+        ]
+      },
+      "then": {
+        "properties": {
+          "tolerances": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ]
+}

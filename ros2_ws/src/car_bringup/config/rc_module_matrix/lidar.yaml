@@ -1,0 +1,1422 @@
+# LiDAR target poses use z=0.06 m so research meshes intersect the configured single scan plane at the mounted sensor height.
+schema_version: '1.0'
+module_id: lidar
+scenarios:
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/range-min-below
+  seed: 61001
+  case_kind: boundary
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -12.87
+      y_m: 2.000000
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122102.0
+      y_m: 100.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: vehicle_01
+    pose:
+      x_m: 122122.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  setup:
+    fixture_sizes_m: &id001
+      cone_01:
+      - 0.054
+      - 0.054
+      - 0.07
+      pedestrian_01:
+      - 0.08
+      - 0.08
+      - 0.18
+      vehicle_01:
+      - 0.45
+      - 0.22
+      - 0.18
+    target_entity: cone_01
+    target_bearing_rad: 0.0
+    target_surface_range_m: 0.02
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: null
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 0.02
+      unit: m
+      frame_id: lidar_link
+      entity_id: cone_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 0.02
+  tolerances:
+  - tolerance_id: range-min-below-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: categorical
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/range-min-at
+  seed: 61002
+  case_kind: boundary
+  run_purpose: qualification
+  quick_case: true
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -12.823000
+      y_m: 2.000000
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122122.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  - entity_id: vehicle_01
+    pose:
+      x_m: 122124.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: cone_01
+    target_bearing_rad: 0.0
+    target_surface_range_m: 0.05
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: null
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 0.05
+      unit: m
+      frame_id: lidar_link
+      entity_id: cone_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 0.05
+  tolerances:
+  - tolerance_id: range-min-at-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/range-min-inside
+  seed: 61003
+  case_kind: boundary
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -12.813000
+      y_m: 2.000000
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122106.0
+      y_m: 100.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: vehicle_01
+    pose:
+      x_m: 122122.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: cone_01
+    target_bearing_rad: 0.0
+    target_surface_range_m: 0.06
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: null
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 0.06
+      unit: m
+      frame_id: lidar_link
+      entity_id: cone_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 0.06
+  tolerances:
+  - tolerance_id: range-min-inside-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/range-max-inside
+  seed: 61004
+  case_kind: boundary
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: 122086.0
+      y_m: 80.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122108.0
+      y_m: 100.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: vehicle_01
+    pose:
+      x_m: -4.675
+      y_m: 2.0
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: vehicle_01
+    target_bearing_rad: 0.0
+    target_surface_range_m: 7.99
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: null
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: vehicle_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 7.99
+      unit: m
+      frame_id: lidar_link
+      entity_id: vehicle_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 7.99
+  tolerances:
+  - tolerance_id: range-max-inside-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/range-max-at
+  seed: 61005
+  case_kind: boundary
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: 122086.0
+      y_m: 80.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122122.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  - entity_id: vehicle_01
+    pose:
+      x_m: -4.671
+      y_m: 2.0
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: vehicle_01
+    target_bearing_rad: 0.0
+    target_surface_range_m: 8.0
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: null
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: vehicle_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 8.0
+      unit: m
+      frame_id: lidar_link
+      entity_id: vehicle_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 8.0
+  tolerances:
+  - tolerance_id: range-max-at-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/range-max-beyond
+  seed: 61006
+  case_kind: boundary
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: 122086.0
+      y_m: 80.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122112.0
+      y_m: 100.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: vehicle_01
+    pose:
+      x_m: -4.655
+      y_m: 2.0
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: vehicle_01
+    target_bearing_rad: 0.0
+    target_surface_range_m: 8.01
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: null
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: vehicle_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 8.01
+      unit: m
+      frame_id: lidar_link
+      entity_id: vehicle_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 8.01
+  tolerances:
+  - tolerance_id: range-max-beyond-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: categorical
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/sector-right
+  seed: 61010
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -11.381500
+      y_m: -0.612799
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: -1.047197551
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122120.0
+      y_m: 100.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: vehicle_01
+    pose:
+      x_m: 122140.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: cone_01
+    target_bearing_rad: -1.0471975511965976
+    target_surface_range_m: 3.0
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: right
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 3.0
+      unit: m
+      frame_id: lidar_link
+      entity_id: cone_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 3.0
+  tolerances:
+  - tolerance_id: sector-right-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/sector-front_right
+  seed: 61011
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -10.054947
+      y_m: 0.968125
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122122.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: -0.34906585
+  - entity_id: vehicle_01
+    pose:
+      x_m: 122142.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: cone_01
+    target_bearing_rad: -0.3490658503988659
+    target_surface_range_m: 3.0
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: front_right
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 3.0
+      unit: m
+      frame_id: lidar_link
+      entity_id: cone_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 3.0
+  tolerances:
+  - tolerance_id: sector-front_right-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/sector-front
+  seed: 61012
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: 122104.0
+      y_m: 80.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122124.0
+      y_m: 100.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: vehicle_01
+    pose:
+      x_m: -9.665
+      y_m: 2.0
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: vehicle_01
+    target_bearing_rad: 0.0
+    target_surface_range_m: 3.0
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: front
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: vehicle_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 3.0
+      unit: m
+      frame_id: lidar_link
+      entity_id: vehicle_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 3.0
+  tolerances:
+  - tolerance_id: sector-front-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/sector-front_left
+  seed: 61013
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.8999999999999999
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -10.054947
+      y_m: 1.931875
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.34906585
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122126.0
+      y_m: 100.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: vehicle_01
+    pose:
+      x_m: 122146.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: cone_01
+    target_bearing_rad: 0.3490658503988659
+    target_surface_range_m: 3.0
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: front_left
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 3.0
+      unit: m
+      frame_id: lidar_link
+      entity_id: cone_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 3.0
+  tolerances:
+  - tolerance_id: sector-front_left-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/sector-left
+  seed: 61014
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: -0.20000000000000018
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -11.381500
+      y_m: 2.412799
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122122.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 1.047197551
+  - entity_id: vehicle_01
+    pose:
+      x_m: 122148.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: cone_01
+    target_bearing_rad: 1.0471975511965976
+    target_surface_range_m: 3.0
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: left
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 3.0
+      unit: m
+      frame_id: lidar_link
+      entity_id: cone_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 3.0
+  tolerances:
+  - tolerance_id: sector-left-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/moving-obstacle
+  seed: 61020
+  case_kind: fault
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: 122120.0
+      y_m: 80.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122140.0
+      y_m: 100.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: vehicle_01
+    pose:
+      x_m: -9.665
+      y_m: 2.0
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: -0.2
+    - sim_time_s: 1.0
+      speed_mps: 0.2
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: vehicle_01
+    target_bearing_rad: 0.0
+    target_surface_range_m: 3.0
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: null
+    moving_target_order: closing_then_receding
+    capture_duration_sim_s: 3.0
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: vehicle_01
+    expected_observations:
+    - measurement_id: nearest_return
+      expected_value: 3.0
+      unit: m
+      frame_id: lidar_link
+      entity_id: vehicle_01
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: 3.0
+  tolerances:
+  - tolerance_id: moving-obstacle-range
+    measurement_id: nearest_return
+    unit: m
+    comparison: absolute
+    derivation: Compare against the fixture face placed in the configured lidar_link
+      frame at the explicit target range; 0.01 m profile resolution.
+    absolute_error: 0.02
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/ground-only
+  seed: 61021
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements: []
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: null
+    target_bearing_rad: 0.0
+    target_surface_range_m: null
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: null
+    ground_truth_only: true
+    lighting_preset: neutral_day
+    quality_preset: high
+  ground_truth:
+    description: Configured RC profile and deterministic research fixture pose; range is measured
+      from lidar_link origin to the visible research mesh surface.
+    references:
+    - path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: ground-only
+    expected_observations: []
+  measurements:
+  - measurement_id: nearest_return
+    source: /scan
+    field: ranges
+    unit: m
+    frame_id: lidar_link
+    configured_rate_hz: 10.0
+    sampling: nearest finite return in the configured target-beam neighborhood
+    expected: null
+  tolerances:
+  - tolerance_id: ground-only-empty
+    measurement_id: nearest_return
+    unit: count
+    comparison: maximum
+    maximum: 0
+    derivation: No obstacle collision is present in the sensor field; only configured
+      ground returns may occur.
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0
+- schema_version: '1.0'
+  module_id: lidar
+  scenario_id: lidar/stale-scan-stop
+  seed: 61022
+  case_kind: fault
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 2.0
+    z_m: 0.0
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -9.873000
+      y_m: 2.000000
+      z_m: 0.06
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: 122144.0
+      y_m: 100.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  - entity_id: vehicle_01
+    pose:
+      x_m: 122164.0
+      y_m: 120.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0
+  setup:
+    fixture_sizes_m: *id001
+    target_entity: cone_01
+    target_bearing_rad: 0.0
+    target_surface_range_m: 3.0
+    sensor_origin_offset_m:
+    - 0.11
+    - 0.0
+    - 0.055
+    expected_sector: null
+    stale_after_s: 3.0
+    fault_injection: suppress_lidar_after_sim_time
+    lighting_preset: neutral_day
+    quality_preset: high
+    capture_duration_sim_s: 4.5
+    command_at_sim_s: 2.5
+    command_speed_mps: 0.2
+    command_steering_rad: 0.0
+    command_repeat_interval_s: 0.2
+    command_repeat_until_sim_s: 4.4
+    minimum_commands_before_stop: 4
+    status_period_tolerance_s: 0.15
+    minimum_commands_after_stale: 2
+  ground_truth:
+    description: The matrix-only relay forwards live scans for three simulation seconds,
+      then stops forwarding them to the controller. After the configured 0.5 s freshness
+      limit, status must expose sensor_lidar_state=stale and readiness_blocker=sensor_lidar_stale;
+      the existing controller reports controller_not_ready and publishes a zero Twist.
+      This records modeled simulation freshness behavior, not hardware sensor performance.
+    references:
+    - path: ros2_ws/src/car_autonomy_nodes/car_autonomy_nodes/safe_drive_controller.py
+      entity_id: cone_01
+        fail-safe output
+    - path: ros2_ws/src/car_bringup/launch/obstacle_course.launch.py
+      entity_id: cone_01
+    expected_observations:
+    - measurement_id: stale_stop
+      expected_value: sensor_lidar_state=stale; readiness_blocker=sensor_lidar_stale;
+        zero Twist
+      unit: s
+      frame_id: base_link
+  measurements:
+  - measurement_id: stale_stop
+    source: /vehicle_controller/status
+    field: sensor_lidar_state, readiness_blocker, controller Twist, sensor_lidar_age_s
+    unit: s
+    frame_id: base_link
+    sampling: first controller status and output Twist after the injected scan drop
+  tolerances:
+  - tolerance_id: stale-scan-controller-stop
+    measurement_id: stale_stop
+    unit: s
+    comparison: interval
+    minimum: 0.5
+    maximum: 0.65
+    derivation: Controller status period is 0.1 s and the tracked freshness threshold
+      is 0.5 simulation seconds; accept one status period of observation latency and
+      require zero controller Twist after stale is reported.
+  source_refs:
+    vehicle_profile:
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/lidar
+    protocols:
+    - matrix-unique-physical-set-v1
+    - high-fidelity research locked research assets
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /scan: 10.0

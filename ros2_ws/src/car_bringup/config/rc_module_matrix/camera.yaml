@@ -1,0 +1,1287 @@
+schema_version: '1.0'
+module_id: camera
+scenarios:
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/cone-near
+  seed: 62010
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: true
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -11.4
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: cone_01
+    target_class: cone
+    distance_band: near
+    camera_range_m: 1.5
+    target_visible: true
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: cone-near-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: &id001
+      path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+      pointer: /presets/rc_car/sensors/camera
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/cone-middle
+  seed: 62011
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -9.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: cone_01
+    target_class: cone
+    distance_band: middle
+    camera_range_m: 3.0
+    target_visible: true
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: cone-middle-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/cone-far
+  seed: 62012
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -7.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: cone_01
+    target_class: cone
+    distance_band: far
+    camera_range_m: 5.0
+    target_visible: true
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: cone-far-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/pedestrian-near
+  seed: 62013
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: pedestrian_01
+    pose:
+      x_m: -11.4
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: pedestrian_01
+    target_class: pedestrian
+    distance_band: near
+    camera_range_m: 1.5
+    target_visible: true
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: pedestrian_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: pedestrian-near-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/pedestrian-middle
+  seed: 62014
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: pedestrian_01
+    pose:
+      x_m: -9.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: pedestrian_01
+    target_class: pedestrian
+    distance_band: middle
+    camera_range_m: 3.0
+    target_visible: true
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: pedestrian_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: pedestrian-middle-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/pedestrian-far
+  seed: 62015
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: pedestrian_01
+    pose:
+      x_m: -7.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: pedestrian_01
+    target_class: pedestrian
+    distance_band: far
+    camera_range_m: 5.0
+    target_visible: true
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: pedestrian_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: pedestrian-far-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/vehicle-near
+  seed: 62016
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: vehicle_01
+    pose:
+      x_m: -11.4
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: vehicle_01
+    target_class: vehicle
+    distance_band: near
+    camera_range_m: 1.5
+    target_visible: true
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: vehicle_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: vehicle-near-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/vehicle-middle
+  seed: 62017
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: vehicle_01
+    pose:
+      x_m: -9.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: vehicle_01
+    target_class: vehicle
+    distance_band: middle
+    camera_range_m: 3.0
+    target_visible: true
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: vehicle_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: vehicle-middle-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/vehicle-far
+  seed: 62018
+  case_kind: nominal
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: vehicle_01
+    pose:
+      x_m: -7.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: vehicle_01
+    target_class: vehicle
+    distance_band: far
+    camera_range_m: 5.0
+    target_visible: true
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: vehicle_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: vehicle-far-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/occlusion-pedestrian
+  seed: 62019
+  case_kind: condition
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -11.4
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: -10.1
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: pedestrian_01
+    target_class: pedestrian
+    distance_band: occluded
+    camera_range_m: 2.8
+    target_visible: true
+    condition_tags:
+    - partial_occlusion
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: pedestrian_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: occlusion-pedestrian-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/lighting-overcast_day
+  seed: 62020
+  case_kind: condition
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -10.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: overcast_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: cone_01
+    target_class: cone
+    distance_band: lighting-control
+    camera_range_m: 2.0
+    target_visible: true
+    condition_tags:
+    - lighting:overcast_day
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: lighting-overcast_day-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/lighting-neutral_day
+  seed: 62021
+  case_kind: condition
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -10.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: cone_01
+    target_class: cone
+    distance_band: lighting-control
+    camera_range_m: 2.0
+    target_visible: true
+    condition_tags:
+    - lighting:neutral_day
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: lighting-neutral_day-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/lighting-warm_afternoon
+  seed: 62022
+  case_kind: condition
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -10.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: warm_afternoon
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: cone_01
+    target_class: cone
+    distance_band: lighting-control
+    camera_range_m: 2.0
+    target_visible: true
+    condition_tags:
+    - lighting:warm_afternoon
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: lighting-warm_afternoon-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/multi-object-separation
+  seed: 62023
+  case_kind: condition
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -10.9
+      y_m: -0.45
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  - entity_id: pedestrian_01
+    pose:
+      x_m: -10.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  - entity_id: vehicle_01
+    pose:
+      x_m: -10.9
+      y_m: 0.45
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.0
+    minimum_box_iou: 0.5
+    target_entity: cone_01
+    target_class: cone
+    distance_band: multi-object
+    camera_range_m: 2.0
+    target_visible: true
+    check_all_visible_instances: true
+    condition_tags:
+    - multi_object
+    - duplicate_merge_check
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: pedestrian_01
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: vehicle_01
+  measurements:
+  - measurement_id: visible_target_box
+    source: /camera/labels
+    field: visible_instance_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: inclusive bounds of visible panoptic pixels
+  - measurement_id: detector_box
+    source: /detections
+    field: class_and_box
+    unit: px
+    frame_id: camera_link
+    configured_rate_hz: 30.0
+    sampling: last exact-stamp aligned detector result
+  tolerances:
+  - tolerance_id: multi-object-separation-box-iou
+    measurement_id: detector_box
+    unit: ratio
+    comparison: minimum
+    minimum: 0.5
+    derivation: Frozen matrix detector output must overlap the visible labeled target
+      by at least 0.5 IoU.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0
+- schema_version: '1.0'
+  module_id: camera
+  scenario_id: camera/detector-stale
+  seed: 62024
+  case_kind: fault
+  run_purpose: qualification
+  quick_case: false
+  world_id: rc_module_matrix
+  world_path: simulation/worlds/rc_module_matrix.sdf
+  start_pose:
+    x_m: -13.0
+    y_m: 0.0
+    z_m: 0.0675
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+  vehicle_motion:
+    speed_profile:
+    - sim_time_s: 0.0
+      speed_mps: 0.0
+  obstacle_placements:
+  - entity_id: cone_01
+    pose:
+      x_m: -10.9
+      y_m: 0.0
+      z_m: 0.0
+      roll_rad: 0.0
+      pitch_rad: 0.0
+      yaw_rad: 0.0
+  setup:
+    quality_preset: high
+    lighting_preset: neutral_day
+    capture_duration_sim_s: 1.5
+    minimum_box_iou: 0.5
+    target_entity: cone_01
+    target_class: cone
+    distance_band: stale
+    camera_range_m: 2.0
+    target_visible: true
+    expect_detector_stale: true
+    condition_tags:
+    - detector_output_absent
+  ground_truth:
+    description: Locked research model pose and Gazebo visible instance-label pixels
+      at the captured simulation stamp.
+    references:
+    - path: simulation/worlds/rc_module_matrix.sdf
+      entity_id: cone_01
+  measurements:
+  - measurement_id: detector_stale_age
+    source: /detections
+    field: last_message_age_sim_s
+    unit: s
+    frame_id: camera_link
+    sampling: simulation time since capture began with no detector message
+  tolerances:
+  - tolerance_id: detector-stale-age
+    measurement_id: detector_stale_age
+    unit: s
+    comparison: minimum
+    minimum: 0.5
+    derivation: Staleness becomes observable after the configured half-second detector
+      freshness interval.
+  source_refs:
+    vehicle_profile: *id001
+    detector_id: rc-module-matrix-frozen-detector-v1
+    detector_sha256: 79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0
+    threshold: 0.8
+    protocols:
+    - matrix-frozen-detector-v1
+    - research-asset-locks-v1
+  overlap_refs:
+    required: true
+    protocol_ids:
+    - matrix-unique-physical-set-v1
+  expected_sensor_rates_hz:
+    /camera/image_raw: 30.0
+    /camera/labels: 30.0

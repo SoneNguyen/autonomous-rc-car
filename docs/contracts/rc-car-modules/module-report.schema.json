@@ -1,0 +1,679 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "module-report.schema.json",
+  "title": "matrix module report",
+  "description": "Append-only observation report with the module-matrix stop-reason contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_id",
+    "created_utc",
+    "module_id",
+    "mode",
+    "status",
+    "qualified",
+    "required_case_ids",
+    "scenario_results",
+    "overlap_checks",
+    "source_identity",
+    "diagnosis",
+    "stop_reason",
+    "protected_metrics_written"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "report_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "created_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "module_id": {
+      "enum": [
+        "lidar",
+        "camera",
+        "imu_odometry",
+        "contact_tf",
+        "command_path",
+        "matrix"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "case",
+        "module",
+        "quick",
+        "pilot",
+        "core_matrix",
+        "full_matrix"
+      ]
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "fail",
+        "blocked",
+        "smoke",
+        "partial",
+        "not_run"
+      ]
+    },
+    "qualified": {
+      "type": "boolean"
+    },
+    "required_case_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "scenario_results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scenarioResult"
+      }
+    },
+    "overlap_checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/overlapCheck"
+      }
+    },
+    "source_identity": {
+      "type": "object",
+      "required": [
+        "ubuntu",
+        "ros_distro",
+        "gazebo_version",
+        "config_hashes"
+      ],
+      "properties": {
+        "ubuntu": {
+          "type": "string"
+        },
+        "ros_distro": {
+          "type": "string"
+        },
+        "gazebo_version": {
+          "type": "string"
+        },
+        "ros_gz_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "world_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "detector_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "detector_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "detector_threshold": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "config_hashes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "source_hashes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "diagnosis": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Read-only simulator status summary recorded for this module run.",
+      "properties": {
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "first_failed_layer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "report_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "stop_reason": {
+      "anyOf": [
+        {
+          "$ref": "stop-reasons.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "protected_metrics_written": {
+      "const": false
+    },
+    "implementation_state": {
+      "enum": [
+        "capture_registered",
+        "capture_unavailable",
+        "scenario_set_missing",
+        "module_scenarios_missing"
+      ]
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "missing_modules": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "lidar",
+          "camera",
+          "imu_odometry",
+          "contact_tf",
+          "command_path"
+        ]
+      }
+    },
+    "simulation_noise_statement": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Required for IMU/odometry results; explicitly says the bounds are simulation-only and not a hardware accuracy claim."
+    },
+    "aggregate_module_reports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "module_id",
+          "status",
+          "qualified",
+          "report_ref"
+        ],
+        "properties": {
+          "module_id": {
+            "enum": [
+              "lidar",
+              "camera",
+              "imu_odometry",
+              "contact_tf",
+              "command_path"
+            ]
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "fail",
+              "blocked",
+              "smoke",
+              "partial",
+              "not_run"
+            ]
+          },
+          "qualified": {
+            "type": "boolean"
+          },
+          "report_ref": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "scenarioResult": {
+      "type": "object",
+      "required": [
+        "scenario_id",
+        "scenario_sha256",
+        "seed",
+        "world_id",
+        "status",
+        "ground_truth_ref",
+        "observations",
+        "evidence_refs"
+      ],
+      "properties": {
+        "scenario_id": {
+          "type": "string"
+        },
+        "scenario_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "world_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "blocked",
+            "smoke",
+            "not_run",
+            "unobserved",
+            "unscored"
+          ]
+        },
+        "ground_truth_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/boundaryObservation"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "boundaryObservation": {
+      "type": "object",
+      "required": [
+        "observation_id",
+        "source",
+        "stamp_sim_ns",
+        "frame_id",
+        "value",
+        "ground_truth",
+        "unit",
+        "tolerance_id",
+        "result"
+      ],
+      "properties": {
+        "observation_id": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "stamp_sim_ns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "frame_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {},
+        "ground_truth": {},
+        "unit": {
+          "type": "string"
+        },
+        "tolerance_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "error": {},
+        "result": {
+          "enum": [
+            "pass",
+            "fail",
+            "unobserved",
+            "not_applicable"
+          ]
+        },
+        "evidence_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "overlapCheck": {
+      "type": "object",
+      "required": [
+        "protocol_id",
+        "checker_path",
+        "passed",
+        "checked_at_utc",
+        "candidate_set_sha256",
+        "reference_manifest_hashes",
+        "threshold_source",
+        "comparisons"
+      ],
+      "properties": {
+        "protocol_id": {
+          "const": "matrix-unique-physical-set-v1"
+        },
+        "checker_path": {
+          "type": "string"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "checked_at_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "candidate_set_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reference_manifest_hashes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "threshold_source": {
+          "type": "string"
+        },
+        "comparisons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "candidate_id",
+              "reference_id",
+              "exact_duplicate"
+            ],
+            "properties": {
+              "candidate_id": {
+                "type": "string"
+              },
+              "reference_id": {
+                "type": "string"
+              },
+              "exact_duplicate": {
+                "type": "boolean"
+              },
+              "normalized_distance": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "limiting_group": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "pilot"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "qualified": {
+            "const": false
+          },
+          "status": {
+            "enum": [
+              "partial",
+              "blocked"
+            ]
+          },
+          "scenario_results": {
+            "items": {
+              "required": [
+                "ground_truth_ref"
+              ],
+              "properties": {
+                "status": {
+                  "enum": [
+                    "unscored",
+                    "blocked"
+                  ]
+                },
+                "ground_truth_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "observations": {
+                  "items": {
+                    "properties": {
+                      "tolerance_id": {
+                        "type": "null"
+                      },
+                      "result": {
+                        "enum": [
+                          "not_applicable",
+                          "unobserved"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "enum": [
+              "case",
+              "module",
+              "quick",
+              "core_matrix",
+              "full_matrix"
+            ]
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "scenario_results": {
+            "items": {
+              "properties": {
+                "observations": {
+                  "items": {
+                    "properties": {
+                      "tolerance_id": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "quick"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "qualified": {
+            "const": false
+          },
+          "status": {
+            "enum": [
+              "smoke",
+              "partial",
+              "blocked",
+              "fail"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "module_id": {
+            "const": "imu_odometry"
+          }
+        },
+        "required": [
+          "module_id"
+        ]
+      },
+      "then": {
+        "required": [
+          "simulation_noise_statement"
+        ],
+        "properties": {
+          "simulation_noise_statement": {
+            "const": "These noise and drift tolerances characterize the configured simulated sensor-noise model only; they do not claim real-IMU or real-vehicle accuracy."
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "module_id": {
+            "const": "matrix"
+          },
+          "mode": {
+            "enum": [
+              "core_matrix",
+              "full_matrix"
+            ]
+          }
+        },
+        "required": [
+          "module_id",
+          "mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "aggregate_module_reports"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "qualified": {
+            "const": true
+          }
+        },
+        "required": [
+          "qualified"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "pass"
+          },
+          "mode": {
+            "enum": [
+              "module",
+              "core_matrix",
+              "full_matrix"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

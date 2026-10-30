@@ -1,0 +1,618 @@
+schema_version: 1
+profile_id: rc-car-profile-v1
+coordinate_convention:
+  forward: +x
+  left: +y
+  up: +z
+  angular_unit: rad
+  length_unit: m
+  time_source: Gazebo simulation time
+source_records:
+  rc_car: Configured RC simulation profile; values are placeholders and do not represent
+    measured hardware.
+presets:
+  rc_car:
+    scale_reference:
+      value: 0.1
+      unit: ratio
+      status: placeholder
+      source: Configured simulator value; not a hardware measurement.
+    geometry:
+      wheelbase_m:
+        value: 0.27
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      front_track_m:
+        value: 0.2
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      rear_track_m:
+        value: 0.2
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      wheel_radius_m:
+        value: 0.033
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      wheel_width_m:
+        value: 0.025
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      chassis_length_m:
+        value: 0.38
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      chassis_width_m:
+        value: 0.22
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      chassis_height_m:
+        value: 0.085
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      ground_clearance_m:
+        value: 0.025
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      wheel_centers_base_link_m:
+        value:
+        - - 0.135
+          - 0.1
+          - -0.0345
+        - - 0.135
+          - -0.1
+          - -0.0345
+        - - -0.135
+          - 0.1
+          - -0.0345
+        - - -0.135
+          - -0.1
+          - -0.0345
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      collision_envelope_m:
+        value:
+        - 0.38
+        - 0.22
+        - 0.085
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      footprint_radius_m:
+        value: 0.2195449840010015
+        unit: m
+        status: placeholder
+        source: Derived from placeholder chassis length and width; conservative circular
+          footprint for scenario overlap and collision checks.
+    dynamics:
+      chassis_mass_kg:
+        value: 0.45
+        unit: kg
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      total_mass_kg:
+        value: 0.6
+        unit: kg
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      steering_link_mass_kg:
+        value: 0.003
+        unit: kg
+        status: placeholder
+        source: Small primitive steering-knuckle mass placeholder; contributes to
+          the configured total mass.
+      steering_link_inertia_tensor_kg_m2:
+        value:
+          ixx: 5.0e-08
+          iyy: 5.0e-08
+          izz: 5.0e-08
+          ixy: 0.0
+          ixz: 0.0
+          iyz: 0.0
+        unit: kg·m²
+        status: placeholder
+        source: Primitive steering-knuckle inertia placeholder; replace with measured
+          geometry.
+      center_of_mass_base_link_m:
+        value:
+        - 0.0
+        - 0.0
+        - -0.005
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      inertia_tensor_kg_m2:
+        value:
+          ixx: 0.002085
+          iyy: 0.0056859375
+          izz: 0.00723
+          ixy: 0.0
+          ixz: 0.0
+          iyz: 0.0
+        unit: kg·m²
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      wheel_friction_mu:
+        value: 0.8
+        unit: unitless
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      braking_deceleration_mps2:
+        value: 0.4
+        unit: m/s²
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      max_acceleration_mps2:
+        value: 0.5
+        unit: m/s²
+        status: placeholder
+        source: Design placeholder for the RC prototype; Gazebo command acceleration
+          limit.
+    steering:
+      effective_center_wheel_limit_rad:
+        value: 0.45
+        unit: rad
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      plugin_steering_limit_rad:
+        value: 0.5041405186899995
+        unit: rad
+        status: placeholder
+        source: Configured simulator value; not a hardware measurement.
+      max_speed_mps:
+        value: 1.0
+        unit: m/s
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      max_yaw_rate_radps:
+        value: 1.0
+        unit: rad/s
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      turn_radius_tolerance_ratio:
+        value: 0.1
+        unit: ratio
+        status: placeholder
+        source: Initial simulation acceptance tolerance from the user specification;
+          not a hardware calibration.
+    frames:
+      odometry:
+        value: odom
+        unit: frame_id
+        status: placeholder
+        source: Chosen ROS odometry frame label; confirm against the real vehicle
+          TF tree.
+      base:
+        value: base_link
+        unit: frame_id
+        status: placeholder
+        source: Chosen ROS vehicle-root frame label; confirm against the real vehicle
+          TF tree.
+    sensors:
+      lidar:
+        sku:
+          value: unknown-single-plane-lidar
+          unit: identifier
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        vertical_samples:
+          value: 1
+          unit: count
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        range_min_m:
+          value: 0.05
+          unit: m
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        range_max_m:
+          value: 8.0
+          unit: m
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        range_resolution_m:
+          value: 0.01
+          unit: m
+          status: placeholder
+          source: Design placeholder for the RC LiDAR range quantization.
+        horizontal_angle_min_rad:
+          value: -1.57079632679
+          unit: rad
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        horizontal_angle_max_rad:
+          value: 1.57079632679
+          unit: rad
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        horizontal_samples:
+          value: 361
+          unit: count
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        angular_resolution_rad:
+          value: 0.00872664626
+          unit: rad
+          status: placeholder
+          source: Derived from 180 degrees over 360 beam intervals; placeholder sensor
+            field of view.
+        update_rate_hz:
+          value: 10.0
+          unit: Hz
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        pose_base_link_m_rad:
+          value:
+          - 0.11
+          - 0.0
+          - 0.055
+          - 0.0
+          - 0.0
+          - 0.0
+          unit: m,rad
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        frame: lidar_link
+      camera:
+        variant:
+          value: Camera Module 3 variant unknown
+          unit: identifier
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        width_px:
+          value: 640
+          unit: px
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        height_px:
+          value: 480
+          unit: px
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        horizontal_fov_rad:
+          value: 1.2217304764
+          unit: rad
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        clip_min_m:
+          value: 0.05
+          unit: m
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        clip_max_m:
+          value: 12.0
+          unit: m
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        update_rate_hz:
+          value: 15.0
+          unit: Hz
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        pose_base_link_m_rad:
+          value:
+          - 0.1
+          - 0.0
+          - 0.1
+          - 0.0
+          - 0.0
+          - 0.0
+          unit: m,rad
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        frame: camera_link
+        segmentation:
+          gz_topic:
+            value: /model/gazebo_truck/sensors/front_camera_segmentation/labels_map
+            unit: topic
+            status: simulation_ground_truth
+            source: Gazebo Jetty instance-segmentation camera mounted at the RGB camera
+              pose.
+          ros_topic:
+            value: /camera/labels
+            unit: topic
+            status: simulation_ground_truth
+            source: ros_gz_bridge sensor_msgs/Image alias in rc_module_matrix/bridge.yaml.
+          encoding:
+            value: rgb8
+            unit: sensor_msgs/Image encoding
+            status: simulation_ground_truth
+            source: Gazebo R8G8B8 label map; channels 0-1 encode instance count and
+              channel 2 encodes class label.
+          class_ids:
+            background: 0
+            cone: 10
+            pedestrian: 20
+            vehicle: 30
+          update_rate_hz:
+            value: 15.0
+            unit: Hz
+            status: placeholder
+            source: Matched to the RGB simulation camera for timestamp pairing.
+      imu:
+        update_rate_hz:
+          value: 100.0
+          unit: Hz
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        pose_base_link_m_rad:
+          value:
+          - 0.0
+          - 0.0
+          - 0.02
+          - 0.0
+          - 0.0
+          - 0.0
+          unit: m,rad
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        frame: imu_link
+      contact:
+        update_rate_hz:
+          value: 100.0
+          unit: Hz
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        collision_allowlist:
+        - cone_01_collision
+        - pedestrian_01_collision
+        - vehicle_01_collision
+    navigation:
+      lookahead_min_m:
+        value: 0.25
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      lookahead_max_m:
+        value: 0.6
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      default_speed_mps:
+        value: 0.45
+        unit: m/s
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      required_clearance_m:
+        value: 0.12
+        unit: m
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      control_period_s:
+        value: 0.05
+        unit: s
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      planner_period_s:
+        value: 0.1
+        unit: s
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      sensor_max_age_s:
+        value: 0.3
+        unit: s
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      clock_stall_limit_s:
+        value: 0.5
+        unit: s
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      detection_max_age_s:
+        value: 0.5
+        unit: s
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      camera_detection:
+        minimum_confidence:
+          value: 0.55
+          unit: probability
+          status: placeholder
+          source: Validation-selected detector confidence floor is recorded in frozen
+            model metadata; this is the conservative node fallback.
+        class_safety_margin_m:
+          cone: 0.3
+          pedestrian: 0.55
+          vehicle: 0.4
+        stale_policy:
+          value: lidar_only
+          unit: policy
+          status: contract
+          source: Missing, stale, unknown-class, and low-confidence detections never
+            reduce the LiDAR clearance floor.
+      image_scan_sync_tolerance_s:
+        value: 0.08
+        unit: s
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      sector_boundaries_rad:
+        value:
+        - -1.57079632679
+        - -0.52359877559
+        - -0.1745329252
+        - 0.1745329252
+        - 0.52359877559
+        - 1.57079632679
+        unit: rad
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      lidar_planner:
+        planning_horizon_m:
+          value: 4.0
+          unit: m
+          status: placeholder
+          source: Initial RC local-planning horizon chosen to give the 0.27 m wheelbase
+            time to steer around course stand-ins.
+        max_lateral_deviation_m:
+          value: 1.6
+          unit: m
+          status: placeholder
+          source: Course-bound design limit; scenario configs may reduce this
+            value for constrained-path stop tests.
+        stopping_margin_m:
+          value: 0.15
+          unit: m
+          status: placeholder
+          source: Conservative additional stopping allowance beyond footprint and
+            required obstacle clearance.
+        self_filter_radius_m:
+          value: 0.25
+          unit: m
+          status: placeholder
+          source: Excludes near-field returns from the lidar mount and chassis geometry.
+        minimum_safe_speed_mps:
+          value: 0.05
+          unit: m/s
+          status: placeholder
+          source: Below this calculated speed the local planner requests a full stop.
+      route:
+        id:
+          value: report-course-scaled-v1
+          unit: identifier
+          status: placeholder
+          source: Ten-percent scaled report route, with lane-change offsets fitted
+            to the RC course bounds.
+        frame_id:
+          value: odom
+          unit: frame_id
+          status: placeholder
+          source: RC odometry is relative to the configured spawn pose; verify the
+            hardware frame convention before reuse.
+        waypoints_odom_m:
+          value:
+          - - 0.0
+            - 0.0
+          - - 4.0
+            - 0.0
+          - - 6.0
+            - 0.7
+          - - 8.0
+            - 1.6
+          - - 10.0
+            - 2.0
+          - - 14.0
+            - 2.0
+          - - 15.5
+            - 2.0
+          - - 16.5
+            - 1.7
+          - - 17.5
+            - 0.7
+          - - 18.5
+            - 0.2
+          - - 22.0
+            - 0.0
+          unit: m
+          status: placeholder
+          source: Configured simulator value; not a hardware measurement.
+        goal_tolerance_m:
+          value: 0.3
+          unit: m
+          status: placeholder
+          source: Configured simulator value; not a hardware measurement.
+        lookahead_distance_m:
+          value: 1.2
+          unit: m
+          status: placeholder
+          source: Configured simulator value; not a hardware measurement.
+        route_speed_mps:
+          value: 0.4
+          unit: m/s
+          status: placeholder
+          source: Configured simulator value; not a hardware measurement.
+        update_rate_hz:
+          value: 20.0
+          unit: Hz
+          status: placeholder
+          source: Configured simulator value; not a hardware measurement.
+    detection_policy:
+      classes:
+      - cone
+      - pedestrian
+      - vehicle
+      confidence_threshold:
+        value: 0.5
+        unit: probability
+        status: placeholder
+        source: Design placeholder for the RC prototype; replace with a linked physical
+          measurement or manufacturer specification before hardware claims.
+      safety_margin_by_class_m:
+        cone:
+          value: 0.12
+          unit: m
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        pedestrian:
+          value: 0.25
+          unit: m
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
+        vehicle:
+          value: 0.25
+          unit: m
+          status: placeholder
+          source: Design placeholder for the RC prototype; replace with a linked physical
+            measurement or manufacturer specification before hardware claims.
