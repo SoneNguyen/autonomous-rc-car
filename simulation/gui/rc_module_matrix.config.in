@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <window>
-  <width>1440</width>
-  <height>900</height>
+  <width>1100</width>
+  <height>700</height>
   <style material_theme="Light" material_primary="BlueGrey" material_accent="LightBlue" />
   <dialog_on_exit>false</dialog_on_exit>
 </window>

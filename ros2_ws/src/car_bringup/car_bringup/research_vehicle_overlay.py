@@ -36,8 +36,9 @@ def create_matrix_vehicle_overlay(
     *,
     research_vehicle_mesh_uri: str | None = None,
     research_vehicle_scale: float = 0.08,
+    enabled_sensors: set[str] | None = None,
 ) -> RuntimeModelOverlay:
-    """Apply a matrix camera profile and locked research vehicle visual."""
+    """Apply a camera profile, selected runtime sensors, and research vehicle visual."""
     source = Path(source_model).resolve()
     source_sdf = source / "model.sdf"
     if not source_sdf.is_file():
@@ -87,6 +88,27 @@ def create_matrix_vehicle_overlay(
             mesh_uri=research_vehicle_mesh_uri,
             scale=research_vehicle_scale,
         )
+
+    if enabled_sensors is not None:
+        sensor_groups = {
+            "lidar": {"front_lidar"},
+            "camera": {"front_camera", "front_camera_segmentation"},
+            "imu": {"imu"},
+            "contact": {"bumper_contact"},
+        }
+        unknown = enabled_sensors - sensor_groups.keys()
+        if unknown:
+            temporary.cleanup()
+            raise RuntimeError(f"unknown matrix sensor groups: {sorted(unknown)}")
+        enabled_names = set().union(*(sensor_groups[group] for group in enabled_sensors))
+        model = tree.getroot().find("model")
+        if model is None:
+            temporary.cleanup()
+            raise RuntimeError("RC vehicle model overlay has no model")
+        for link in model.findall("link"):
+            for sensor in list(link.findall("sensor")):
+                if sensor.get("name") not in enabled_names:
+                    link.remove(sensor)
     tree.write(copied_sdf, encoding="utf-8", xml_declaration=True)
     return RuntimeModelOverlay(temporary_directory=temporary, models_dir=models_dir)
 

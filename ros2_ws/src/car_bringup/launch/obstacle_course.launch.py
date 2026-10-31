@@ -49,6 +49,9 @@ def _launch_setup(context, *_args, **_kwargs):
     behavior = LaunchConfiguration("behavior").perform(context)
     headless = LaunchConfiguration("headless").perform(context).lower()
     gui_config = LaunchConfiguration("gui_config").perform(context).strip()
+    bridge_config = LaunchConfiguration("bridge_config").perform(context).strip()
+    sensor_set = LaunchConfiguration("sensor_set").perform(context).strip().lower()
+    quality_preset = LaunchConfiguration("quality_preset").perform(context).strip().lower()
     if headless not in {"true", "false", "glx"}:
         raise RuntimeError("headless must be true, false, or glx (server-only WSLg rendering)")
     if behavior not in {"sensors", "camera", "command_path"}:
@@ -57,6 +60,12 @@ def _launch_setup(context, *_args, **_kwargs):
         raise RuntimeError("command-path runs must be server-only")
     if gui_config and headless != "false":
         raise RuntimeError("gui_config can only be used when headless:=false")
+    if sensor_set not in {"", "lidar", "camera", "imu", "contact", "none"}:
+        raise RuntimeError("sensor_set must be empty, lidar, camera, imu, contact, or none")
+    if quality_preset not in {"", "high", "low"}:
+        raise RuntimeError("quality_preset must be empty, high, or low")
+    if (sensor_set or quality_preset) and headless != "false":
+        raise RuntimeError("sensor_set and quality_preset overrides are restricted to visible GUI demos")
     if not scenario_name or Path(scenario_name).is_absolute():
         raise RuntimeError("scenario must be a relative matrix scenario path")
     scenario_parts = Path(scenario_name).parts
@@ -91,6 +100,8 @@ def _launch_setup(context, *_args, **_kwargs):
         "--lock", str(config_source / "research_assets.lock.yaml"),
         "--output", str(world_path),
     ]
+    if quality_preset:
+        build.extend(["--quality-preset", quality_preset])
     subprocess.run(build, cwd=repo, check=True)
 
     vehicle_lock_path = config_source / "research_vehicle.lock.yaml"
@@ -116,11 +127,23 @@ def _launch_setup(context, *_args, **_kwargs):
 
     quality = yaml.safe_load((config_source / "quality.yaml").read_text(encoding="utf-8"))
     quality_id = scenario.get("quality_preset", scenario.get("setup", {}).get("quality_preset", "high"))
+    if quality_preset:
+        quality_id = quality_preset
     if quality_id not in quality.get("presets", {}):
         raise RuntimeError(f"unknown camera quality preset {quality_id!r}")
+    enabled_sensors = None
+    if sensor_set:
+        enabled_sensors = {
+            "lidar": {"lidar"},
+            "camera": {"camera"},
+            "imu": {"imu"},
+            "contact": {"contact"},
+            "none": set(),
+        }[sensor_set]
     overlay = create_matrix_vehicle_overlay(
         repo / "simulation/models/rc_car", quality["presets"][quality_id],
         research_vehicle_mesh_uri=mesh_uri, research_vehicle_scale=mesh_scale,
+        enabled_sensors=enabled_sensors,
     )
     _ACTIVE_RUNTIME_OVERLAYS.append(overlay)
 
@@ -144,9 +167,12 @@ def _launch_setup(context, *_args, **_kwargs):
         gz_args.extend(["--gui-config", str(gui_config_path)])
     gz_args.append(str(world_path))
     gazebo = ExecuteProcess(cmd=["gz", *gz_args], cwd=str(repo), output="screen", emulate_tty=True)
+    bridge_config_path = Path(bridge_config).expanduser().resolve() if bridge_config else config_share / "bridge.yaml"
+    if not bridge_config_path.is_file():
+        raise RuntimeError(f"matrix bridge configuration does not exist: {bridge_config_path}")
     bridge = Node(
         package="ros_gz_bridge", executable="parameter_bridge", name="matrix_bridge",
-        parameters=[{"config_file": str(config_share / "bridge.yaml"), "use_sim_time": True}],
+        parameters=[{"config_file": str(bridge_config_path), "use_sim_time": True}],
         output="screen",
     )
 
@@ -208,7 +234,10 @@ def _launch_setup(context, *_args, **_kwargs):
             )))
     shutdown_handlers.append(RegisterEventHandler(OnProcessExit(
         target_action=gazebo,
-        on_exit=[OpaqueFunction(function=_cleanup_runtime_overlays)],
+        on_exit=[
+            OpaqueFunction(function=_cleanup_runtime_overlays),
+            Shutdown(reason="Gazebo exited; stopping matrix nodes"),
+        ],
     )))
     gui_render_environment = []
     if headless == "false" and Path("/mnt/wslg").is_dir():
@@ -247,5 +276,8 @@ def generate_launch_description():
         DeclareLaunchArgument("headless", default_value="true"),
         DeclareLaunchArgument("behavior", default_value="sensors"),
         DeclareLaunchArgument("gui_config", default_value=""),
+        DeclareLaunchArgument("bridge_config", default_value=""),
+        DeclareLaunchArgument("sensor_set", default_value=""),
+        DeclareLaunchArgument("quality_preset", default_value=""),
         OpaqueFunction(function=_launch_setup),
     ])

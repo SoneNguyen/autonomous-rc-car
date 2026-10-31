@@ -101,6 +101,19 @@ Then launch the component you want to inspect:
 | Contact/TF | `python3 tools/rc_module_gui.py contact_tf` | Gazebo contact scene and contact/TF topics. |
 | Drive actuator | `python3 tools/rc_module_gui.py actuator` | Gazebo scene and odometry plots during a short drive pulse. |
 
+These viewer commands start only the selected sensor and bridge only its topics;
+the unrelated camera, segmentation, and LiDAR workloads stay disabled. They use
+the `low` preview profile by default (320 × 240 camera at 15 Hz, reduced shadows)
+to keep WSLg responsive. Use `--quality high` when you need the qualification
+camera resolution and rate:
+
+~~~bash
+python3 tools/rc_module_gui.py camera --quality high
+~~~
+
+The preview profile is for visual inspection and does not produce qualification
+results. The full matrix keeps its configured sensors and quality settings.
+
 The viewer uses a project-owned Gazebo layout, so saved panels in `~/.gz` do
 not add duplicate UI elements. It opens one 3D scene, one world-control panel,
 one stats panel, and one entity tree. The camera is framed from the selected
@@ -110,10 +123,11 @@ that belong to that test.
 The IMU/odometry and actuator demos briefly command the simulated truck at
 0.2 m/s, then publish a zero command. The actuator demo exercises the Gazebo
 drive plugin through its bridge; it does not test the safe-drive controller.
-Press Ctrl-C in the launching terminal to close the viewer. On this WSLg
-machine, Gazebo and the ROS bridge print exit code `-11` during Ctrl-C
-shutdown, although the live view starts and runs. These demos are for visual
-inspection and do not create qualification reports.
+Press Ctrl-C in the launching terminal to close the viewer. If Gazebo exits or
+crashes, the launch now stops its bridge and ROS nodes, and the viewer reports
+that it did not receive live sensor data instead of waiting on a topic name
+created by the bridge. These demos are for visual inspection and do not create
+qualification reports.
 
 ## 4. Run the qualification matrix
 
