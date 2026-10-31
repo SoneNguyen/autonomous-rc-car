@@ -14,9 +14,20 @@
   </gz-gui>
   <engine>ogre2</engine>
   <scene>scene</scene>
+  <view_controller>orbit</view_controller>
   <ambient_light>0.55 0.55 0.55</ambient_light>
   <background_color>0.78 0.82 0.86</background_color>
   <camera_pose>__CAMERA_POSE__</camera_pose>
+</plugin>
+
+<plugin filename="InteractiveViewControl" name="Interactive view control">
+  <gz-gui>
+    <property type="bool" key="resizable">false</property>
+    <property type="double" key="width">5</property>
+    <property type="double" key="height">5</property>
+    <property type="string" key="state">floating</property>
+    <property type="bool" key="showTitleBar">false</property>
+  </gz-gui>
 </plugin>
 
 <plugin filename="GzSceneManager" name="Scene manager">
@@ -30,6 +41,16 @@
 </plugin>
 
 <plugin filename="VisualizationCapabilities" name="Visualization capabilities">
+  <gz-gui>
+    <property type="bool" key="resizable">false</property>
+    <property type="double" key="width">5</property>
+    <property type="double" key="height">5</property>
+    <property type="string" key="state">floating</property>
+    <property type="bool" key="showTitleBar">false</property>
+  </gz-gui>
+</plugin>
+
+<plugin filename="CameraTracking" name="Camera Tracking">
   <gz-gui>
     <property type="bool" key="resizable">false</property>
     <property type="double" key="width">5</property>

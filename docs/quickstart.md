@@ -91,21 +91,46 @@ source /opt/ros/lyrical/setup.bash
 source ros2_ws/install/setup.bash
 ~~~
 
-Then launch the component you want to inspect:
+To print the component names and commands without starting anything:
 
-| Component | Command | What you will see |
-|---|---|---|
-| LiDAR | `python3 tools/rc_module_gui.py lidar` | Gazebo scene and live front-beam range plot. |
-| Camera | `python3 tools/rc_module_gui.py camera` | Gazebo scene, RGB and segmentation windows, and detection topics. |
-| IMU/odometry | `python3 tools/rc_module_gui.py imu_odometry` | Gazebo scene and live IMU/odometry plots during a short turn. |
-| Contact/TF | `python3 tools/rc_module_gui.py contact_tf` | Gazebo contact scene and contact/TF topics. |
-| Drive actuator | `python3 tools/rc_module_gui.py actuator` | Gazebo scene and odometry plots during a short drive pulse. |
+~~~bash
+python3 tools/rc_module_gui.py --list
+~~~
+
+To open the interactive menu and choose a component:
+
+~~~bash
+python3 tools/rc_module_gui.py
+~~~
+
+Choose a number in the menu. The same demo can be launched directly with one
+of these commands:
+
+| Component | Command | Work case | Measure that confirms it |
+|---|---|---|---|
+| LiDAR | `python3 tools/rc_module_gui.py lidar` | Drive past the cone at 3 m and -20 degrees. | `/scan/ranges[140]` should show a finite return near 3 m. |
+| Camera | `python3 tools/rc_module_gui.py camera` | Pass a near cone without hitting it. | Compare RGB and segmentation; `/detections` should report class `cone` at confidence ≥ 0.8. |
+| IMU/odometry | `python3 tools/rc_module_gui.py imu_odometry` | Turn left for 5 seconds, then continue straight. | IMU and odometry yaw rates rise during the turn and return near zero afterward; odometry speed is near 0.2 m/s. |
+| Contact/TF | `python3 tools/rc_module_gui.py contact_tf` | Slowly touch the cone with the bumper. | `/contacts` identifies the truck chassis and `cone_01`; TF resolves `base_link` to each sensor frame. |
+| Drive actuator | `python3 tools/rc_module_gui.py actuator` | Send a direct straight Gazebo Twist command. | `/odom` linear speed approaches 0.2 m/s while yaw rate remains near zero. |
+
+To show another camera target class or more than one contact fixture, run one of
+these alternatives after closing the current demo:
+
+~~~bash
+python3 tools/rc_module_gui.py camera --scenario camera/pedestrian-near
+python3 tools/rc_module_gui.py camera --scenario camera/vehicle-near
+python3 tools/rc_module_gui.py contact_tf --scenario contact_tf/multi-fixture-identity
+~~~
 
 These viewer commands start only the selected sensor and bridge only its topics;
 the unrelated camera, segmentation, and LiDAR workloads stay disabled. They use
 the `low` preview profile by default (320 × 240 camera at 15 Hz, reduced shadows)
-to keep WSLg responsive. Use `--quality high` when you need the qualification
-camera resolution and rate:
+to keep WSLg responsive. Keep this default for visual demos. The `high` camera
+profile (640 × 480 at 30 Hz, shadows, and antialiasing) is heavier and can make
+WSLg lag, especially while the RGB, segmentation, Gazebo, and detector windows
+are open. Use it only when you specifically need to inspect the full camera
+resolution:
 
 ~~~bash
 python3 tools/rc_module_gui.py camera --quality high
@@ -116,18 +141,61 @@ results. The full matrix keeps its configured sensors and quality settings.
 
 The viewer uses a project-owned Gazebo layout, so saved panels in `~/.gz` do
 not add duplicate UI elements. It opens one 3D scene, one world-control panel,
-one stats panel, and one entity tree. The camera is framed from the selected
-scenario's car and in-world fixtures; each scenario only displays the actors
-that belong to that test.
+one stats panel, and one entity tree. Each `rqt` window also starts with a clean
+per-run layout, so old saved topic panes cannot appear more than once. This
+does not change or delete your personal `rqt` settings. Gazebo and its `rqt`
+viewers are tiled on the same monitor: the scene fills the left side, and the
+relevant plots or image/topic viewers stack on the right. The camera is framed
+from the selected scenario's car and in-world fixtures; each scenario only
+displays the actors that belong to that test.
 
-The IMU/odometry and actuator demos briefly command the simulated truck at
-0.2 m/s, then publish a zero command. The actuator demo exercises the Gazebo
-drive plugin through its bridge; it does not test the safe-drive controller.
-Press Ctrl-C in the launching terminal to close the viewer. If Gazebo exits or
-crashes, the launch now stops its bridge and ROS nodes, and the viewer reports
-that it did not receive live sensor data instead of waiting on a topic name
-created by the bridge. These demos are for visual inspection and do not create
-qualification reports.
+The camera starts in a free world view framed around the truck and its fixtures.
+Click the Gazebo scene to focus it, then use these game-style controls:
+
+| Input | Camera action |
+|---|---|
+| `W A S D` | Pan across the world |
+| `Q / E` | Rotate left / right |
+| `Page Up / Page Down` or `+ / -` | Zoom in / out |
+| `Shift` + movement key | Move faster |
+| `0` | Return to the scenario overview |
+| `T` | Toggle truck-follow mode |
+
+Gazebo mouse controls also work: scroll to zoom, right-drag to zoom, middle-drag
+to orbit, and left-drag to pan. Truck-follow is optional; press `T` to enable or
+disable it. Enabling follow preserves the camera's current distance from the
+truck, so it does not reset the zoom. The wheel or Page Up/Down then changes that
+distance while the camera keeps tracking. The LiDAR and camera targets sit
+beside the straight driving line, so the truck passes them while their sensors
+update.
+The contact/TF demo begins 1.4 m before the cone and approaches it at 0.1 m/s
+to make contact visible. The IMU/odometry demo turns left at 0.08 rad/s for
+five seconds, then continues straight at 0.2 m/s; this bounds the yaw response
+so the truck does not circle indefinitely. The actuator demo drives straight
+at 0.2 m/s and
+exercises the Gazebo drive plugin through its bridge; it does not test the
+safe-drive controller or claim autonomous obstacle avoidance.
+
+The launching terminal stays occupied while Gazebo is open; that is the running
+demo, not a stuck shell. After startup it prints `Live data received; the demo
+is running`, the camera controls, and the truck's speed. Press Ctrl-C in that
+terminal to stop the truck and close the viewer. To switch to another component, run the
+menu command again and choose a different number, or run that component's
+command from the table. In the camera demo, each image
+window starts on its matching topic; the small topic field can be opened to
+select `/camera/image_raw` or `/camera/labels`. The topic viewer lists detector
+and status topics. The LiDAR and motion plots update while simulation time
+advances.
+
+Gazebo's simulation clock should advance while the demo runs. The GUI runner
+resumes the world as soon as Gazebo's world-control service is ready and checks
+that `/clock` advances before it starts the truck or opens the viewers.
+If the world is paused manually, click the play control in Gazebo's World
+Control panel; a still car in the camera, LiDAR, or contact/TF demo is expected.
+If Gazebo exits or crashes, the launch stops its bridge and ROS nodes and the
+viewer reports that it did not receive live sensor data instead of waiting on a
+topic name created by the bridge. These demos are for visual inspection and do
+not create qualification reports.
 
 If the terminal says `ros2: command not found` or exits with status `127`, run
 the setup commands again in that same WSLg terminal before starting the demo:
