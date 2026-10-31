@@ -20,6 +20,13 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_ROOT = ROOT / "ros2_ws/src/car_bringup/config/rc_module_matrix"
 BRIDGE_CONFIG = CONFIG_ROOT / "bridge.yaml"
+ROS_TOPIC_TYPES = {
+    "/camera/image_raw": "sensor_msgs/msg/Image",
+    "/imu/data": "sensor_msgs/msg/Imu",
+    "/odom": "nav_msgs/msg/Odometry",
+    "/scan": "sensor_msgs/msg/LaserScan",
+    "/clock": "rosgraph_msgs/msg/Clock",
+}
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
@@ -177,11 +184,14 @@ def _wait_for_topic(
     if topic == "/contacts":
         # Contact publishers only emit during a collision, so use simulation clock for startup.
         topic = "/clock"
+    message_type = ROS_TOPIC_TYPES.get(topic)
+    if message_type is None:
+        return False
     if launch.poll() is not None:
         return False
     try:
         subscriber = subprocess.Popen(
-            ["ros2", "topic", "echo", "--once", topic,
+            ["ros2", "topic", "echo", "--once", topic, message_type,
              "--qos-reliability", "best_effort"],
             env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             start_new_session=True,
