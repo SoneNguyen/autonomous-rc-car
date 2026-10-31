@@ -7,6 +7,7 @@ import math
 import os
 from pathlib import Path
 import signal
+import shutil
 import subprocess
 import sys
 import time
@@ -277,8 +278,30 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("no GUI display found; start this command from a WSLg terminal")
     if not (ROOT / "ros2_ws/install/car_bringup/share/car_bringup").is_dir():
         parser.error("workspace is not built/sourced; source /opt/ros/lyrical/setup.bash and ros2_ws/install/setup.bash")
+    for executable in ("ros2", "gz"):
+        if shutil.which(executable) is None:
+            parser.error(
+                f"{executable} is not on PATH; source /opt/ros/lyrical/setup.bash "
+                "and ros2_ws/install/setup.bash before opening a module demo"
+            )
 
     view = MODULE_VIEWS[args.module]
+    for package in {item[0] for item in view["viewers"]}:
+        try:
+            available = subprocess.run(
+                ["ros2", "pkg", "executables", package],
+                capture_output=True, text=True, timeout=10, check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            parser.error(f"cannot check ROS viewer package {package}: {exc}")
+        expected = f"{package} {package}"
+        if available.returncode != 0 or expected not in available.stdout.splitlines():
+            package_name = package.replace("_", "-")
+            parser.error(
+                f"ROS viewer {package} is unavailable; install ros-lyrical-{package_name} "
+                "and source /opt/ros/lyrical/setup.bash"
+            )
+
     scenario = args.scenario or view["scenario"]
     scenarios = _scenarios(CONFIG_ROOT / view["config"])
     if scenario not in scenarios:
@@ -298,13 +321,7 @@ def main(argv: list[str] | None = None) -> int:
     bridge_config_path = _write_module_bridge_config(
         args.module, gui_config_path.parent,
     )
-    launch = subprocess.Popen([
-        "ros2", "launch", "car_bringup", "obstacle_course.launch.py",
-        f"behavior:={view['behavior']}", f"scenario:={runtime_scenario_name}",
-        "headless:=false", f"gui_config:={gui_config_path}",
-        f"bridge_config:={bridge_config_path}",
-        f"sensor_set:={view['sensor_set']}", f"quality_preset:={args.quality}",
-    ], cwd=ROOT, env=env, start_new_session=True)
+    launch: subprocess.Popen | None = None
     viewers: list[subprocess.Popen] = []
     topic = {
         "lidar": "/scan",
@@ -316,6 +333,13 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Opening Gazebo GUI for {scenario} (quality={args.quality}).", flush=True)
     print(view["description"], flush=True)
     try:
+        launch = subprocess.Popen([
+            "ros2", "launch", "car_bringup", "obstacle_course.launch.py",
+            f"behavior:={view['behavior']}", f"scenario:={runtime_scenario_name}",
+            "headless:=false", f"gui_config:={gui_config_path}",
+            f"bridge_config:={bridge_config_path}",
+            f"sensor_set:={view['sensor_set']}", f"quality_preset:={args.quality}",
+        ], cwd=ROOT, env=env, start_new_session=True)
         if not _wait_for_topic(topic, env, launch):
             raise RuntimeError(
                 f"{topic} did not produce a live sample; Gazebo may have exited, "
@@ -341,7 +365,7 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         for process in viewers:
             _stop_process_group(process, timeout_s=5.0)
-        if launch.poll() is None:
+        if launch is not None and launch.poll() is None:
             _stop_process_group(launch)
         runtime_scenario_path.unlink(missing_ok=True)
         gui_config_path.unlink(missing_ok=True)

@@ -129,6 +129,19 @@ that it did not receive live sensor data instead of waiting on a topic name
 created by the bridge. These demos are for visual inspection and do not create
 qualification reports.
 
+If the terminal says `ros2: command not found` or exits with status `127`, run
+the setup commands again in that same WSLg terminal before starting the demo:
+
+~~~bash
+cd ~/src/gz-ws
+source /opt/ros/lyrical/setup.bash
+source ros2_ws/install/setup.bash
+command -v ros2 gz
+~~~
+
+The demo script now checks these commands and its selected `rqt` viewer before
+launching Gazebo, and prints a setup or package-install hint if one is missing.
+
 ## 4. Run the qualification matrix
 
 Keep the ROS and workspace setup from step 3 active. List available scenarios,
