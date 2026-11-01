@@ -2,7 +2,7 @@ schema_version: '1.0'
 decision_config_id: obstacle-course-barrier-tuning-development-v1
 vehicle_profile:
   path: ros2_ws/src/car_bringup/config/obstacle_course/rc_vehicle_reference.yaml
-  sha256: 886c30481d02054ecbe6f3bf04eff196d06603e9f57efdef656cd2f371b31381
+  sha256: b21c1aacc788714606d088fbfee919f7422933ca31876a58157041c79997c1dd
 camera:
   source: hsv
   lighting: world_default
