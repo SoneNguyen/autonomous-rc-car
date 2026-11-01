@@ -1,0 +1,165 @@
+schema_version: "1.0"
+decision_config_id: obstacle-course-decision-v1
+vehicle_profile:
+  path: ros2_ws/src/car_bringup/config/obstacle_course/rc_vehicle_reference.yaml
+  sha256: 886c30481d02054ecbe6f3bf04eff196d06603e9f57efdef656cd2f371b31381
+camera:
+  source: hsv
+  lighting: obstacle_course_default
+  qualification_detector: true
+  hsv_classes:
+    barrier:
+      ranges:
+      - lower_hsv:
+          value: [0, 110, 75]
+          unit: OpenCV_HSV_0_179_0_255_0_255
+          provenance: Initial red barrier range for the Feature 007 development variant; freeze only after separate lighting checks.
+        upper_hsv:
+          value: [12, 255, 255]
+          unit: OpenCV_HSV_0_179_0_255_0_255
+          provenance: Initial red barrier range for the Feature 007 development variant; freeze only after separate lighting checks.
+      - lower_hsv:
+          value: [168, 110, 75]
+          unit: OpenCV_HSV_0_179_0_255_0_255
+          provenance: Wraparound red hue range; development starting point only.
+        upper_hsv:
+          value: [179, 255, 255]
+          unit: OpenCV_HSV_0_179_0_255_0_255
+          provenance: Wraparound red hue range; development starting point only.
+    post:
+      ranges:
+      - lower_hsv:
+          value: [7, 120, 90]
+          unit: OpenCV_HSV_0_179_0_255_0_255
+          provenance: Initial orange cone/post range under obstacle_course_default lighting.
+        upper_hsv:
+          value: [24, 255, 255]
+          unit: OpenCV_HSV_0_179_0_255_0_255
+          provenance: Initial orange cone/post range under obstacle_course_default lighting.
+    gate:
+      ranges:
+      - lower_hsv:
+          value: [92, 90, 65]
+          unit: OpenCV_HSV_0_179_0_255_0_255
+          provenance: Initial blue gate range under obstacle_course_default lighting.
+        upper_hsv:
+          value: [132, 255, 255]
+          unit: OpenCV_HSV_0_179_0_255_0_255
+          provenance: Initial blue gate range under obstacle_course_default lighting.
+  minimum_blob_area_px:
+    value: 24
+    unit: px^2
+    provenance: Initial image qualification floor for 640x480 camera frames; development value.
+  minimum_class_confidence:
+    value: 0.45
+    unit: ratio
+    provenance: HSV color-coverage score floor; development value, not a trained-model threshold.
+  detector_policy:
+    frozen_feature_001_diagnostic_only: true
+    qualification_source: hsv
+    actionable_frozen_label: cone
+    mapped_actionable_class: post
+    other_frozen_labels_actionable: false
+thresholds:
+  caution_distance_multiple_d_stop:
+    value: 2.0
+    unit: d_stop(v)
+    provenance: Initial range for early speed reduction; tune only in tracked development configs.
+  avoidance_distance_multiple_d_stop:
+    value: 1.0
+    unit: d_stop(v)
+    provenance: Initial avoidance trigger distance; tune only in tracked development configs.
+  stop_required_deceleration_fraction:
+    value: 0.8
+    unit: fraction_of_measured_braking_deceleration
+    provenance: Conservative STOP threshold below the measured_sim braking capability; development value.
+  lateral_acceleration_caution_mps2:
+    value: 0.8
+    unit: m/s^2
+    provenance: Initial RC-scale turn-caution value; development value.
+  turn_speed_cap_mps:
+    value: 0.35
+    unit: m/s
+    provenance: Initial speed cap applied after lateral-acceleration caution; development value.
+  class_clearance_vehicle_width_multiple:
+    barrier:
+      value: 0.5
+      unit: W
+      provenance: Initial barrier clearance; obstacle edge separation is this multiple times wheel-inclusive vehicle width.
+    post:
+      value: 0.25
+      unit: W
+      provenance: Initial smaller post clearance for slalom; development value.
+    gate:
+      value: 0.5
+      unit: W
+      provenance: Gate passability margin beyond W; development value.
+    conservative_lidar_only:
+      value: 0.75
+      unit: W
+      provenance: Conservative clearance when camera evidence is stale or unavailable; development value.
+freshness:
+  lidar_timeout_s:
+    value: 0.35
+    unit: s
+    provenance: 10 Hz RC LiDAR period plus transport allowance.
+  camera_timeout_s:
+    value: 0.25
+    unit: s
+    provenance: 15 Hz RC camera period plus transport allowance.
+  imu_timeout_s:
+    value: 0.08
+    unit: s
+    provenance: 100 Hz RC IMU period with simulation scheduling allowance.
+  odometry_timeout_s:
+    value: 0.15
+    unit: s
+    provenance: RC odometry period plus transport allowance.
+  contact_timeout_s:
+    value: 0.08
+    unit: s
+    provenance: 100 Hz contact sensor period with simulation scheduling allowance.
+temporal:
+  gate_clear_consecutive_scans:
+    value: 3
+    unit: scans
+    provenance: Require consecutive approach evidence before a gate veto; initial development value.
+  clear_consecutive_scans:
+    value: 5
+    unit: scans
+    provenance: Initial path-clear hysteresis for RESUME; development value.
+  minimum_behavior_dwell_s:
+    value: 0.25
+    unit: s
+    provenance: Initial decision flicker suppression dwell; development value.
+  stop_clear_dwell_s:
+    value: 1.0
+    unit: s
+    provenance: Initial latched STOP release dwell after corridor clears; development value.
+  distance_hysteresis_multiple_d_stop:
+    value: 0.25
+    unit: d_stop(v)
+    provenance: Entry/exit hysteresis around configured distance transitions; development value.
+geometry:
+  route_corridor_half_width_multiple_W:
+    value: 1.0
+    unit: W
+    provenance: Initial one-vehicle-width centerline corridor on either side of route center.
+  gate_opening_width_formula: W * (1 + class_clearance_vehicle_width_multiple.gate.value)
+  planner_intent:
+    lookahead_min_multiple_L:
+      value: 1.5
+      unit: L
+      provenance: Initial short-horizon target distance for the RC scale.
+    lookahead_max_multiple_L:
+      value: 3.5
+      unit: L
+      provenance: Initial upper target distance to remain within the condensed route.
+    intent_validity_s:
+      value: 0.2
+      unit: s
+      provenance: Two 10 Hz decision periods; stale intent must fail closed.
+    waypoint_tolerance_multiple_W:
+      value: 0.5
+      unit: W
+      provenance: Initial route waypoint acceptance radius.

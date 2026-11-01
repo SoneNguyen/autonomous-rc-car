@@ -1,0 +1,141 @@
+schema_version: '1.0'
+profile_id: obstacle-course-rc-car
+status: measured_sim
+coordinate_convention:
+  forward: +x
+  left: +y
+  up: +z
+  length_unit: m
+  angular_unit: rad
+  time_source: Gazebo simulation time
+sources:
+  vehicle_profile:
+    path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
+    sha256: 3d20371e1cf40417495e67fe761fc3b5da1c2a0c9ab54ad7215733684c3d726c
+    pointer: /presets/rc_car
+  vehicle_model:
+    path: simulation/models/rc_car/model.sdf
+    sha256: 4405554064669da937fb8f4e264296265fac9113fa2ca64561d9fa22d5268939
+    pointer: /sdf/model[@name='rc_car']
+  controller:
+    path: ros2_ws/src/car_autonomy_nodes/car_autonomy_nodes/safe_drive_controller.py
+    sha256: 3ae0d0b69cdb43d92b1d262f396065e075a54cb79b6f92ed962431e74fdaa634
+    pointer: /SafeDriveController/_on_ackermann
+geometry:
+  wheelbase_m:
+    value: 0.27
+    unit: m
+    status: placeholder
+    provenance: rc_vehicle.yaml#/presets/rc_car/geometry/wheelbase_m; inherited unchanged.
+  chassis_length_m:
+    value: 0.38
+    unit: m
+    status: model_geometry
+    provenance: rc_car/model.sdf base_link collision box size[0].
+  chassis_width_m:
+    value: 0.22
+    unit: m
+    status: model_geometry
+    provenance: rc_car/model.sdf base_link collision box size[1].
+  chassis_height_m:
+    value: 0.085
+    unit: m
+    status: model_geometry
+    provenance: rc_car/model.sdf base_link collision box size[2].
+  front_track_m:
+    value: 0.2
+    unit: m
+    status: placeholder
+    provenance: rc_vehicle.yaml#/presets/rc_car/geometry/front_track_m.
+  rear_track_m:
+    value: 0.2
+    unit: m
+    status: placeholder
+    provenance: rc_vehicle.yaml#/presets/rc_car/geometry/rear_track_m.
+  wheel_width_m:
+    value: 0.025
+    unit: m
+    status: model_geometry
+    provenance: rc_car/model.sdf wheel_collision cylinder length.
+  wheel_radius_m:
+    value: 0.033
+    unit: m
+    status: model_geometry
+    provenance: rc_car/model.sdf wheel_collision cylinder radius.
+steering:
+  effective_center_wheel_limit_rad:
+    value: 0.45
+    unit: rad
+    status: placeholder
+    provenance: rc_vehicle.yaml#/presets/rc_car/steering/effective_center_wheel_limit_rad.
+  plugin_steering_limit_rad:
+    value: 0.50414051869
+    unit: rad
+    status: model_geometry
+    provenance: rc_car/model.sdf AckermannSteering plugin steering_limit.
+  maximum_speed_mps:
+    value: 1.0
+    unit: m/s
+    status: placeholder
+    provenance: rc_vehicle.yaml#/presets/rc_car/steering/max_speed_mps.
+derived_geometry:
+  minimum_turn_radius_m:
+    value: 0.5589424875513274
+    unit: m
+    status: derived_sim_geometry
+    provenance: wheelbase_m / tan(effective_center_wheel_limit_rad)
+  formula: wheelbase_m / tan(effective_center_wheel_limit_rad)
+  status: validated_derivation
+dynamics:
+  braking_deceleration_mps2:
+    value: 0.3999092578809597
+    unit: m/s^2
+    status: measured_sim
+    provenance: artifacts/obstacle-course/dynamics/rc-vehicle-reference.json#measurements.conservative_braking_deceleration_mps2
+  request_to_deceleration_latency_s:
+    value: 0.14000000000000057
+    unit: s
+    status: measured_sim
+    provenance: artifacts/obstacle-course/dynamics/rc-vehicle-reference.json#measurements.conservative_request_to_deceleration_latency_s
+  measurement_report:
+    path: artifacts/obstacle-course/dynamics/rc-vehicle-reference.json
+    sha256: 95c7bfdeb63e8e77631919d49d02d3fb1445838d49c77e85f030f24941b4911f
+  simulator_identity: Gazebo Sim 10.5.0; ROS 2 lyrical; ros_gz_bridge 3.0.10; physics=source-world;
+    seed=78001
+  measurement_source_hashes:
+    controller: 3ae0d0b69cdb43d92b1d262f396065e075a54cb79b6f92ed962431e74fdaa634
+    profile: 7931dcf2a01daa0cd6ebd2d3e19bd3e389165ee172662b303823a0938b95e39d
+    scenario: 15e8fb8417b605939a24a117aa27e052d4b7fd458c5bcd3029e7d850ffa98a8c
+    source_world: de31990f634af6e92115d5c92c49c28b7d4668aaa1cd04e99c407bc5d67b55d4
+    vehicle_model: 4405554064669da937fb8f4e264296265fac9113fa2ca64561d9fa22d5268939
+    vehicle_profile: 3d20371e1cf40417495e67fe761fc3b5da1c2a0c9ab54ad7215733684c3d726c
+stopping_distance:
+  formula: v^2 / (2 * braking_deceleration_mps2) + v * request_to_deceleration_latency_s
+  status: measured_sim
+  sample_speeds_mps:
+  - 0.1
+  - 0.25
+  - 0.5
+  - 0.75
+  - 1.0
+  curve:
+  - speed_mps: 0.1
+    distance_m: 0.026502836334657612
+    unit: m
+    provenance: measured_sim braking and request latency from this report
+  - speed_mps: 0.25
+    distance_m: 0.11314272709160984
+    unit: m
+    provenance: measured_sim braking and request latency from this report
+  - speed_mps: 0.5
+    distance_m: 0.3825709083664391
+    unit: m
+    provenance: measured_sim braking and request latency from this report
+  - speed_mps: 0.75
+    distance_m: 0.8082845438244877
+    unit: m
+    provenance: measured_sim braking and request latency from this report
+  - speed_mps: 1.0
+    distance_m: 1.3902836334657558
+    unit: m
+    provenance: measured_sim braking and request latency from this report

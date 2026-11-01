@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "run-report.schema.json",
+  "title": "Feature 007 demonstration run report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_id",
+    "created_utc",
+    "scenario_id",
+    "run_purpose",
+    "mode",
+    "status",
+    "qualified",
+    "expected_behavior_sequence",
+    "expected_trigger_components",
+    "repeats",
+    "source_identity",
+    "protected_metrics_written"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "report_id": {"type": "string", "format": "uuid"},
+    "created_utc": {"type": "string", "format": "date-time"},
+    "scenario_id": {"enum": ["S0", "S1", "S2", "S3", "S3b", "S4", "S5", "S6-lidar-drop", "S6-camera-drop", "S7"]},
+    "run_purpose": {"enum": ["demonstration", "development", "diagnostic"]},
+    "mode": {"enum": ["single", "scenario", "all", "quick", "manual"]},
+    "status": {"enum": ["pass", "fail", "blocked", "partial", "smoke", "not_run"]},
+    "qualified": {"type": "boolean"},
+    "expected_behavior_sequence": {"type": "array", "items": {"$ref": "#/$defs/behavior"}},
+    "expected_trigger_components": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/component"}},
+    "repeats": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/repeat"}},
+    "source_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ubuntu", "ros_distro", "gazebo_version", "profile_sha256", "scenario_sha256", "decision_config_sha256", "trigger_matrix_sha256", "world_sha256"],
+      "properties": {
+        "ubuntu": {"type": "string"},
+        "ros_distro": {"type": "string"},
+        "gazebo_version": {"type": "string"},
+        "profile_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "scenario_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "decision_config_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "trigger_matrix_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "world_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "source_revision": {"type": "string", "minLength": 1}
+      }
+    },
+    "protected_metrics_written": {"const": false},
+    "frozen_inputs_root_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "report_path": {"type": "string", "pattern": "^artifacts/obstacle-course/runs/"},
+    "summary_ref": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"run_purpose": {"const": "demonstration"}},
+        "required": ["run_purpose"]
+      },
+      "then": {"required": ["frozen_inputs_root_sha256"]}
+    }
+  ],
+  "$defs": {
+    "behavior": {"enum": ["FOLLOW_ROUTE", "CAUTION", "AVOID_LEFT", "AVOID_RIGHT", "STOP", "RESUME"]},
+    "component": {"enum": ["lidar", "camera", "imu", "odometry", "contact"]},
+    "repeat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repeat_index", "run_id", "seed", "status", "qualified", "observed_behavior_sequence", "behavior_sequence_matches", "actual_trigger_components", "trigger_set_matches", "contact_outcome", "fault_events", "event_refs"],
+      "properties": {
+        "repeat_index": {"type": "integer", "minimum": 1},
+        "run_id": {"type": "string", "format": "uuid"},
+        "seed": {"type": "integer", "minimum": 0},
+        "status": {"enum": ["pass", "fail", "blocked", "partial", "smoke", "not_run"]},
+        "qualified": {"type": "boolean"},
+        "observed_behavior_sequence": {"type": "array", "items": {"$ref": "#/$defs/behavior"}},
+        "behavior_sequence_matches": {"type": "boolean"},
+        "actual_trigger_components": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/component"}},
+        "trigger_set_matches": {"type": "boolean", "description": "True only when the actual and expected trigger component sets are exactly equal; missing and extra triggers both make this false."},
+        "contact_outcome": {"enum": ["none", "ground_only", "non_ground", "permitted_inside_d_stop", "unavailable"]},
+        "fault_events": {"type": "array", "items": {"$ref": "fault-event.schema.json"}},
+        "events_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+        "event_refs": {"type": "array", "items": {"type": "string"}},
+        "stale_components": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/component"}},
+        "reason": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

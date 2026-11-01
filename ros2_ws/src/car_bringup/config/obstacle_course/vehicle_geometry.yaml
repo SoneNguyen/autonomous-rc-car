@@ -1,0 +1,69 @@
+schema_version: "1.0"
+geometry_id: obstacle-course-rc-car-geometry
+coordinate_frame: vehicle_start_base_link
+axes:
+  forward: +x
+  left: +y
+  up: +z
+  angular_unit: rad
+  length_unit: m
+profile_reference:
+  path: ros2_ws/src/car_bringup/config/obstacle_course/rc_vehicle_reference.yaml
+  sha256: 886c30481d02054ecbe6f3bf04eff196d06603e9f57efdef656cd2f371b31381
+  source: measured Feature 007 profile overlay; simulation-only dynamics.
+vehicle:
+  length_m:
+    value: 0.38
+    unit: m
+    status: model_geometry
+    provenance: simulation/models/rc_car/model.sdf base_link collision box length.
+    symbol: L
+  width_m:
+    value: 0.225
+    unit: m
+    status: derived_model_geometry
+    provenance: Maximum of chassis half-width and wheel centers plus half the wheel-cylinder width, from simulation/models/rc_car/model.sdf.
+    symbol: W
+  height_m:
+    value: 0.085
+    unit: m
+    status: model_geometry
+    provenance: simulation/models/rc_car/model.sdf base_link collision box height.
+  footprint_radius_m:
+    value: 0.220808
+    unit: m
+    status: derived_model_geometry
+    provenance: Half-diagonal of the 0.38 m by 0.225 m full wheel-inclusive envelope.
+  wheel_inclusive_envelope:
+    front_extent_x_m: 0.168
+    rear_extent_x_m: 0.168
+    left_extent_y_m: 0.1125
+    right_extent_y_m: 0.1125
+    chassis_length_m: 0.38
+    chassis_width_m: 0.22
+    wheel_radius_m: 0.033
+    wheel_width_m: 0.025
+    source: simulation/models/rc_car/model.sdf collision geometry and wheel link poses.
+clearance:
+  baseline_margin_multiple_of_W:
+    value: 0.5
+    unit: W
+    status: design_placeholder
+    provenance: Initial course-layout engineering margin; per-class tested values are configured in decision.yaml and must be frozen before demonstrations.
+  derivation: physical_margin_m = vehicle.width_m * configured_margin_multiple_of_W
+route_sizing:
+  minimum_route_formula: approach_distance_m + d_stop(entry_speed_mps) + lane_change_path_length_m + recovery_distance_m
+  layout_margin_ratio:
+    value: 0.25
+    unit: ratio
+    status: requirement
+    provenance: Feature 007 FR-002; applied after the geometry-derived minimum route length.
+  strict_course_cap_m:
+    value: 280.0
+    unit: m
+    status: requirement
+    provenance: Existing course length in Feature 007 problem statement; every route must remain strictly below this value.
+  lane_change_model:
+    name: symmetric_opposite_curvature_arcs
+    equation: lateral_shift_m = 2 * R_min * (1 - cos(theta)); path_length_m = 2 * R_min * theta
+    provenance: Constant-curvature bicycle model at maximum permitted steering; theta = acos(1 - lateral_shift_m / (2 * R_min)).

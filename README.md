@@ -1,35 +1,42 @@
-# RC Sensor and Actuation Matrix
+# RC Obstacle Course and Multi-Sensor Behavior Demo
 
-A fixed-seed characterization suite for the RC simulation's LiDAR, camera,
-IMU/odometry, contact/TF, and command path. The matrix uses the locked research
-meshes for the controlled vehicle, obstacles, and road. The RC vehicle SDF
-supplies collision, sensor, and drive physics only.
+Feature 007 adds a compact course for the existing RC-scale Gazebo vehicle, a
+rule-based sensor decision layer, an attributed live dashboard, and real-car
+setup sheets. **The runtime gate, measured vehicle profile, shared contracts,
+and protected-input checks are complete. Course behavior and qualification are
+in progress; no Feature 007 pass rates are claimed yet.**
 
-Start with [the quickstart](docs/quickstart.md). It covers the apt-based ROS 2
-Lyrical/Gazebo setup, research asset locks, workspace build, and the available
-matrix commands.
-
-The matrix records simulator observations with scenario identity, seed, ground
-truth, units, frames, timestamps, and tolerances. Quick runs are diagnostic
-only. Simulator values and sensor noise are not hardware accuracy claims.
-
-Current qualification: LiDAR 14/14, IMU/odometry 4/4, contact/TF 3/3, and the
-optional command-path set 3/3 pass. Camera/detection remains unqualified until
-its complete scored set passes. See the [module status](docs/evaluation/rc-car-modules/matrix.md).
+Start at the existing [quickstart entry point](docs/quickstart.md). The
+Feature 007 implementation sequence and acceptance checks are documented in
+[its run guide](docs/features/007-multi-sensor-obstacle-course/quickstart.md).
 
 ## Project map
 
-- `ros2_ws/`: runtime packages and matrix scenario configuration.
-- `simulation/`: RC physics/sensor body and the research-asset test world.
-- `models/rc_module_matrix/`: frozen detector used by camera checks.
-- `tools/rc_module_matrix.py`: scenario selection, separation checks, reports.
-- `tools/rc_module_gui.py`: live Gazebo and ROS viewers for individual modules.
-- `tools/checks/`: module observation logic and simulator capture.
-- `docs/contracts/rc-car-modules/`: local scenario, report, and stop contracts.
-- `docs/evaluation/rc-car-modules/`: implementation and qualification status.
-- `artifacts/rc-car-matrix/assets/`: fetched research assets; ignored by Git.
-- `artifacts/rc-car-modules/`: run reports and evidence; ignored by Git.
+- `simulation/models/rc_car/` and `simulation/models/research/`: protected
+  Feature 003 physics and high-detail visual anchors; Feature 007 reads them
+  without changing their files.
+- `simulation/worlds/`: existing worlds remain protected; the condensed course
+  will be added as a separate world.
+- `ros2_ws/src/`: existing ROS 2 packages plus the new `car_decision` package
+  and additive course wiring as it is implemented.
+- `tools/`: fixed-seed scenario generation, dynamics measurement,
+  qualification, and mapping tools as they are implemented.
+- `docs/features/007-multi-sensor-obstacle-course/`: implementation contract,
+  runtime findings, data model, task sequence, and quickstart.
+- `docs/real-car-mapping/` and `docs/evaluation/obstacle-course/`: planned
+  operator setup sheets and final results.
+- `artifacts/obstacle-course/`: ignored generated worlds, measurements, and
+  per-run records.
 
-Supported runtime: WSL2 Ubuntu 26.04, ROS 2 Lyrical, Gazebo Sim 10.5.0,
-installed from apt. Fetch assets before running; simulation runs use local
-assets and do not need network access.
+## Protected history
+
+Feature 001 and 002 frozen scenarios, model assets, manifests, and results are
+historical inputs and remain unchanged. Feature 003 RC physics and locked
+research assets are read-only anchors. New Feature 007 scenarios and results
+use separate paths; demonstration runs do not write to prior metric roots.
+
+## Runtime
+
+The required runtime gate passed on WSL2 Ubuntu 26.04, ROS 2 Lyrical,
+`ros_gz_bridge` 3.0.10, and Gazebo Sim 10.5.0. The recorded output is in
+[runtime-gate.md](docs/features/007-multi-sensor-obstacle-course/runtime-gate.md).

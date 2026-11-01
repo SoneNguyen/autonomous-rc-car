@@ -1,0 +1,1877 @@
+{
+  "allowed_feature007_world_additions": [
+    "simulation/worlds/obstacle_condensed.sdf",
+    "simulation/worlds/obstacle_course/fragments/barrier_red.sdf",
+    "simulation/worlds/obstacle_course/fragments/post_orange.sdf",
+    "simulation/worlds/obstacle_course/fragments/gate_blue.sdf",
+    "simulation/worlds/obstacle_course/fragments/gate_blocked.sdf",
+    "simulation/worlds/obstacle_course/fragments/generic_obstacle.sdf"
+  ],
+  "base_commit": "42b3b12bc77d893231f1fad3999db4b8196e9ee3",
+  "baseline_scope": "Complete tracked base-commit inventory for protected roots, Feature 001/002 scenario/config/result references, and Feature 003 anchors. Tracked historical files absent from this base are explicitly recorded as absent with source-ref hashes; prior ignored result paths named by Feature 002 reports are also protected from reappearance.",
+  "empty_protected_roots_at_base_commit": [
+    "simulation/models/car/",
+    "assets/source/",
+    "tools/blender/"
+  ],
+  "entries": [
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/models/frozen/",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/models/frozen/model.onnx",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/runs/",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/runs/p2-route-20261030-46161c75.json",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/runs/p2-route-20261030-7e1d603f.json",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/runs/p3-lidar-20261031-034525a7.csv",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/runs/p3-lidar-20261031-7be69055.json",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/runs/p3-lidar-20261031-ae978796.json",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/runs/p3-lidar-20261032-c5d43a66.json",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": null
+        }
+      ],
+      "path": "artifacts/rc-car/runs/p3-lidar-20261032-f837ba07.json",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "583eb1392786ce18f45d072ddfe4100507c0289a8cd3444e5d42ad460412df7d"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "583eb1392786ce18f45d072ddfe4100507c0289a8cd3444e5d42ad460412df7d"
+        }
+      ],
+      "path": "assets/source/chassis.blend",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "bfe8981977ce5731d6e180d3a2e41d4b49ef697c06a3259146751c1cfb2c7e44"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "bfe8981977ce5731d6e180d3a2e41d4b49ef697c06a3259146751c1cfb2c7e44"
+        }
+      ],
+      "path": "assets/source/legacy/obj.obj",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "5032f715f233ca46b97e0c87dc65d20fbfca61ca7051d55de19bd1d6c0f69576"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "5032f715f233ca46b97e0c87dc65d20fbfca61ca7051d55de19bd1d6c0f69576"
+        }
+      ],
+      "path": "assets/source/legacy/stl.stl",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "321614b76f6b2de86ecf116832e8db402cb6d093e86fc7f2baf7bb73ceefca0e"
+        }
+      ],
+      "path": "docs/evaluation/README.md",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "3a40a0e7b3320a0eb0baf472e806a2576c07b3ed578aa8193924bb58305f44eb"
+        }
+      ],
+      "path": "docs/evaluation/lidar-baseline.csv",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "be4f47a1e21fb61e7bf4f5dec357b9ff7172b2146559434843597ea8087a6285"
+        }
+      ],
+      "path": "docs/evaluation/rc-car/p0-model-check.md",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "662bbcd78e93ea335edebc03c81c57c51c0fa100f379458915cde7ac29014861"
+        }
+      ],
+      "path": "docs/evaluation/rc-car/p1-interface-check.md",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "58bfc36e8130115db724132abdd621f4e92acaa2caeb1621421f82c59524b6cb"
+        }
+      ],
+      "path": "docs/evaluation/rc-car/p2-route-check.md",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "2661be40f617a68a926d91041b6d05a9e8c62fc77f0f1c1711b7ed6d1bc5e27a"
+        }
+      ],
+      "path": "docs/evaluation/rc-car/p3-lidar-check.md",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "b897cc03ccccd7dbf56d2e6c2e8fa484da35586e26a1b8d5fe2946ae548d6fd7"
+        }
+      ],
+      "path": "docs/evaluation/rc-car/p4-detector-check.md",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "0ac825ddf87826496074b6428ce780387197a493475615c9ce265dbeda0afe8f"
+        }
+      ],
+      "path": "docs/evaluation/rc-car/protocol-bootstrap.md",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "77400f67ec8b3d7caf09c8eb054f42321619a2200632113e1f2fea587e7db851"
+        }
+      ],
+      "path": "docs/evaluation/summary.md",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "path": "models/rc_module_matrix/detector.onnx",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "79eafbe11c919fef2f240762b512a3a389cf7bd00fe3076ac43490ef2ae8eaf0",
+      "status": "present"
+    },
+    {
+      "path": "models/rc_module_matrix/metadata.json",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "1aab23251ff0636a5614bc09bd698b1f1d6da3bbf9f434b7273a45468b403ea6",
+      "status": "present"
+    },
+    {
+      "path": "pixi.toml",
+      "scope": "protected_runtime_root",
+      "sha256": "b09aa58af025bf5a10b508b67027aa7e2c1a96f3fe55b197775ad53ed8e03560",
+      "status": "present"
+    },
+    {
+      "path": "ros2_ws/src/car_bringup/config/rc_module_matrix/research_assets.lock.yaml",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "d8930b00c4c35b8562a5dda5f7bc58ea5efac83db30d46ff9c90c6bec6cd32b3",
+      "status": "present"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "83c6914469f853d4ae1fef76ce95d34350896645d07478f98504024ffa593695"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/diagnostics/blocked_path.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "7a60f435cd72841299c8cb107dc133f50f21f8ecb1f9b94d3d29a2311ef0c62f"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/diagnostics/contact_bridge_smoke.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "c4c87846a6da195fa240cadd0d52987f4698c8ef370897cc8de6a65892c13e1b"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/diagnostics/interface_smoke.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "e1e14938b668c48230c84682466ada7dbf005941b47048fa56afbb060836c845"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/diagnostics/live_fusion_smoke.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "e14621b57d017ed1e97255e343ab8a340b5887964f6f88e26d3d8eb8c0ce6d93"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/diagnostics/obstacle_stop.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "1981a2b11478bf4591d58472b6f710719ce5739d6ea77d2b7aff04ae0bac2f49"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/diagnostics/p0_steering_smoke.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "0856954f0dd9badf7a5024f40cb7ebf14944bf215dc881ca86c54fb46270eed4"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/diagnostics/perception_condition.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "50d91c1b7ff4aadb91b011c068cd0cde491b5a39b7dfbac01be31852f3a6123f"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/diagnostics/route_smoke.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "ade91de62e088daa6f385183be4a774c66d7edebef2c22b9df4da6a0a7335b17"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/diagnostics/too_tight_route.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "5115fe6881575e10f091d2c925a7c65b887b91c12375ced9a6158da56e09c24d"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_01.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "f9635587c1ac9e74201cfaa0e2609c8da6b4a2d038e8fb00e3dd456235457931"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_02.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "bc98944093bf4f7bfe980ff4c3b436f417bc0c7ae96e01f64749428cbdb69383"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_03.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "2e1ba2bb4d4696bfc3431f3d58700513463e5b6a8133972ff239436a7aa0aa5f"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_04.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "15a8eeaf52691b0abeeea51d5ce9f75184736a7af6fae4edd9f657eb39aeb4f8"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_05.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "80a85f517b42695c9d4c2c2bd128466ca2654197f4dfd0fea33adca5633ad267"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_06.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "c82d0a5e9651d88a5b0d339702c1b7a5ace4e98a3fd569bf23db8ff943400e36"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_07.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "f343f1f45eff5c762426cd07456da1711d3254eaf493ab4638f19a06c02c160f"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_08.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "b225bae4d9d6df07aa7ff5113c1add3cdbc563b963b2001190016e15d1f0c292"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_09.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "586c4e16444de99da9620de1011d0cd54a29a7bb1b69deee1e0d205e71d51c15"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_10.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "01f09b5e480d63411e01663b53ee66f9dce35bdbf85bbe1de78f132f8851910d"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/generation.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "718905d60eee4e9c24b75d5419b2a65ced00ac8fa397e89bbd94c5b4ff68a461"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/manifest.json",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "f08f3b5e44b11484fad6c87e1a5dd3488b3611f730432df466d60666faf247b8"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/registry.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "c1b07996d7dc301665b5261d0ff34b50a11d389893a8cb388d7743ab539f16e2"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/resolved_thresholds.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "a59076f411628dfd7a236536256e39b3a6059da5fd504763e709d9da3f4bf2ff"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_01.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "3cfb670f5b7e148319725a1c169c7afeba35c124d555a41cfc6facfca85093b1"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_02.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "f4cef352462f5ee81ce699b77c37ac870f4a38773c84851826ce54734e98ade7"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_03.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "a6e7d25056f9cac71af9fb7be20520c3242422da75f33f775500552e14180507"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_04.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "60f38d8557d64fdda9721848b73843c176de6b482b292ec25c1d6b904b2274fb"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_05.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "42ab7d761b4b0b60eb046169056ad499067995aa6c5c88a48f558d7b91084a01"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_06.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "3d609b0d30ec7f833372b600d1c9a5b04b09ced982d55467e7bc4add4820b555"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_07.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "7856920369c39c85c4a01b0c30a2904f36ea980950422e0583791de8a934024f"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_08.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "0a17b9aa1a8fb4a726c9159da2e930c1a6478d271166fa557b87bf3f99b2db5c"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/validation/val_01.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "9fbd7407fc68e9dbfd87b3d2808a52f97a4903b5c29d5d2730440ae5c1159ad8"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/validation/val_02.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "683d9bf0f530e073b3295e5445fb1e08116d12e54e86d078109e2064688f520b"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/validation/val_03.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "ea9f546e49f2a8315ef704840fd48965fa0be1c93443b18e11d8371399f8e827"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/validation/val_04.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "path": "ros2_ws/src/car_bringup/config/rc_vehicle.yaml",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "3d20371e1cf40417495e67fe761fc3b5da1c2a0c9ab54ad7215733684c3d726c",
+      "status": "present"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "60a3af9bffd03961e83f5ce12188a09a999c161994c3024f1019245b593ab35f"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenario.schema.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "2df30733dfc82bd7f535043645d7d4df18a5575c6977ed2d90ff952ae696ce00"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "2df30733dfc82bd7f535043645d7d4df18a5575c6977ed2d90ff952ae696ce00"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_01.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "e8e0b86a648efd42cf34e6d93b55b062ac2b4e652b493234c6d79502b178e2ae"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "e8e0b86a648efd42cf34e6d93b55b062ac2b4e652b493234c6d79502b178e2ae"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_02.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "6e45661e26d47976c2073eb27e60a136dfe5a0a9525d5a759082e37b674d712e"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "6e45661e26d47976c2073eb27e60a136dfe5a0a9525d5a759082e37b674d712e"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_03.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "e6bf13858c09d46b0c1a2757b0f09279999434705ff66ed9861418c7cadbda70"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "e6bf13858c09d46b0c1a2757b0f09279999434705ff66ed9861418c7cadbda70"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_04.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "c345b324afa715bcba464b46ad705f3740a0e94578fb30f9edc311282ceed920"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "c345b324afa715bcba464b46ad705f3740a0e94578fb30f9edc311282ceed920"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_05.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "a671495dba18e99e9df4b6a731aa7a736f92475309f72a9f8a3133a85454ce00"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "a671495dba18e99e9df4b6a731aa7a736f92475309f72a9f8a3133a85454ce00"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_06.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "cc19eea2a768fcc121638e8fea6329f0e4ca17c50fbb982ace761b817da695b8"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "cc19eea2a768fcc121638e8fea6329f0e4ca17c50fbb982ace761b817da695b8"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_07.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "71115b8724fb211d68ef39098c0c2e252c3b585560349dd8bc5f027f8d19a108"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "71115b8724fb211d68ef39098c0c2e252c3b585560349dd8bc5f027f8d19a108"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_08.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "6d340e12fb10327a0d614298b5125d9e35f48e8dbe102eade1d4687151ecebe1"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "6d340e12fb10327a0d614298b5125d9e35f48e8dbe102eade1d4687151ecebe1"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_09.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "e9f9922240884a7b2ca921c5b256944c5698a822441cbe0f0b30032a9312f988"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "e9f9922240884a7b2ca921c5b256944c5698a822441cbe0f0b30032a9312f988"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_10.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "9a1509e351ef75d96eb8a793b30e041b5d706ce5320fee36172ebd98ad8ed43a"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "9a1509e351ef75d96eb8a793b30e041b5d706ce5320fee36172ebd98ad8ed43a"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/training/calibration.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "39700fd378e66ccdd431740f630cfd8d284302b7e67e00ca51b8a7a51f726085"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "39700fd378e66ccdd431740f630cfd8d284302b7e67e00ca51b8a7a51f726085"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/training/command_smoke.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "fbdc61017189622bd06d122b035d380ef366c20a5b66a6db2269fbc788b2012f"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "fbdc61017189622bd06d122b035d380ef366c20a5b66a6db2269fbc788b2012f"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/training/contact_smoke.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "97f95599dfba0b8c3fe7e1f60427f50dce0996969b5b9fa34b121285238e851a"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "97f95599dfba0b8c3fe7e1f60427f50dce0996969b5b9fa34b121285238e851a"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/training/inside_stop_distance.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "6bc3e9c178250483e7764ed30180c44fe793995ba38c5a386677d301523125d3"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "6bc3e9c178250483e7764ed30180c44fe793995ba38c5a386677d301523125d3"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/training/sensor_smoke.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "579b75ad40d738500e8aa398083c3b799959a289761be551874ba7a660e79820"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "579b75ad40d738500e8aa398083c3b799959a289761be551874ba7a660e79820"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/training/stop_smoke.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "3d5003ff44c34051ad1dce9c672b069ab4cccd16e8aafde9c97d873d68d97fba"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "3d5003ff44c34051ad1dce9c672b069ab4cccd16e8aafde9c97d873d68d97fba"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/validation/val_gate_left_fast.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "36ba104ff64b76577a42726b9ed38fcc625568a48ef9e841f7d15b0728518710"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "36ba104ff64b76577a42726b9ed38fcc625568a48ef9e841f7d15b0728518710"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/validation/val_gate_left_mid.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "8c4d5c67f5926da2d24d5f60971f7d69b456f5382b260f2dc0e86557ed4efa5c"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "8c4d5c67f5926da2d24d5f60971f7d69b456f5382b260f2dc0e86557ed4efa5c"
+        }
+      ],
+      "path": "ros2_ws/src/car_bringup/config/scenarios/validation/val_gate_left_slow.yaml",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "498f20e2074ebcc7ffd05c42b9568b2d274ac52146b9820893a8f5cf8c8b785b"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "498f20e2074ebcc7ffd05c42b9568b2d274ac52146b9820893a8f5cf8c8b785b"
+        }
+      ],
+      "path": "simulation/models/car/README.md",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "0adad2a9d3cb86093dcb959770da76a7d4c5d275c3733d0e4b6ce87f29308290"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "0adad2a9d3cb86093dcb959770da76a7d4c5d275c3733d0e4b6ce87f29308290"
+        }
+      ],
+      "path": "simulation/models/car/meshes/chassis.stl",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "ba9dfe11270846794b21d8da63e01282b778f1bc2b8dcaf8505958da0bd7c592"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "ba9dfe11270846794b21d8da63e01282b778f1bc2b8dcaf8505958da0bd7c592"
+        }
+      ],
+      "path": "simulation/models/car/meshes/mesh_manifest.json",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "39f58faa872b0d660237c3c604822e6d097bedfe031fffb6470dc566427dda93"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "39f58faa872b0d660237c3c604822e6d097bedfe031fffb6470dc566427dda93"
+        }
+      ],
+      "path": "simulation/models/car/meshes/wheel_fl.stl",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "83a2bafc25336309a4904b2ec4b921484c9a0ac56a5abfddb1b3c6f87bbe9f86"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "83a2bafc25336309a4904b2ec4b921484c9a0ac56a5abfddb1b3c6f87bbe9f86"
+        }
+      ],
+      "path": "simulation/models/car/meshes/wheel_fr.stl",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "fe9f2a1b120692d657caa7d3f60c4b027181213c79e5beb04f3bb77cb4237775"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "fe9f2a1b120692d657caa7d3f60c4b027181213c79e5beb04f3bb77cb4237775"
+        }
+      ],
+      "path": "simulation/models/car/meshes/wheel_rl.stl",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "57d6628bc1e7c8cce51f24b97dd27b63fe0277252811c4ae4fd0f24754f2cfd8"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "57d6628bc1e7c8cce51f24b97dd27b63fe0277252811c4ae4fd0f24754f2cfd8"
+        }
+      ],
+      "path": "simulation/models/car/meshes/wheel_rr.stl",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "a0aaba1629814db7e17b78ae6e2c8e2a2e6b6b9089ad6e66a8a3cacc7f7ddc09"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "a0aaba1629814db7e17b78ae6e2c8e2a2e6b6b9089ad6e66a8a3cacc7f7ddc09"
+        }
+      ],
+      "path": "simulation/models/car/model.config",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "e5116c2cd4860c1e9a9877b532d1676ebe341080cfa2f61fba1a7db96896d832"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "e5116c2cd4860c1e9a9877b532d1676ebe341080cfa2f61fba1a7db96896d832"
+        }
+      ],
+      "path": "simulation/models/car/model.sdf",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "a2a315978f8de486bf938f080a1e44ffb7cf8fa8",
+          "feature": "003",
+          "ref": "003-realistic-domain-transfer",
+          "sha256": "16a945dba7ac782a28f81b060cc3a30b750242d7c6948d125595f93746b79782"
+        }
+      ],
+      "path": "simulation/models/rc_car/geometry_manifest.yaml",
+      "scope": "feature003_source_identity_absent_from_base",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "path": "simulation/models/rc_car/model.config",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "1a46b49bf8828d8ece6ebed5356adcef829566f51ab4ce9b224368a75e965459",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/rc_car/model.sdf",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "4405554064669da937fb8f4e264296265fac9113fa2ca64561d9fa22d5268939",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/cone/cone_clean_01/model.config",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "73182eab66ffeb0203e528933aa093627292839b5448782eb7b4044e2d8c4465",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/cone/cone_clean_01/model.sdf",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "2cb378e4dbb152f4846484e7c05888806f0d52f2e6364317c39b25f9b18d08df",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/cone/cone_reflector_01/model.config",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "0ed7defe24302fbc6a4ca00b763a47153addcf8a79773d9a9f6196ceaf7c03a8",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/cone/cone_reflector_01/model.sdf",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "b9f31e12bb03600987287b53ba74a782c8082077a55d4b2fcf2d5ae89b1915ad",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/pedestrian/pedestrian_cross_step_01/model.config",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "ec77533fdbd5f7e71371af13f90b21654a1807070606e09281f932ade5ed7fc1",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/pedestrian/pedestrian_cross_step_01/model.sdf",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "2a8d84ada28bd8688f8476406f50f1837fd560989dd193ecd71c2505408eab1a",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/pedestrian/pedestrian_nurse_01/model.config",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "01bb94dc9eb0127582e4a34c7eb9e4ac595b9ec33d42a6f30acf960c765a822e",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/pedestrian/pedestrian_nurse_01/model.sdf",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "fa9556bf566bae823ba7a8c6436659bc36898e2b084160fc34c49ed0226ee57e",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/vehicle/vehicle_compact_suv_01/model.config",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "096bbbdc1dba39d7197f9ead8e3fe63f8dba29456671cc9dcd50ed994b72c9c9",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/vehicle/vehicle_compact_suv_01/model.sdf",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "2b62b2eda5ede5c3dd5012ad9283b189a7e4ca245bb0eaca29851bd2b1695d2d",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/vehicle/vehicle_convertible_01/model.config",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "6f5fafec792e43252cb9487bc60a060e815fa84bd9826d0909677b774857a55c",
+      "status": "present"
+    },
+    {
+      "path": "simulation/models/research/vehicle/vehicle_convertible_01/model.sdf",
+      "scope": "feature003_anchor_or_frozen_camera_model",
+      "sha256": "23cb0592fd77f95dde7ace04749fc1bc1401ce75e965267287044dfa8c757cf0",
+      "status": "present"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "1b3556e2940ee8f3da9131e3303dc484bda04cefb6350a50de71e71e623c3dee"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "1b3556e2940ee8f3da9131e3303dc484bda04cefb6350a50de71e71e623c3dee"
+        }
+      ],
+      "path": "simulation/worlds/car_demo.sdf",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "bed6177d020c12c03c9dfee5d4e8b6fd8cf8294c94e79f4b475d2fbe62da302a"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "bed6177d020c12c03c9dfee5d4e8b6fd8cf8294c94e79f4b475d2fbe62da302a"
+        }
+      ],
+      "path": "simulation/worlds/obstacle.sdf",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "ada59a0b5a945d49cd0d68f1bb6b1bcd34d2dd0a4902cfa631560657912372b4"
+        }
+      ],
+      "path": "simulation/worlds/obstacle_rc.sdf",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "path": "simulation/worlds/rc_module_matrix.sdf",
+      "scope": "protected_runtime_root",
+      "sha256": "de31990f634af6e92115d5c92c49c28b7d4668aaa1cd04e99c407bc5d67b55d4",
+      "status": "present"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+          "feature": "feature001",
+          "ref": "origin/001-ros2-ai-obstacle-stop",
+          "sha256": "dc67a0d19745833c7bed7ca4fb2ee9a478cf65892e49b578a14751cf027cff41"
+        },
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "dc67a0d19745833c7bed7ca4fb2ee9a478cf65892e49b578a14751cf027cff41"
+        }
+      ],
+      "path": "tools/blender/export_gazebo_parts.py",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    },
+    {
+      "historical_sources": [
+        {
+          "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+          "feature": "feature002",
+          "ref": "002-rc-car-autonomy",
+          "sha256": "d01ede3dbdfc73606cc52cd8e03c3f86da07d80c690ed48c4d860837b7849dd3"
+        }
+      ],
+      "path": "tools/rc_scenarios/overlap.py",
+      "scope": "feature001_002_frozen_history",
+      "sha256": null,
+      "status": "absent"
+    }
+  ],
+  "feature001_002_manifest_registry_inventory": {
+    "feature001_evaluation_scenario_paths": [
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_01.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_02.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_03.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_04.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_05.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_06.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_07.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_08.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_09.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/evaluation/eval_10.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/training/calibration.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/training/command_smoke.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/training/contact_smoke.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/training/inside_stop_distance.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/training/sensor_smoke.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/training/stop_smoke.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/validation/val_gate_left_fast.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/validation/val_gate_left_mid.yaml",
+      "ros2_ws/src/car_bringup/config/scenarios/validation/val_gate_left_slow.yaml"
+    ],
+    "feature001_manifest_or_registry_paths": [],
+    "feature002_manifest_evaluation_set_sha256": "d0cbbe22755e1e94a27f7de38a66ae1804be7e9132d585058a2e68a8ce57ec8e",
+    "feature002_manifest_path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/manifest.json",
+    "feature002_manifest_scenario_paths": [
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_01.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_02.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_03.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_04.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_05.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_06.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_07.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_08.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_09.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/evaluation/eva_10.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_01.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_02.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_03.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_04.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_05.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_06.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_07.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/training/tra_08.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/validation/val_01.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/validation/val_02.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/validation/val_03.yaml",
+      "ros2_ws/src/car_bringup/config/rc_scenario_sets/validation/val_04.yaml"
+    ],
+    "feature002_registry_path": "ros2_ws/src/car_bringup/config/rc_scenario_sets/registry.yaml",
+    "feature002_result_paths_named_in_reports": [
+      "artifacts/rc-car/",
+      "artifacts/rc-car/models/frozen/",
+      "artifacts/rc-car/models/frozen/model.onnx",
+      "artifacts/rc-car/runs/",
+      "artifacts/rc-car/runs/p2-route-20261030-46161c75.json",
+      "artifacts/rc-car/runs/p2-route-20261030-7e1d603f.json",
+      "artifacts/rc-car/runs/p3-lidar-20261031-034525a7.csv",
+      "artifacts/rc-car/runs/p3-lidar-20261031-7be69055.json",
+      "artifacts/rc-car/runs/p3-lidar-20261031-ae978796.json",
+      "artifacts/rc-car/runs/p3-lidar-20261032-c5d43a66.json",
+      "artifacts/rc-car/runs/p3-lidar-20261032-f837ba07.json"
+    ],
+    "manifest_direct_asset_paths": [],
+    "manifest_direct_model_weight_paths": []
+  },
+  "feature003_source_comparison": {
+    "commit": "a2a315978f8de486bf938f080a1e44ffb7cf8fa8",
+    "missing_from_active_base": [
+      "simulation/models/rc_car/geometry_manifest.yaml"
+    ],
+    "observations": [
+      {
+        "active_path": "simulation/models/rc_car/model.sdf",
+        "active_sha256": "4405554064669da937fb8f4e264296265fac9113fa2ca64561d9fa22d5268939",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/rc_car/model.sdf",
+        "feature003_source_sha256": "fd67d3c87a75cb5cf9a1a29dedefaf69203c52c0f075681efa9ca8eeb1fcd137",
+        "observation": "same path; current model is compared to Feature 003"
+      },
+      {
+        "active_path": "simulation/models/rc_car/model.config",
+        "active_sha256": "1a46b49bf8828d8ece6ebed5356adcef829566f51ab4ce9b224368a75e965459",
+        "byte_identical": true,
+        "feature003_source_path": "simulation/models/rc_car/model.config",
+        "feature003_source_sha256": "1a46b49bf8828d8ece6ebed5356adcef829566f51ab4ce9b224368a75e965459",
+        "observation": "same path"
+      },
+      {
+        "active_path": "ros2_ws/src/car_bringup/config/rc_vehicle.yaml",
+        "active_sha256": "3d20371e1cf40417495e67fe761fc3b5da1c2a0c9ab54ad7215733684c3d726c",
+        "byte_identical": false,
+        "feature003_source_path": "ros2_ws/src/car_bringup/config/rc_vehicle.yaml",
+        "feature003_source_sha256": "7f2cdf91c1b05758193916be7949eb2ce7dbafdbe7228c0b8b8672a096e63f94",
+        "observation": "same path; profile reflects later Feature 002 updates"
+      },
+      {
+        "active_path": "ros2_ws/src/car_bringup/config/rc_module_matrix/research_assets.lock.yaml",
+        "active_sha256": "d8930b00c4c35b8562a5dda5f7bc58ea5efac83db30d46ff9c90c6bec6cd32b3",
+        "byte_identical": false,
+        "feature003_source_path": "ros2_ws/src/car_bringup/config/hifi/assets.lock.yaml",
+        "feature003_source_sha256": "6777af9e3bd5ca579f3f25d737601708c6bce5687a19815c9b030f91b24d45d9",
+        "observation": "lock path and inventory were carried forward into the Feature 006 matrix"
+      },
+      {
+        "active_path": "simulation/models/research/cone/cone_clean_01/model.config",
+        "active_sha256": "73182eab66ffeb0203e528933aa093627292839b5448782eb7b4044e2d8c4465",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/cone/cone_clean_01/model.config",
+        "feature003_source_sha256": "8239da66e7619f8d8788b671b0038955d03fdef3242741b253dfb6bec3435477",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/cone/cone_clean_01/model.sdf",
+        "active_sha256": "2cb378e4dbb152f4846484e7c05888806f0d52f2e6364317c39b25f9b18d08df",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/cone/cone_clean_01/model.sdf",
+        "feature003_source_sha256": "f5e55e63c6419f983b97ecdb83068bf63dc77476c85e5bbc73a3a246e1d0fed2",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/cone/cone_reflector_01/model.config",
+        "active_sha256": "0ed7defe24302fbc6a4ca00b763a47153addcf8a79773d9a9f6196ceaf7c03a8",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/cone/cone_reflector_01/model.config",
+        "feature003_source_sha256": "ee5e3aaf9f06fb3496db22904f8e07541ac1c8adbb4298062d4f8ce884c5e880",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/cone/cone_reflector_01/model.sdf",
+        "active_sha256": "b9f31e12bb03600987287b53ba74a782c8082077a55d4b2fcf2d5ae89b1915ad",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/cone/cone_reflector_01/model.sdf",
+        "feature003_source_sha256": "2292c6d8b86986c98b6fe72676483c8d43da62812c80f13ca1b1b34eb2af1416",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/pedestrian/pedestrian_cross_step_01/model.config",
+        "active_sha256": "ec77533fdbd5f7e71371af13f90b21654a1807070606e09281f932ade5ed7fc1",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/pedestrian/pedestrian_cross_step_01/model.config",
+        "feature003_source_sha256": "c6ec1fcea258589fde676c4f550e6ae514f6ef98d5da5ca0f74f88590d6b1746",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/pedestrian/pedestrian_cross_step_01/model.sdf",
+        "active_sha256": "2a8d84ada28bd8688f8476406f50f1837fd560989dd193ecd71c2505408eab1a",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/pedestrian/pedestrian_cross_step_01/model.sdf",
+        "feature003_source_sha256": "c75614a391945187c538443a5851ab4960c56cc1f3c0f80db8ff71731d6c8f4c",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/pedestrian/pedestrian_nurse_01/model.config",
+        "active_sha256": "01bb94dc9eb0127582e4a34c7eb9e4ac595b9ec33d42a6f30acf960c765a822e",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/pedestrian/pedestrian_nurse_01/model.config",
+        "feature003_source_sha256": "8f4ac8c3354a5d9cd9eceea3f5c5393466b75535675441f85753b6209b9b9983",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/pedestrian/pedestrian_nurse_01/model.sdf",
+        "active_sha256": "fa9556bf566bae823ba7a8c6436659bc36898e2b084160fc34c49ed0226ee57e",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/pedestrian/pedestrian_nurse_01/model.sdf",
+        "feature003_source_sha256": "3b02abe0488c3a0c7e0ca4d2ff8ead8ebaf3fc65ad709e5d19087935c9700039",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/vehicle/vehicle_compact_suv_01/model.config",
+        "active_sha256": "096bbbdc1dba39d7197f9ead8e3fe63f8dba29456671cc9dcd50ed994b72c9c9",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/vehicle/vehicle_compact_suv_01/model.config",
+        "feature003_source_sha256": "a16f5261db9070bdec3ed20a968422d9da46af3d6df0fa2eb1eebd3dd5f05065",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/vehicle/vehicle_compact_suv_01/model.sdf",
+        "active_sha256": "2b62b2eda5ede5c3dd5012ad9283b189a7e4ca245bb0eaca29851bd2b1695d2d",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/vehicle/vehicle_compact_suv_01/model.sdf",
+        "feature003_source_sha256": "a85db1a1df2d2c1e6214270f0b81feac22ed51c16b1dbc227f9f5ce759755f34",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/vehicle/vehicle_convertible_01/model.config",
+        "active_sha256": "6f5fafec792e43252cb9487bc60a060e815fa84bd9826d0909677b774857a55c",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/vehicle/vehicle_convertible_01/model.config",
+        "feature003_source_sha256": "074ff1a78864aacc6207c268ef7bc8c1b8abb87968197f47bdfbcb4d48eaf8d8",
+        "observation": "research model path was renamed from hifi to research"
+      },
+      {
+        "active_path": "simulation/models/research/vehicle/vehicle_convertible_01/model.sdf",
+        "active_sha256": "23cb0592fd77f95dde7ace04749fc1bc1401ce75e965267287044dfa8c757cf0",
+        "byte_identical": false,
+        "feature003_source_path": "simulation/models/hifi/vehicle/vehicle_convertible_01/model.sdf",
+        "feature003_source_sha256": "60db0e866d2c353850f87ff95d8dc4380690ecb765eed5533830b31c7a053048",
+        "observation": "research model path was renamed from hifi to research"
+      }
+    ],
+    "ref": "003-realistic-domain-transfer"
+  },
+  "historical_sources": [
+    {
+      "commit": "952aa962857ff91e5e1c48bc27a156a4fd751b95",
+      "feature": "feature001",
+      "ref": "origin/001-ros2-ai-obstacle-stop"
+    },
+    {
+      "commit": "3a0a835179c7366f2921d181436a019b28ba7dca",
+      "feature": "feature002",
+      "ref": "002-rc-car-autonomy"
+    }
+  ],
+  "protected_roots": [
+    "simulation/models/car/",
+    "simulation/worlds/",
+    "assets/source/",
+    "tools/blender/",
+    "pixi.toml",
+    "simulation/models/rc_car/",
+    "simulation/models/research/",
+    "ros2_ws/src/car_bringup/config/rc_vehicle.yaml",
+    "ros2_ws/src/car_bringup/config/rc_module_matrix/research_assets.lock.yaml",
+    "models/rc_module_matrix/",
+    "ros2_ws/src/car_bringup/config/scenarios/",
+    "ros2_ws/src/car_bringup/config/rc_scenario_sets/",
+    "docs/evaluation/rc-car/",
+    "artifacts/rc-car/"
+  ],
+  "schema_version": "1.0"
+}
