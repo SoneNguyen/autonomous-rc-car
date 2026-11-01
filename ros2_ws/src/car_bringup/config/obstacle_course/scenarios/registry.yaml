@@ -1,0 +1,109 @@
+schema_version: '1.0'
+registry_id: obstacle-course-scenarios-v1
+run_purpose: demonstration
+scenarios:
+- scenario_id: S0
+  path: S0.yaml
+  seed: 70001
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  expected_trigger_components: []
+- scenario_id: S1
+  path: S1.yaml
+  seed: 70002
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  - CAUTION
+  - AVOID_LEFT
+  - RESUME
+  - FOLLOW_ROUTE
+  expected_trigger_components:
+  - lidar
+  - camera
+- scenario_id: S2
+  path: S2.yaml
+  seed: 70003
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  - CAUTION
+  - AVOID_LEFT
+  - RESUME
+  - AVOID_RIGHT
+  - RESUME
+  - FOLLOW_ROUTE
+  expected_trigger_components:
+  - lidar
+  - camera
+- scenario_id: S3
+  path: S3.yaml
+  seed: 70004
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  expected_trigger_components: []
+- scenario_id: S3b
+  path: S3b.yaml
+  seed: 70005
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  - CAUTION
+  - STOP
+  expected_trigger_components:
+  - lidar
+- scenario_id: S4
+  path: S4.yaml
+  seed: 70006
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  - STOP
+  expected_trigger_components:
+  - lidar
+- scenario_id: S5
+  path: S5.yaml
+  seed: 70007
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  - STOP
+  expected_trigger_components:
+  - lidar
+  - contact
+- scenario_id: S6-lidar-drop
+  path: S6-lidar-drop.yaml
+  seed: 70008
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  - STOP
+  expected_trigger_components:
+  - lidar
+- scenario_id: S6-camera-drop
+  path: S6-camera-drop.yaml
+  seed: 70009
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  - CAUTION
+  - AVOID_LEFT
+  - RESUME
+  - FOLLOW_ROUTE
+  expected_trigger_components:
+  - lidar
+- scenario_id: S7
+  path: S7.yaml
+  seed: 70010
+  run_purpose: demonstration
+  expected_behavior_sequence:
+  - FOLLOW_ROUTE
+  - CAUTION
+  - AVOID_LEFT
+  - RESUME
+  - FOLLOW_ROUTE
+  expected_trigger_components:
+  - lidar
+  - imu

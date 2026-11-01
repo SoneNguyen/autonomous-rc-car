@@ -8,11 +8,11 @@ Feature 007 uses the RC-scale vehicle and high fidelity visual assets establishe
 |---|---|---|
 | Dynamic vehicle, sensors, and collision geometry | `simulation/models/rc_car/model.sdf` | Feature 003 RC model, modified later to remove its primitive visuals while preserving physics, sensors, and joints; it has no chassis `<visual>` element. Gazebo entity name remains `gazebo_truck`. |
 | RC vehicle profile | `ros2_ws/src/car_bringup/config/rc_vehicle.yaml`, `presets.rc_car` | Feature 003 vehicle-relative geometry and simulator placeholders; hardware values remain unmeasured. |
-| High fidelity vehicle and obstacle mesh pins | `ros2_ws/src/car_bringup/config/rc_module_matrix/research_assets.lock.yaml` | Active derivative of Feature 003 `ros2_ws/src/car_bringup/config/hifi/assets.lock.yaml`; preserves the Feature 003 mesh identities and hashes. Feature 007 selects only those Feature 003 asset IDs. |
+| Feature 003 vehicle and obstacle mesh pins | `ros2_ws/src/car_bringup/config/rc_module_matrix/research_assets.lock.yaml` | Active derivative of Feature 003 `ros2_ws/src/car_bringup/config/hifi/assets.lock.yaml`; preserves the Feature 003 mesh identities and hashes. Feature 007 reads it unchanged. |
 | High fidelity model descriptions | `simulation/models/research/{cone,pedestrian,vehicle}/` | Feature 003 mesh scales and simple collision proxies, with mesh URIs renamed from `hifi` to `research` in the cleaned project. |
 | Asset fetch and hash verification | `tools/fetch_matrix_assets.py` | Fetches locked files into ignored artifacts; runtime uses only local verified meshes. |
 
-The Feature 003 high-fidelity inventory includes miniature cones, pedestrian figures, compact-SUV and convertible vehicles, and floor materials. Only assets present in the Feature 003 lock are eligible as Feature 003 anchors; any unpinned mesh in the ignored cache is excluded. Use Feature 003's `vehicle_compact_suv_01` mesh as the Feature 007 controlled-vehicle visual overlay where a detailed vehicle body is needed, while leaving the RC physics model's collisions, sensors, joints, and controller behavior unchanged. Use the original locked Feature 003 GLBs for matching scene objects. Keep their pinned bytes and native mesh/material detail; do not decimate, downsample, simplify, or substitute a lower-detail variant. If a semantic visual such as the red barrier or blue gate has no Feature 003 asset, select the most detailed compatible asset available from a pinned source and record the candidate comparison, mesh/texture detail, source, license, revision, hash, and dimensions before use. A low-poly, generated, or unpinned visual is not an acceptable fallback. Primitive collisions remain appropriate and required for stable contact truth.
+The Feature 003 high-fidelity inventory includes miniature cones, pedestrian figures, compact-SUV and convertible vehicles, and floor materials. Only assets present in the Feature 003 lock are Feature 003 anchors; any unpinned mesh in the ignored cache is excluded. Use Feature 003's `vehicle_compact_suv_01` mesh as the Feature 007 controlled-vehicle visual overlay where a detailed vehicle body is needed, while leaving the RC physics model's collisions, sensors, joints, and controller behavior unchanged. Use the original locked Feature 003 GLBs for matching scene objects. Keep their pinned bytes and native mesh/material detail; do not decimate, downsample, simplify, or substitute a lower-detail variant. Where Feature 003 has no matching semantic visual, Feature 007 uses a separately pinned source asset and records the candidate comparison, mesh/texture detail, source, license, revision, hash, and dimensions before use. A low-poly, generated, or unpinned visual is not an acceptable fallback. Primitive collisions remain appropriate and required for stable contact truth.
 
 ### Visual detail comparison
 
@@ -94,3 +94,46 @@ Therefore, the frozen classifier is available only in diagnostic, unqualified ru
 2. Use standard ROS messages for sensor and controller interfaces. Versioned evidence, decision, intent, and report payloads use `std_msgs/String` JSON contracts, avoiding a custom message package.
 3. Use Python's standard-library HTTP server and server-sent events for the localhost GET-only dashboard. Dashboard failure cannot gate, stop, or redirect vehicle commands.
 4. Keep the new world, scenarios, reports, and real-car mapping in Feature 007 paths. Feature 003 asset/model anchors are read-only inputs; Feature007 does not modify existing worlds, vehicle physics, or asset locks.
+
+## Feature 007 semantic visual additions and sizing
+
+The Feature 003 lock contains no traffic barrier or gate mesh. The Feature 007
+lock therefore adds two original CC0 GLBs without changing the protected
+Feature 003 lock or the original source bytes:
+
+| Candidate | Observed detail | Comparison and decision |
+|---|---|---|
+| [Innerscene Road barrier set](https://www.innerscene.com/tools/library/3d-parts/road-barrier-set-4d29eb0a) | 6.94 MB local GLB, 2,704 triangles, 8 meshes, 12 embedded texture images; authored red/white reflective barricade and orange cones. | Selected for the barrier visual over a lower-size untextured STEP barrier and a YDR-only concrete barrier; the pinned source includes road-work objects with native PBR materials. |
+| [Innerscene Security grille gate](https://www.innerscene.com/tools/library/3d-parts/grille-security-grille-gate-941c0408) | 350.6 KB local GLB, 11,796 triangles, 31 meshes, 3 embedded texture images; graphite powder-coat and bronze hardware. | Selected as the most detailed compatible realistic gate model among the inspected CC0 gate alternatives; the 18 KB / 190-triangle low-poly medieval gate was rejected. Its original materials are preserved. |
+
+**Camera-class limitation**: the selected gate source is graphite/bronze, not
+blue. Its geometry and detail are suitable as a gate visual, but it cannot be
+counted as blue-HSV gate evidence. Do not tune the HSV rule or recolor the
+source GLB to hide this mismatch. Before claiming S3/S3b camera qualification,
+replace this candidate with a compatible pinned high-detail blue gate asset
+or keep that camera-specific acceptance explicitly unqualified. The red
+barrier and orange post retain the requested source colors; the post uses the
+Feature 003 `cone_reflector_01` mesh.
+
+The fixed-seed scenario route lengths were checked using `R_min =
+0.5589424875513274 m`, `a_brake = 0.3999092578809597 m/s^2`, and `t_latency =
+0.14 s`. At each scenario's `0.35 m/s` entry speed, `d_stop(v) =
+0.2021597451 m`. The bound is `1.25 × (approach + d_stop + counted lane-change
+path lengths + recovery)`.
+
+| Scenario | Route length | Derived minimum | With 25% margin |
+|---|---:|---:|---:|
+| S0 | 0.850 m | 0.702 m | 0.878 m |
+| S1 | 1.800 m | 1.464 m | 1.831 m |
+| S2 | 2.600 m | 2.129 m | 2.661 m |
+| S3 | 0.850 m | 0.702 m | 0.878 m |
+| S3b | 1.800 m | 1.464 m | 1.831 m |
+| S4 | 0.850 m | 0.702 m | 0.878 m |
+| S5 | 0.850 m | 0.702 m | 0.878 m |
+| S6-lidar-drop | 0.850 m | 0.702 m | 0.878 m |
+| S6-camera-drop | 1.800 m | 1.464 m | 1.831 m |
+| S7 | 1.800 m | 1.464 m | 1.831 m |
+
+The independent checker counts both lane changes in S2. Every listed route is
+strictly below 280 m and no longer than its recomputed margin bound. These are
+simulation layout values, not measurements of a physical RC car.

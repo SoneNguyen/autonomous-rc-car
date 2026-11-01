@@ -1,0 +1,51 @@
+schema_version: 1
+lock_id: feature007-obstacle-visuals-v1
+sources:
+  innerscene_road_barrier_set:
+    source: Innerscene Free Parts Library
+    author: Innerscene
+    revision: road-barrier-set-4d29eb0a-added-2026-10-24
+    page_url: https://www.innerscene.com/tools/library/3d-parts/road-barrier-set-4d29eb0a
+    download_url: https://www.innerscene.com/api/library/road-barrier-set-4d29eb0a/download
+    license: CC0-1.0
+    license_url: https://www.innerscene.com/tools/library/terms
+  innerscene_security_grille_gate:
+    source: Innerscene Free Parts Library
+    author: Innerscene
+    revision: grille-security-grille-gate-941c0408-added-2026-10-03
+    page_url: https://www.innerscene.com/tools/library/3d-parts/grille-security-grille-gate-941c0408
+    download_url: https://www.innerscene.com/api/library/grille-security-grille-gate-941c0408/download
+    license: CC0-1.0
+    license_url: https://www.innerscene.com/tools/library/terms
+assets:
+  - asset_id: road_barrier_set
+    class_id: obstacle
+    source_id: innerscene_road_barrier_set
+    file_name: road-barrier-set.glb
+    file_sha256: 7ff804219e1401b691af7c8c27aa5c93c61ad247778c68b3599c7feeaea8f567
+    quality_review:
+      role: red road barrier visual source; the original grouped assembly also contains orange cones and delineators.
+      measured_triangles: 2704
+      embedded_pbr_textures: 12
+      material_detail: Original red and white reflective barricade, orange PVC cones, galvanized hardware, rubber bases, and embedded surface textures.
+      candidate_comparison: "Selected over the 118 KB untextured traffic-barrier STEP, the 2.5 MB YDR concrete barrier, and Feature 003's cone models because it is a direct road-work barrier GLB with preserved authored PBR materials and higher semantic match. Feature 003 cones remain the post-class reference."
+    dimensions:
+      source_bounds_m: {value: [5.01, 1.97, 1.21], unit: m, provenance: Innerscene published measured overall dimensions}
+      visual_scale_factor: {value: 0.1, unit: ratio, provenance: 1:10 RC course scale}
+      miniature_bounds_m: {value: [0.501, 0.197, 0.121], unit: m, provenance: derived from source bounds and scale}
+  - asset_id: security_grille_gate
+    class_id: obstacle
+    source_id: innerscene_security_grille_gate
+    file_name: security-grille-gate.glb
+    file_sha256: f174371a4d3da93ae4f5c27d2172985bc17d9813f0e93fffc9d0a63caba1a8dc
+    quality_review:
+      role: high-detail gate leaf visual source.
+      measured_triangles: 11796
+      embedded_pbr_textures: 3
+      material_detail: Original graphite powder-coated steel and champagne-bronze details with embedded normal/base-color textures.
+      candidate_comparison: "Selected for a realistic welded gate leaf with explicit frame, bars, crossrails, lock hardware, and about 12k triangles. The 18 KB low-poly medieval gate was rejected. Source materials and mesh bytes remain unchanged."
+      color_class_note: "The source finish is graphite and bronze, not blue. It cannot qualify the blue HSV gate class until a blue-compatible high-detail source asset is selected; do not recolor or count this visual as successful blue-class evidence."
+    dimensions:
+      source_bounds_m: {value: [1.08, 0.143, 2.15], unit: m, provenance: Innerscene published overall dimensions}
+      visual_scale_factor: {value: 0.25, unit: ratio, provenance: derived RC-scale visual fit; geometry remains a visual only}
+      miniature_bounds_m: {value: [0.27, 0.03575, 0.5375], unit: m, provenance: derived from source bounds and scale}
