@@ -1,0 +1,161 @@
+schema_version: '1.0'
+scenario_id: barrier_tuning
+seed: 87001
+run_purpose: development
+world_path: simulation/worlds/obstacle_condensed.sdf
+lighting_profile: world_default
+vehicle_preset: rc_vehicle_reference
+entry_speed_mps:
+  value: 0.35
+  unit: m/s
+  provenance: Feature 007 fixed-seed scenario entry condition
+  status: derived
+start_pose:
+  x:
+    value: 0
+    unit: m
+    provenance: Feature 007 vehicle-relative course layout
+    status: derived
+  y:
+    value: 0
+    unit: m
+    provenance: Feature 007 vehicle-relative course layout
+    status: derived
+  yaw:
+    value: 0
+    unit: rad
+    provenance: Feature 007 vehicle-relative course layout
+    status: derived
+route:
+  frame: vehicle_relative
+  waypoints:
+  - x:
+      value: 0.0
+      unit: m
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+    y:
+      value: 0
+      unit: m
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+    yaw:
+      value: 0
+      unit: rad
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+  - x:
+      value: 0.9
+      unit: m
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+    y:
+      value: 0
+      unit: m
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+    yaw:
+      value: 0
+      unit: rad
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+  - x:
+      value: 1.8
+      unit: m
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+    y:
+      value: 0
+      unit: m
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+    yaw:
+      value: 0
+      unit: rad
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+  length_m:
+    value: 1.8
+    unit: m
+    provenance: sum of vehicle-relative route segment lengths
+    status: derived
+  sizing:
+    entry_speed_mps:
+      value: 0.35
+      unit: m/s
+      provenance: matches scenario entry speed
+      status: derived
+    approach_distance_m:
+      value: 0.25
+      unit: m
+      provenance: layout distance before the decision zone
+      status: derived
+    lateral_shift_m:
+      value: 0.25
+      unit: m
+      provenance: total lateral displacement per counted lane change
+      status: derived
+    lane_change_count: 1
+    recovery_distance_m:
+      value: 0.25
+      unit: m
+      provenance: clear route distance after the decision zone
+      status: derived
+obstacles:
+- entity_id: barrier_01
+  class: barrier
+  colour: red
+  pose:
+    x:
+      value: 0.75
+      unit: m
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+    y:
+      value: 0
+      unit: m
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+    yaw:
+      value: 0.0
+      unit: rad
+      provenance: Feature 007 vehicle-relative course layout
+      status: derived
+  dimensions_m:
+    length:
+      value: 0.5511
+      unit: m
+      provenance: locked visual source or measured miniature obstacle
+      status: derived
+    width:
+      value: 0.2167
+      unit: m
+      provenance: locked visual source or measured miniature obstacle
+      status: derived
+    height:
+      value: 0.1331
+      unit: m
+      provenance: locked high-detail visual scaled to cross the configured RC LiDAR scan plane
+      status: derived
+  mesh_or_fragment: barrier_red
+  scan_plane_intersection: true
+expected_behavior_sequence:
+- FOLLOW_ROUTE
+- CAUTION
+- AVOID_LEFT
+- RESUME
+- FOLLOW_ROUTE
+expected_trigger_components:
+- lidar
+- camera
+contact_rule: no_non_ground_contact
+setup_sheet: docs/real-car-mapping/setup-sheets/S1.md
+run_timeout_s:
+  value: 20
+  unit: s
+  provenance: fixed demonstration timeout
+  status: derived
+condition_tags:
+- development_variant
+- fixed_seed
+- vehicle_relative
