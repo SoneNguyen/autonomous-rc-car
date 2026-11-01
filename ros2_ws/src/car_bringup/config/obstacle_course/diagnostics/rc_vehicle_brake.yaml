@@ -1,0 +1,50 @@
+schema_version: "1.0"
+scenario_id: rc_vehicle_brake
+seed: 78001
+run_purpose: diagnostic
+world:
+  source_path: simulation/worlds/rc_module_matrix.sdf
+  generated_output: artifacts/obstacle-course/dynamics/rc_vehicle_brake_world.sdf
+  world_name: rc_module_matrix
+  transform: remove research target includes and use a plain local ground/road visual while preserving the RC include, physics, and sensor plugins
+  source_sha256: de31990f634af6e92115d5c92c49c28b7d4668aaa1cd04e99c407bc5d67b55d4
+vehicle:
+  entity: gazebo_truck
+  initial_pose:
+    x_m: -10.5
+    y_m: -1.0
+    z_m: 0.0675
+    yaw_rad: 0.0
+drive:
+  request_topic: /ackermann_cmd
+  command_authority: car_autonomy_nodes.safe_drive_controller
+  mode: rc_navigation
+  entry_speed_mps: 0.55
+  minimum_stable_speed_mps: 0.4
+  brake_speed_mps: 0.0
+  steering_angle_rad: 0.0
+trial_schedule:
+  count: 10
+  warmup_sim_time_s: 1.0
+  approach_timeout_sim_time_s: 4.0
+  approach_command_period_sim_time_s: 0.1
+  brake_hold_sim_time_s: 2.5
+  rest_sim_time_s: 0.4
+  stop_speed_threshold_mps: 0.02
+  deceleration_onset_delta_mps: 0.015
+  maximum_trial_distance_m: 1.6
+expected_observations:
+  clock_topic: /clock
+  odometry_topic: /odom
+  controller_status_topic: /vehicle_controller/status
+  odometry_frame_id: odom
+  base_frame_id: base_link
+  require_controller_ready: true
+  require_fresh_lidar_imu_odometry: true
+  minimum_samples_per_brake: 4
+  maximum_sample_gap_sim_time_s: 0.25
+provenance:
+  purpose: Simulation braking calibration only; not a physical RC-car claim.
+  source_profile: ros2_ws/src/car_bringup/config/rc_vehicle.yaml#/presets/rc_car
+  source_vehicle: simulation/models/rc_car/model.sdf#/sdf/model[@name='rc_car']
+  runtime: WSL2 Ubuntu 26.04, ROS 2 Lyrical, ros_gz 3.0.10, Gazebo Sim 10.5.0
