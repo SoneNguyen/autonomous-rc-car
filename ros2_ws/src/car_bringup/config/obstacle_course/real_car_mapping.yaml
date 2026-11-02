@@ -1,0 +1,116 @@
+schema_version: '1.0'
+mapping_id: obstacle-course-rc-reference
+status_note: All physical RC values remain placeholders until measured on the real vehicle.
+entries:
+- constant_path: derived_geometry.minimum_turn_radius_m.value
+  simulation_value: 0.5589424875513274
+  unit: m
+  provenance: wheelbase_m / tan(effective_center_wheel_limit_rad)
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: dynamics.braking_deceleration_mps2.value
+  simulation_value: 0.39988707442494525
+  unit: m/s^2
+  provenance: artifacts/obstacle-course/dynamics/rc-vehicle-reference.json#measurements.conservative_braking_deceleration_mps2
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: dynamics.request_to_deceleration_latency_s.value
+  simulation_value: 0.14100000000000001
+  unit: s
+  provenance: artifacts/obstacle-course/dynamics/rc-vehicle-reference.json#measurements.conservative_request_to_deceleration_latency_s
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: geometry.chassis_height_m.value
+  simulation_value: 0.085
+  unit: m
+  provenance: rc_car/model.sdf base_link collision box size[2].
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: geometry.chassis_length_m.value
+  simulation_value: 0.38
+  unit: m
+  provenance: rc_car/model.sdf base_link collision box size[0].
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: geometry.chassis_width_m.value
+  simulation_value: 0.22
+  unit: m
+  provenance: rc_car/model.sdf base_link collision box size[1].
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: geometry.front_track_m.value
+  simulation_value: 0.2
+  unit: m
+  provenance: rc_vehicle.yaml#/presets/rc_car/geometry/front_track_m.
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: geometry.rear_track_m.value
+  simulation_value: 0.2
+  unit: m
+  provenance: rc_vehicle.yaml#/presets/rc_car/geometry/rear_track_m.
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: geometry.wheel_radius_m.value
+  simulation_value: 0.033
+  unit: m
+  provenance: rc_car/model.sdf wheel_collision cylinder radius.
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: geometry.wheel_width_m.value
+  simulation_value: 0.025
+  unit: m
+  provenance: rc_car/model.sdf wheel_collision cylinder length.
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: geometry.wheelbase_m.value
+  simulation_value: 0.27
+  unit: m
+  provenance: rc_vehicle.yaml#/presets/rc_car/geometry/wheelbase_m; inherited unchanged.
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: steering.effective_center_wheel_limit_rad.value
+  simulation_value: 0.45
+  unit: rad
+  provenance: rc_vehicle.yaml#/presets/rc_car/steering/effective_center_wheel_limit_rad.
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: steering.maximum_speed_mps.value
+  simulation_value: 1.0
+  unit: m/s
+  provenance: rc_vehicle.yaml#/presets/rc_car/steering/max_speed_mps.
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.
+- constant_path: steering.plugin_steering_limit_rad.value
+  simulation_value: 0.50414051869
+  unit: rad
+  provenance: rc_car/model.sdf AckermannSteering plugin steering_limit.
+  rc_value: null
+  rc_status: placeholder
+  rc_provenance: Physical vehicle measurement has not been supplied; do not interpret measured_sim or
+    model geometry as hardware data.

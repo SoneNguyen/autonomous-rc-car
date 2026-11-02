@@ -2,7 +2,7 @@
 <package format="3">
   <name>car_decision</name>
   <version>0.1.0</version>
-  <description>Feature 007 sensor evidence, attributed obstacle decisions, and read-only dashboard.</description>
+  <description>Obstacle course sensor evidence, attributed obstacle decisions, and read-only dashboard.</description>
   <maintainer email="174254834+SoneNguyen@users.noreply.github.com">Son Nguyen</maintainer>
   <license>MIT</license>
   <buildtool_depend>python3-setuptools</buildtool_depend>
@@ -16,8 +16,8 @@
   <exec_depend>ros_gz_interfaces</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-  <exec_depend>tf2_ros</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-jsonschema</exec_depend>
   <exec_depend>python3-yaml</exec_depend>
   <export>
     <build_type>ament_python</build_type>

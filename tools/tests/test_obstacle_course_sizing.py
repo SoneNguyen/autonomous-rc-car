@@ -84,3 +84,16 @@ def test_stopping_distance_is_part_of_the_minimum_route():
         + sizing.lane_change_minimum_lengths_m(0.3, 0.5589424875513274)["path_length_m"]
         + 0.4
     )
+
+
+def test_each_scenario_lane_change_is_counted_in_the_layout_minimum():
+    route = _scenario(3.5)
+    route["route"]["sizing"]["lane_change_count"] = 2
+    result = sizing.derive_scenario_sizing(route, PROFILE, GEOMETRY)
+    single = _scenario(2.5)
+    single_result = sizing.derive_scenario_sizing(single, PROFILE, GEOMETRY)
+    assert result["lane_change_count"] == 2
+    assert result["minimum_feasible_route_length_m"] == pytest.approx(
+        single_result["minimum_feasible_route_length_m"]
+        + single_result["lane_change"]["path_length_m"]
+    )

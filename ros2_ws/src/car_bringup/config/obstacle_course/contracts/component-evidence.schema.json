@@ -1,0 +1,622 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "component-evidence.schema.json",
+  "title": "Obstacle-course normalized component evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "component",
+    "scenario_id",
+    "run_id",
+    "run_purpose",
+    "sequence",
+    "source_sample_sequence",
+    "sim_time_ns",
+    "clock_epoch",
+    "freshness",
+    "valid",
+    "source",
+    "config_sha256",
+    "profile_sha256",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "component": {
+      "enum": [
+        "lidar",
+        "camera",
+        "imu",
+        "odometry",
+        "contact"
+      ]
+    },
+    "scenario_id": {
+      "type": "string",
+      "minLength": 2
+    },
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "run_purpose": {
+      "enum": [
+        "demonstration",
+        "development",
+        "diagnostic"
+      ]
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source_sample_sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sim_time_ns": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "clock_epoch": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "frozen_inputs_root_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "config_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "profile_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "frame_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "freshness": {
+      "$ref": "#/$defs/freshness"
+    },
+    "valid": {
+      "type": "boolean"
+    },
+    "invalid_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "evidence": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "run_purpose": {
+            "const": "demonstration"
+          }
+        },
+        "required": [
+          "run_purpose"
+        ]
+      },
+      "then": {
+        "required": [
+          "frozen_inputs_root_sha256"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "component": {
+            "const": "lidar"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "type": "object",
+            "required": [
+              "input_adapter",
+              "sectors",
+              "route_corridor",
+              "points_base_link",
+              "ground_points_rejected",
+              "invalid_returns_rejected",
+              "usable_points"
+            ],
+            "properties": {
+              "input_adapter": {
+                "const": "laser_scan"
+              },
+              "sectors": {
+                "$ref": "#/$defs/sectors"
+              },
+              "route_corridor": {
+                "$ref": "#/$defs/corridor"
+              },
+              "points_base_link": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/lidarPoint"
+                }
+              },
+              "ground_points_rejected": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "invalid_returns_rejected": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "usable_points": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "component": {
+            "const": "camera"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "type": "object",
+            "required": [
+              "classifier",
+              "objects"
+            ],
+            "properties": {
+              "classifier": {
+                "const": "hsv"
+              },
+              "objects": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/object"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "component": {
+            "const": "imu"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "type": "object",
+            "required": [
+              "yaw_rate_rad_s",
+              "lateral_acceleration_mps2",
+              "longitudinal_acceleration_mps2"
+            ],
+            "properties": {
+              "yaw_rate_rad_s": {
+                "type": "number"
+              },
+              "lateral_acceleration_mps2": {
+                "type": "number"
+              },
+              "longitudinal_acceleration_mps2": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "component": {
+            "const": "odometry"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "type": "object",
+            "required": [
+              "world_pose",
+              "start_relative_pose",
+              "speed_mps",
+              "route_progress_m",
+              "d_stop_m",
+              "profile_id",
+              "pose_source",
+              "speed_source",
+              "wheel_odometry_pose_error_m"
+            ],
+            "properties": {
+              "world_pose": {
+                "$ref": "#/$defs/pose2d"
+              },
+              "start_relative_pose": {
+                "$ref": "#/$defs/pose2d"
+              },
+              "speed_mps": {
+                "type": "number"
+              },
+              "route_progress_m": {
+                "type": "number"
+              },
+              "d_stop_m": {
+                "type": "number",
+                "minimum": 0
+              },
+              "profile_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pose_source": {
+                "const": "gazebo_named_model_pose"
+              },
+              "speed_source": {
+                "const": "ackermann_odometry_twist"
+              },
+              "wheel_odometry_pose_error_m": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "component": {
+            "const": "contact"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "type": "object",
+            "required": [
+              "contacts",
+              "ground_excluded",
+              "non_ground_collision"
+            ],
+            "properties": {
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/contactPair"
+                }
+              },
+              "ground_excluded": {
+                "type": "boolean"
+              },
+              "non_ground_collision": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "component": {
+            "const": "camera"
+          },
+          "evidence": {
+            "properties": {
+              "classifier": {
+                "const": "hsv"
+              }
+            },
+            "required": [
+              "classifier"
+            ]
+          }
+        },
+        "required": [
+          "component",
+          "evidence"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "properties": {
+              "objects": {
+                "items": {
+                  "properties": {
+                    "class": {
+                      "enum": [
+                        "barrier",
+                        "post",
+                        "gate"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "freshness": {
+      "type": "object",
+      "required": [
+        "state",
+        "age_s",
+        "timeout_s"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "fresh",
+            "stale",
+            "unavailable"
+          ]
+        },
+        "age_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "timeout_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "topic",
+        "message_type",
+        "adapter_id"
+      ],
+      "properties": {
+        "topic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "adapter_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "sectors": {
+      "type": "object",
+      "required": [
+        "right_m",
+        "front_right_m",
+        "front_m",
+        "front_left_m",
+        "left_m"
+      ],
+      "properties": {
+        "right_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "front_right_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "front_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "front_left_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "left_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "lidarPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x_m",
+        "y_m",
+        "range_m",
+        "bearing_rad"
+      ],
+      "properties": {
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "range_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "bearing_rad": {
+          "type": "number"
+        }
+      }
+    },
+    "corridor": {
+      "type": "object",
+      "required": [
+        "occupied",
+        "nearest_range_m"
+      ],
+      "properties": {
+        "occupied": {
+          "type": "boolean"
+        },
+        "nearest_range_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "object": {
+      "type": "object",
+      "required": [
+        "class",
+        "colour_score",
+        "confidence",
+        "blob_area_px",
+        "bearing_rad",
+        "apparent_size_px"
+      ],
+      "properties": {
+        "class": {
+          "enum": [
+            "barrier",
+            "post",
+            "gate"
+          ]
+        },
+        "colour_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "blob_area_px": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bearing_rad": {
+          "type": "number"
+        },
+        "apparent_size_px": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "pose2d": {
+      "type": "object",
+      "required": [
+        "x_m",
+        "y_m",
+        "yaw_rad"
+      ],
+      "properties": {
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "yaw_rad": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "contactPair": {
+      "type": "object",
+      "required": [
+        "collision_a",
+        "collision_b",
+        "ground",
+        "allowlisted"
+      ],
+      "properties": {
+        "collision_a": {
+          "type": "string",
+          "minLength": 1
+        },
+        "collision_b": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ground": {
+          "type": "boolean"
+        },
+        "allowlisted": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

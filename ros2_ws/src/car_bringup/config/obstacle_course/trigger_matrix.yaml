@@ -24,6 +24,10 @@ rows:
   behavior: RESUME
   role: veto
   rule: any_route_corridor_return_vetoes_path_clear
+- component: lidar
+  behavior: RESUME
+  role: trigger
+  rule: configured_consecutive_clear_scans_and_dwell_complete
 - component: camera
   behavior: CAUTION
   role: trigger
@@ -76,6 +80,10 @@ rows:
   behavior: STOP
   role: trigger
   rule: stale_or_invalid_vehicle_pose_or_speed
+- component: odometry
+  behavior: STOP
+  role: support
+  rule: supplies_speed_and_measured_stopping_distance_for_hazard_braking_decision
 - component: contact
   behavior: STOP
   role: trigger
@@ -84,6 +92,14 @@ rows:
   behavior: RESUME
   role: support
   rule: lateral_clearance_regained_and_route_corridor_clear_for_dwell
+- component: odometry
+  behavior: FOLLOW_ROUTE
+  role: trigger
+  rule: route_resumed_after_clearance_dwell
+- component: contact
+  behavior: STOP
+  role: trigger
+  rule: contact_stream_stale_or_allowlisted_non_ground_collision
 - component: camera
   behavior: RESUME
   role: support

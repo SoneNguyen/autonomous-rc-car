@@ -11,7 +11,7 @@ coordinate_convention:
 sources:
   vehicle_profile:
     path: ros2_ws/src/car_bringup/config/rc_vehicle.yaml
-    sha256: 3d20371e1cf40417495e67fe761fc3b5da1c2a0c9ab54ad7215733684c3d726c
+    sha256: 2af672edbb91aea6d140cb8721dc34bcaa7e494757b3d5a8034d59ee715fa0f4
     pointer: /presets/rc_car
   vehicle_model:
     path: simulation/models/rc_car/model.sdf
@@ -88,27 +88,27 @@ derived_geometry:
   status: validated_derivation
 dynamics:
   braking_deceleration_mps2:
-    value: 0.3999092578809597
+    value: 0.39988707442494525
     unit: m/s^2
     status: measured_sim
     provenance: artifacts/obstacle-course/dynamics/rc-vehicle-reference.json#measurements.conservative_braking_deceleration_mps2
   request_to_deceleration_latency_s:
-    value: 0.14000000000000057
+    value: 0.14100000000000001
     unit: s
     status: measured_sim
     provenance: artifacts/obstacle-course/dynamics/rc-vehicle-reference.json#measurements.conservative_request_to_deceleration_latency_s
   measurement_report:
     path: artifacts/obstacle-course/dynamics/rc-vehicle-reference.json
-    sha256: 95c7bfdeb63e8e77631919d49d02d3fb1445838d49c77e85f030f24941b4911f
+    sha256: 7ef9f01bd809c4ba6bbc3e2bf7d24aacc1a41b46e823fae149a6384bd68e886d
   simulator_identity: Gazebo Sim 10.5.0; ROS 2 lyrical; ros_gz_bridge 3.0.10; physics=source-world;
     seed=78001
   measurement_source_hashes:
-    controller: 3ae0d0b69cdb43d92b1d262f396065e075a54cb79b6f92ed962431e74fdaa634
-    profile: 7931dcf2a01daa0cd6ebd2d3e19bd3e389165ee172662b303823a0938b95e39d
-    scenario: 15e8fb8417b605939a24a117aa27e052d4b7fd458c5bcd3029e7d850ffa98a8c
-    source_world: de31990f634af6e92115d5c92c49c28b7d4668aaa1cd04e99c407bc5d67b55d4
+    profile: b21c1aacc788714606d088fbfee919f7422933ca31876a58157041c79997c1dd
+    scenario: 55b501f3417a9c689b27d1ace8c32a2441bd992b76af372cb8197defb46753e9
+    vehicle_profile: 2af672edbb91aea6d140cb8721dc34bcaa7e494757b3d5a8034d59ee715fa0f4
     vehicle_model: 4405554064669da937fb8f4e264296265fac9113fa2ca64561d9fa22d5268939
-    vehicle_profile: 3d20371e1cf40417495e67fe761fc3b5da1c2a0c9ab54ad7215733684c3d726c
+    controller: 3ae0d0b69cdb43d92b1d262f396065e075a54cb79b6f92ed962431e74fdaa634
+    source_world: e39393a1d8a0e1e8898397bcd47bf082396924fb483c4ff0b7e064457729fcd0
 stopping_distance:
   formula: v^2 / (2 * braking_deceleration_mps2) + v * request_to_deceleration_latency_s
   status: measured_sim
@@ -120,22 +120,22 @@ stopping_distance:
   - 1.0
   curve:
   - speed_mps: 0.1
-    distance_m: 0.026502836334657612
+    distance_m: 0.026603529920766297
     unit: m
     provenance: measured_sim braking and request latency from this report
   - speed_mps: 0.25
-    distance_m: 0.11314272709160984
+    distance_m: 0.11339706200478933
     unit: m
     provenance: measured_sim braking and request latency from this report
   - speed_mps: 0.5
-    distance_m: 0.3825709083664391
+    distance_m: 0.3830882480191573
     unit: m
     provenance: measured_sim braking and request latency from this report
   - speed_mps: 0.75
-    distance_m: 0.8082845438244877
+    distance_m: 0.8090735580431039
     unit: m
     provenance: measured_sim braking and request latency from this report
   - speed_mps: 1.0
-    distance_m: 1.3902836334657558
+    distance_m: 1.3913529920766292
     unit: m
     provenance: measured_sim braking and request latency from this report

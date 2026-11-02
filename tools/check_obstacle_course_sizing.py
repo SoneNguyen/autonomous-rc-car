@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Recompute the Feature 007 route-length bound from measured RC geometry."""
+"""Recompute the Obstacle course route-length bound from measured RC geometry."""
 
 from __future__ import annotations
 
@@ -110,6 +110,7 @@ def derive_scenario_sizing(scenario: dict, profile: dict, geometry: dict) -> dic
         approach = _parameter(layout["approach_distance_m"], "route.sizing.approach_distance_m")
         lateral_shift = _parameter(layout.get("lateral_shift_m", {"value": 0, "unit": "m", "provenance": "no lane change"}), "route.sizing.lateral_shift_m")
         recovery = _parameter(layout["recovery_distance_m"], "route.sizing.recovery_distance_m")
+        lane_change_count = int(layout.get("lane_change_count", 1 if lateral_shift > 0 else 0))
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError(f"scenario {scenario.get('scenario_id', '<unknown>')} has incomplete route sizing: {exc}") from exc
     for name, value in (("route.length_m", route_length), ("entry_speed_mps", speed),
@@ -118,6 +119,10 @@ def derive_scenario_sizing(scenario: dict, profile: dict, geometry: dict) -> dic
             raise ValueError(f"{name} must be finite and nonnegative")
     if route_length <= 0 or speed <= 0:
         raise ValueError("route length and entry speed must be positive")
+    if lane_change_count < 0:
+        raise ValueError("lane_change_count must be nonnegative")
+    if lane_change_count and lateral_shift == 0:
+        raise ValueError("lane_change_count must be zero when lateral_shift_m is zero")
 
     vehicle = geometry["vehicle"]
     vehicle_length = _parameter(vehicle["length_m"], "vehicle.length_m")
@@ -139,7 +144,7 @@ def derive_scenario_sizing(scenario: dict, profile: dict, geometry: dict) -> dic
             profile["steering"]["effective_center_wheel_limit_rad"]["value"],
         )
     lane_change = lane_change_minimum_lengths_m(lateral_shift, radius)
-    minimum = approach + d_stop + lane_change["path_length_m"] + recovery
+    minimum = approach + d_stop + lane_change["path_length_m"] * lane_change_count + recovery
     bound = apply_layout_margin(minimum)
     if route_length > bound:
         raise ValueError(
@@ -158,6 +163,7 @@ def derive_scenario_sizing(scenario: dict, profile: dict, geometry: dict) -> dic
         "d_stop_m": d_stop,
         "minimum_turn_radius_m": radius,
         "lane_change": lane_change,
+        "lane_change_count": lane_change_count,
         "minimum_feasible_route_length_m": minimum,
         "layout_margin_ratio": LAYOUT_MARGIN_RATIO,
         "maximum_route_length_m": bound,

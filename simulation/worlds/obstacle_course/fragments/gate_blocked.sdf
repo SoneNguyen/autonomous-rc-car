@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<sdf version="1.10">
+  <model name="obstacle_template">
+    <static>true</static>
+    <link name="obstacle_link">
+      <visual name="original_research_barrier">
+        <geometry>
+          <mesh>
+            <uri>model://research/obstacle/road_barrier_set/road-barrier-set.glb</uri>
+            <scale>0.11 0.11 0.11</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="opening_blocker_contact">
+        <pose>0 0 0.06655 0 0 0</pose>
+        <geometry><box><size>0.5511 0.2167 0.1331</size></box></geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

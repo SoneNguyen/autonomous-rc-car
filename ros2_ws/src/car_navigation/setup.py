@@ -12,15 +12,13 @@ setup(
     ],
     install_requires=["setuptools", "PyYAML"],
     zip_safe=True,
-    maintainer="Autonomous Vehicle Simulation",
-    maintainer_email="maintainer@example.invalid",
-    description="RC matrix sensor-frame and frozen-detector nodes",
+    maintainer="Son Nguyen",
+    maintainer_email="174254834+SoneNguyen@users.noreply.github.com",
+    description="RC sensor-frame transforms",
     license="MIT",
     entry_points={
         "console_scripts": [
             "sensor_tf_node = car_navigation.sensor_tf_node:main",
-            "object_detection_node = car_navigation.object_detection_node:main",
-            "matrix_lidar_fault_relay = car_navigation.matrix_lidar_relay:main",
         ],
     },
 )

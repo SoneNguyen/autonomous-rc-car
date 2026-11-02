@@ -1,8 +1,0 @@
-schema_version: 1
-presets:
-  high: {camera_width_px: 640, camera_height_px: 480, camera_rate_hz: 30, shadows: true, antialiasing: 4, texture_resolution_px: 1024, lod: high}
-  low: {camera_width_px: 320, camera_height_px: 240, camera_rate_hz: 15, shadows: false, antialiasing: 0, texture_resolution_px: 512, lod: low}
-dimension_records:
-  road_length: {value: 28.0, unit: m, provenance: derived, note: existing RC course length}
-  road_width: {value: 5.0, unit: m, provenance: derived, note: existing RC road width}
-  texture_tile_extent: {value: 1.0, unit: m, provenance: labelled_placeholder, note: texture tiling selected for scene appearance}

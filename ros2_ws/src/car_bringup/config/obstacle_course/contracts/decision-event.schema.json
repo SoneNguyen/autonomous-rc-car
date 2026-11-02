@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decision-event.schema.json",
+  "title": "Obstacle course attributed behavior event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "run_id",
+    "run_purpose",
+    "scenario_id",
+    "sequence",
+    "event_kind",
+    "sim_time_ns",
+    "clock_epoch",
+    "published_monotonic_ns",
+    "previous_behavior",
+    "behavior",
+    "candidate_behavior",
+    "rule_id",
+    "reason",
+    "attribution",
+    "decision_config_sha256",
+    "trigger_matrix_sha256",
+    "profile_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "event_id": {"type": "string", "format": "uuid"},
+    "run_id": {"type": "string", "format": "uuid"},
+    "run_purpose": {"enum": ["demonstration", "development", "diagnostic"]},
+    "scenario_id": {"type": "string", "minLength": 2},
+    "sequence": {"type": "integer", "minimum": 0},
+    "event_kind": {"enum": ["transition", "evaluation"]},
+    "sim_time_ns": {"type": "integer", "minimum": 0},
+    "clock_epoch": {"type": "integer", "minimum": 0},
+    "published_monotonic_ns": {"type": "integer", "minimum": 0},
+    "previous_behavior": {"$ref": "#/$defs/behavior"},
+    "behavior": {"$ref": "#/$defs/behavior"},
+    "candidate_behavior": {"oneOf": [{"$ref": "#/$defs/behavior"}, {"type": "null"}]},
+    "rule_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_-]+$"},
+    "reason": {"type": "string", "minLength": 1},
+    "attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["triggers", "supporters", "vetoes", "overruled", "stale_components"],
+      "properties": {
+        "triggers": {"type": "array", "items": {"$ref": "#/$defs/evidence_ref"}},
+        "supporters": {"type": "array", "items": {"$ref": "#/$defs/evidence_ref"}},
+        "vetoes": {"type": "array", "items": {"$ref": "#/$defs/evidence_ref"}},
+        "overruled": {"type": "array", "items": {"$ref": "#/$defs/overruled_ref"}},
+        "stale_components": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/component"}}
+      }
+    },
+    "planner_intent": {"$ref": "#/$defs/planner_intent"},
+    "decision_config_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "trigger_matrix_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "profile_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "frozen_inputs_root_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"event_kind": {"const": "transition"}}, "required": ["event_kind"]},
+      "then": {
+        "properties": {
+          "candidate_behavior": {"type": "null"},
+          "attribution": {"properties": {"triggers": {"minItems": 1}}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event_kind": {"const": "evaluation"}}, "required": ["event_kind"]},
+      "then": {
+        "properties": {
+          "candidate_behavior": {"$ref": "#/$defs/behavior"},
+          "attribution": {
+            "anyOf": [
+              {"properties": {"vetoes": {"minItems": 1}}},
+              {"properties": {"overruled": {"minItems": 1}}}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"run_purpose": {"const": "demonstration"}}, "required": ["run_purpose"]},
+      "then": {"required": ["frozen_inputs_root_sha256"]}
+    }
+  ],
+  "$defs": {
+    "behavior": {"enum": ["FOLLOW_ROUTE", "CAUTION", "AVOID_LEFT", "AVOID_RIGHT", "STOP", "RESUME"]},
+    "component": {"enum": ["lidar", "camera", "imu", "odometry", "contact"]},
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component", "evidence_sequence", "value", "unit", "freshness"],
+      "properties": {
+        "component": {"$ref": "#/$defs/component"},
+        "evidence_sequence": {"type": "integer", "minimum": 0},
+        "value": {},
+        "unit": {"type": "string", "minLength": 1},
+        "freshness": {"enum": ["fresh", "stale", "unavailable"]}
+      }
+    },
+    "overruled_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component", "overruled_by", "value", "unit", "reason"],
+      "properties": {
+        "component": {"$ref": "#/$defs/component"},
+        "overruled_by": {"$ref": "#/$defs/component"},
+        "value": {},
+        "unit": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "planner_intent": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["preferred_side", "class_margin_m", "speed_cap_mps", "valid_until_ns"],
+      "properties": {
+        "preferred_side": {"enum": ["left", "right", "none"]},
+        "class_margin_m": {"type": "number", "minimum": 0},
+        "speed_cap_mps": {"type": "number", "minimum": 0},
+        "valid_until_ns": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

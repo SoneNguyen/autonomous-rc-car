@@ -1,12 +1,10 @@
 schema_version: '1.0'
-decision_config_id: obstacle-course-barrier-tuning-development-v1
+decision_config_id: obstacle-course-trigger-showcase-development-v2
 vehicle_profile:
   path: ros2_ws/src/car_bringup/config/obstacle_course/rc_vehicle_reference.yaml
-  sha256: b21c1aacc788714606d088fbfee919f7422933ca31876a58157041c79997c1dd
+  sha256: 73085cd0d6f31dc69b865023fee9e67576967a8733d69d9a414da85a4a1112ce
 camera:
-  source: hsv
   lighting: world_default
-  qualification_detector: true
   hsv_classes:
     barrier:
       ranges:
@@ -16,16 +14,16 @@ camera:
           - 110
           - 75
           unit: OpenCV_HSV_0_179_0_255_0_255
-          provenance: Initial red barrier range for the Feature 007 development variant; freeze only after
-            separate lighting checks.
+          provenance: Initial red barrier range for the Obstacle course development variant; freeze only
+            after separate lighting checks.
         upper_hsv:
           value:
           - 12
           - 255
           - 255
           unit: OpenCV_HSV_0_179_0_255_0_255
-          provenance: Initial red barrier range for the Feature 007 development variant; freeze only after
-            separate lighting checks.
+          provenance: Initial red barrier range for the Obstacle course development variant; freeze only
+            after separate lighting checks.
       - lower_hsv:
           value:
           - 168
@@ -85,22 +83,18 @@ camera:
     unit: rad
     provenance: Merge adjacent same-color mesh fragments into one visible object when their camera bearings
       are within this angular gap; keep separate objects outside this gap.
-  detector_policy:
-    frozen_feature_001_diagnostic_only: true
-    qualification_source: hsv
-    actionable_frozen_label: cone
-    mapped_actionable_class: post
-    other_frozen_labels_actionable: false
 thresholds:
   caution_distance_multiple_d_stop:
-    value: 2.0
+    value: 16.0
     unit: d_stop(v)
-    provenance: Initial range for early speed reduction; tune only in tracked development configs.
+    provenance: Development-only warning envelope leaves room to show CAUTION before a controlled detour
+    status: derived
   avoidance_distance_multiple_d_stop:
-    value: 1.5
+    value: 11.5
     unit: d_stop(v)
-    provenance: Initial near-field avoidance trigger; kept below caution distance and outside the emergency
-      braking envelope so a feasible detour can be selected.
+    provenance: Development-only threshold widened from the first visible run so CAUTION can be observed
+      before the LiDAR-visible barrier reaches the detour envelope; validate clearance and contact before
+      freezing.
   stop_required_deceleration_fraction:
     value: 0.8
     unit: fraction_of_measured_braking_deceleration
@@ -110,9 +104,11 @@ thresholds:
     unit: m/s^2
     provenance: Initial RC-scale turn-caution value; development value.
   turn_speed_cap_mps:
-    value: 0.35
+    value: 0.32
     unit: m/s
-    provenance: Initial speed cap applied after lateral-acceleration caution; development value.
+    provenance: Development-only caution speed; chosen to preserve more stopping distance while the widened
+      caution-to-avoid transition is observed.
+    status: derived
   class_clearance_vehicle_width_multiple:
     barrier:
       value: 0.5
@@ -139,7 +135,7 @@ freshness:
   camera_timeout_s:
     value: 0.25
     unit: s
-    provenance: 15 Hz RC camera period plus transport allowance.
+    provenance: 15 Hz source; the adapter classifies alternate frames at 7.5 Hz and allows one missed sample.
   imu_timeout_s:
     value: 0.08
     unit: s
@@ -157,6 +153,11 @@ temporal:
     value: 3
     unit: scans
     provenance: Require consecutive approach evidence before a gate veto; initial development value.
+  camera_clear_consecutive_frames:
+    value: 8
+    unit: frames
+    provenance: Require at least half a second of clear 15 Hz camera evidence before releasing a camera-only
+      caution; development value.
   clear_consecutive_scans:
     value: 5
     unit: scans

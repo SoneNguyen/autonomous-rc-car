@@ -1,0 +1,125 @@
+schema_version: 1
+lock_id: obstacle-course-research-visuals-v1
+sources:
+  opengameart_traffic_road_assets:
+    source: OpenGameArt
+    author: MilkAndBanana
+    revision: page-2022-01-09
+    page_url: https://opengameart.org/content/traffic-road-assets
+    download_url: https://opengameart.org/sites/default/files/traffic_road_assets.zip
+    license: CC0-1.0
+    license_url: https://opengameart.org/content/traffic-road-assets
+    archive_file: traffic_road_assets.zip
+    archive_sha256: 8401078c95231677c07e1eb1639f8d2f0e222f62f9c1463c3999bdb2a0814237
+assets:
+- asset_id: vehicle_compact_suv_01
+  class_id: vehicle
+  source: Innerscene Free Parts Library
+  author: Innerscene
+  revision: asset-2026-10-22-generic-compact-suv-9f157ee5
+  page_url: https://www.innerscene.com/tools/library/3d-parts/generic-compact-suv-9f157ee5
+  download_url: https://www.innerscene.com/api/library/generic-compact-suv-9f157ee5/download
+  license: CC0-1.0
+  license_url: https://www.innerscene.com/tools/library/terms
+  file_name: vehicle_compact_suv_01.glb
+  file_sha256: 634f6d8723d3d00a3265416620b2e1da3d229ca003fdbc2412895d55d08850c1
+  dimensions:
+    source_bounds_m:
+      value:
+      - 4.493
+      - 2.174
+      - 1.73
+      unit: m
+      provenance: derived
+      note: converted from source page nominal bounds; x is vehicle length
+    visual_scale_factor:
+      value: 0.1
+      unit: ratio
+      provenance: derived
+      note: 1:10 miniature scale
+    miniature_bounds_m:
+      value:
+      - 0.4493
+      - 0.2174
+      - 0.173
+      unit: m
+      provenance: derived
+- asset_id: cone_reflector_01
+  class_id: cone
+  source_id: opengameart_traffic_road_assets
+  member_path: Traffic Road Assets/GLB/Cones/Traffic_Cone_001.glb
+  file_name: cone_reflector_01.glb
+  file_sha256: a0bf270ab7a170f31f22903a86ebd6bcfeb5768e34a2e3ca58060a5929231149
+  dimensions:
+    source_bounds_m:
+      value:
+      - 2.0
+      - 2.6184079
+      - 2.0
+      unit: m
+      provenance: measured
+      note: glTF accessor bounds with node transform applied; source axis order is width
+      height: null
+      depth: null
+    visual_scale_factor:
+      value: 0.0267
+      unit: ratio
+      provenance: derived
+      note: gives a 0.070 m miniature height from the pinned mesh bounds
+    miniature_bounds_m:
+      value:
+      - 0.0534
+      - 0.07
+      - 0.0534
+      unit: m
+      provenance: derived
+collision_profiles:
+  cone:
+    primitive: cylinder
+    dimensions:
+      radius_m:
+        value: 0.027
+        unit: m
+        provenance: derived
+        note: from 0.0534 m miniature base width with small perimeter margin
+      height_m:
+        value: 0.07
+        unit: m
+        provenance: derived
+        note: from miniature visual height
+  pedestrian:
+    primitive: box
+    dimensions:
+      length_m:
+        value: 0.08
+        unit: m
+        provenance: derived
+        note: maximum source width after miniature scale with perimeter margin
+      width_m:
+        value: 0.08
+        unit: m
+        provenance: derived
+        note: maximum source depth after miniature scale with perimeter margin
+      height_m:
+        value: 0.18
+        unit: m
+        provenance: derived
+        note: maximum miniature source height with perimeter margin
+  vehicle:
+    primitive: box
+    dimensions:
+      length_m:
+        value: 0.45
+        unit: m
+        provenance: derived
+        note: rounded up from the largest 1:10 miniature vehicle length
+      width_m:
+        value: 0.22
+        unit: m
+        provenance: derived
+        note: rounded up from the largest 1:10 miniature vehicle width
+      height_m:
+        value: 0.18
+        unit: m
+        provenance: derived
+        note: rounded up from the largest 1:10 miniature vehicle height

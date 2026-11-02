@@ -33,9 +33,9 @@ MODEL_SOURCE = Path("simulation/models/rc_car/model.sdf")
 CONTROLLER_SOURCE = Path(
     "ros2_ws/src/car_autonomy_nodes/car_autonomy_nodes/safe_drive_controller.py"
 )
-BRIDGE_CONFIG = Path("ros2_ws/src/car_bringup/config/rc_module_matrix/bridge.yaml")
+BRIDGE_CONFIG = Path("ros2_ws/src/car_bringup/config/obstacle_course/bridge.yaml")
 RC_MODEL_PATH = Path("simulation/models/rc_car")
-ASSET_MODELS_PATH = Path("artifacts/rc-car-matrix/assets/models")
+ASSET_MODELS_PATH = Path("artifacts/obstacle-course/assets/models")
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -192,14 +192,6 @@ def aggregate_trials(trials: list[dict], *, expected_repeats: int,
     }
 
 
-def _git_tracked(path: Path) -> bool:
-    completed = subprocess.run(
-        ["git", "ls-files", "--error-unmatch", path.as_posix()],
-        cwd=REPO, check=False, capture_output=True, text=True,
-    )
-    return completed.returncode == 0
-
-
 def _generate_probe_world(config: dict, output: Path) -> None:
     source = REPO / config["world"]["source_path"]
     if sha256_file(source) != config["world"]["source_sha256"]:
@@ -222,7 +214,7 @@ def _generate_probe_world(config: dict, output: Path) -> None:
         include_pose.text = (
             f"{pose['x_m']} {pose['y_m']} {pose['z_m']} 0 0 {pose['yaw_rad']}"
         )
-    # The source matrix road references optional research textures. The brake
+    # The obstacle-course road references optional research textures. The brake
     # probe needs no visual asset, so remove material PBR maps in this generated
     # derivative while leaving all protected source files untouched.
     for pbr in list(root.iter("pbr")):
@@ -584,9 +576,10 @@ def main(argv=None) -> int:
     output_path = args.output if args.output.is_absolute() else REPO / args.output
     try:
         scenario_rel = scenario_path.relative_to(REPO)
-        profile_rel = profile_path.relative_to(REPO)
-        if not _git_tracked(scenario_rel):
-            raise RuntimeError(f"scenario must be committed before simulation: {scenario_rel}")
+        expected_scenario = REPO / "ros2_ws/src/car_bringup/config/obstacle_course/diagnostics/rc_vehicle_brake.yaml"
+        if scenario_path != expected_scenario.resolve():
+            raise RuntimeError("only the obstacle-course diagnostic brake scenario is accepted")
+        profile_path.relative_to(REPO)
         if args.repeats <= 0:
             raise RuntimeError("--repeats must be positive")
         config = yaml.safe_load(scenario_path.read_text(encoding="utf-8"))

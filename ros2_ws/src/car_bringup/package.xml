@@ -2,8 +2,8 @@
 <package format="3">
   <name>car_bringup</name>
   <version>0.1.0</version>
-  <description>Research-asset RC sensor and actuation matrix bringup.</description>
-  <maintainer email="maintainer@example.invalid">Autonomous Vehicle Simulation</maintainer>
+  <description>Research-asset RC obstacle-course simulation and behavior demo.</description>
+  <maintainer email="174254834+SoneNguyen@users.noreply.github.com">Son Nguyen</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -11,6 +11,7 @@
 
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend>car_autonomy_nodes</exec_depend>
+  <exec_depend>car_decision</exec_depend>
   <exec_depend>car_navigation</exec_depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>

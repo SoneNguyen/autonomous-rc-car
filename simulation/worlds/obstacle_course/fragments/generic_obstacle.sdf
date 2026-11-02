@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<sdf version="1.10">
+  <model name="obstacle_template">
+    <static>true</static>
+    <link name="obstacle_link">
+      <visual name="original_research_vehicle">
+        <!-- The locked research SUV is Y-up. Rotate it into Gazebo's Z-up
+             frame and lower it by the root's 3 mm source offset so its tyre
+             bottoms sit on the course and cross the RC LiDAR scan plane. -->
+        <pose>0 0 -0.0003 1.57079632679 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://research/vehicle/vehicle_compact_suv_01/vehicle_compact_suv_01.glb</uri>
+            <scale>0.1 0.1 0.1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="research_vehicle_contact">
+        <pose>0 0 0.09 0 0 0</pose>
+        <geometry><box><size>0.45 0.22 0.18</size></box></geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

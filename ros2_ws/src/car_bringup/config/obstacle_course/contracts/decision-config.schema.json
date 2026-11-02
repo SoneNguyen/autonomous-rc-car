@@ -1,0 +1,344 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decision-config.schema.json",
+  "title": "Obstacle-course decision and camera configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "decision_config_id",
+    "vehicle_profile",
+    "camera",
+    "thresholds",
+    "freshness",
+    "temporal",
+    "geometry"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "decision_config_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "vehicle_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lighting",
+        "hsv_classes",
+        "minimum_blob_area_px",
+        "minimum_class_confidence",
+        "same_class_merge_bearing_gap_rad"
+      ],
+      "properties": {
+        "lighting": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hsv_classes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "barrier",
+            "post",
+            "gate"
+          ],
+          "properties": {
+            "barrier": {
+              "$ref": "#/$defs/hsv_class"
+            },
+            "post": {
+              "$ref": "#/$defs/hsv_class"
+            },
+            "gate": {
+              "$ref": "#/$defs/hsv_class"
+            }
+          }
+        },
+        "minimum_blob_area_px": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "minimum_class_confidence": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "same_class_merge_bearing_gap_rad": {
+          "$ref": "#/$defs/numeric_parameter"
+        }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caution_distance_multiple_d_stop",
+        "avoidance_distance_multiple_d_stop",
+        "stop_required_deceleration_fraction",
+        "lateral_acceleration_caution_mps2",
+        "turn_speed_cap_mps",
+        "class_clearance_vehicle_width_multiple"
+      ],
+      "properties": {
+        "caution_distance_multiple_d_stop": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "avoidance_distance_multiple_d_stop": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "stop_required_deceleration_fraction": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "lateral_acceleration_caution_mps2": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "turn_speed_cap_mps": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "class_clearance_vehicle_width_multiple": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "barrier",
+            "post",
+            "gate",
+            "conservative_lidar_only"
+          ],
+          "properties": {
+            "barrier": {
+              "$ref": "#/$defs/numeric_parameter"
+            },
+            "post": {
+              "$ref": "#/$defs/numeric_parameter"
+            },
+            "gate": {
+              "$ref": "#/$defs/numeric_parameter"
+            },
+            "conservative_lidar_only": {
+              "$ref": "#/$defs/numeric_parameter"
+            }
+          }
+        }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lidar_timeout_s",
+        "camera_timeout_s",
+        "imu_timeout_s",
+        "odometry_timeout_s",
+        "contact_timeout_s"
+      ],
+      "properties": {
+        "lidar_timeout_s": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "camera_timeout_s": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "imu_timeout_s": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "odometry_timeout_s": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "contact_timeout_s": {
+          "$ref": "#/$defs/numeric_parameter"
+        }
+      }
+    },
+    "temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gate_clear_consecutive_scans",
+        "camera_clear_consecutive_frames",
+        "clear_consecutive_scans",
+        "minimum_behavior_dwell_s",
+        "stop_clear_dwell_s",
+        "distance_hysteresis_multiple_d_stop"
+      ],
+      "properties": {
+        "gate_clear_consecutive_scans": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "camera_clear_consecutive_frames": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "clear_consecutive_scans": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "minimum_behavior_dwell_s": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "stop_clear_dwell_s": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "distance_hysteresis_multiple_d_stop": {
+          "$ref": "#/$defs/numeric_parameter"
+        }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "route_corridor_half_width_multiple_W",
+        "gate_opening_width_formula",
+        "planner_intent"
+      ],
+      "properties": {
+        "route_corridor_half_width_multiple_W": {
+          "$ref": "#/$defs/numeric_parameter"
+        },
+        "gate_opening_width_formula": {
+          "type": "string",
+          "minLength": 1
+        },
+        "planner_intent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lookahead_min_multiple_L",
+            "lookahead_max_multiple_L",
+            "intent_validity_s",
+            "waypoint_tolerance_multiple_W"
+          ],
+          "properties": {
+            "lookahead_min_multiple_L": {
+              "$ref": "#/$defs/numeric_parameter"
+            },
+            "lookahead_max_multiple_L": {
+              "$ref": "#/$defs/numeric_parameter"
+            },
+            "intent_validity_s": {
+              "$ref": "#/$defs/numeric_parameter"
+            },
+            "waypoint_tolerance_multiple_W": {
+              "$ref": "#/$defs/numeric_parameter"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "numeric_parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit",
+        "provenance"
+      ],
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "hsv_parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit",
+        "provenance"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 179
+            },
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            },
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "unit": {
+          "const": "OpenCV_HSV_0_179_0_255_0_255"
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "hsv_range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lower_hsv",
+        "upper_hsv"
+      ],
+      "properties": {
+        "lower_hsv": {
+          "$ref": "#/$defs/hsv_parameter"
+        },
+        "upper_hsv": {
+          "$ref": "#/$defs/hsv_parameter"
+        }
+      }
+    },
+    "hsv_class": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ranges"
+      ],
+      "properties": {
+        "ranges": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/hsv_range"
+          }
+        }
+      }
+    }
+  }
+}

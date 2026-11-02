@@ -17,11 +17,4 @@ file(GLOB_RECURSE CAR_BRINGUP_CONFIG_FILES CONFIGURE_DEPENDS
   "${CMAKE_CURRENT_SOURCE_DIR}/config/*")
 install(DIRECTORY config/ DESTINATION share/${PROJECT_NAME}/config)
 
-if(BUILD_TESTING)
-  find_package(ament_cmake_pytest REQUIRED)
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/test_rc_module_matrix_config.py")
-    ament_add_pytest_test(test_rc_module_matrix_config test/test_rc_module_matrix_config.py)
-  endif()
-endif()
-
 ament_package()

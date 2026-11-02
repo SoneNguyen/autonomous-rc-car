@@ -1,4 +1,4 @@
-schema_version: "1.0"
+schema_version: '1.0'
 geometry_id: obstacle-course-rc-car-geometry
 coordinate_frame: vehicle_start_base_link
 axes:
@@ -9,8 +9,8 @@ axes:
   length_unit: m
 profile_reference:
   path: ros2_ws/src/car_bringup/config/obstacle_course/rc_vehicle_reference.yaml
-  sha256: 886c30481d02054ecbe6f3bf04eff196d06603e9f57efdef656cd2f371b31381
-  source: measured Feature 007 profile overlay; simulation-only dynamics.
+  sha256: 73085cd0d6f31dc69b865023fee9e67576967a8733d69d9a414da85a4a1112ce
+  source: measured Obstacle course profile overlay; simulation-only dynamics.
 vehicle:
   length_m:
     value: 0.38
@@ -22,7 +22,8 @@ vehicle:
     value: 0.225
     unit: m
     status: derived_model_geometry
-    provenance: Maximum of chassis half-width and wheel centers plus half the wheel-cylinder width, from simulation/models/rc_car/model.sdf.
+    provenance: Maximum of chassis half-width and wheel centers plus half the wheel-cylinder width, from
+      simulation/models/rc_car/model.sdf.
     symbol: W
   height_m:
     value: 0.085
@@ -49,7 +50,8 @@ clearance:
     value: 0.5
     unit: W
     status: design_placeholder
-    provenance: Initial course-layout engineering margin; per-class tested values are configured in decision.yaml and must be frozen before demonstrations.
+    provenance: Initial course-layout engineering margin; per-class tested values are configured in decision.yaml
+      and must be frozen before demonstrations.
   derivation: physical_margin_m = vehicle.width_m * configured_margin_multiple_of_W
 route_sizing:
   minimum_route_formula: approach_distance_m + d_stop(entry_speed_mps) + lane_change_path_length_m + recovery_distance_m
@@ -57,13 +59,15 @@ route_sizing:
     value: 0.25
     unit: ratio
     status: requirement
-    provenance: Feature 007 FR-002; applied after the geometry-derived minimum route length.
+    provenance: Obstacle course FR-002; applied after the geometry-derived minimum route length.
   strict_course_cap_m:
     value: 280.0
     unit: m
     status: requirement
-    provenance: Existing course length in Feature 007 problem statement; every route must remain strictly below this value.
+    provenance: Existing course length in Obstacle course problem statement; every route must remain strictly
+      below this value.
   lane_change_model:
     name: symmetric_opposite_curvature_arcs
     equation: lateral_shift_m = 2 * R_min * (1 - cos(theta)); path_length_m = 2 * R_min * theta
-    provenance: Constant-curvature bicycle model at maximum permitted steering; theta = acos(1 - lateral_shift_m / (2 * R_min)).
+    provenance: Constant-curvature bicycle model at maximum permitted steering; theta = acos(1 - lateral_shift_m
+      / (2 * R_min)).

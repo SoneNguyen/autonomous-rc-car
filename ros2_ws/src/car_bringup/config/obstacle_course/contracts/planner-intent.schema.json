@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "planner-intent.schema.json",
+  "title": "Obstacle course short-lived planner intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "scenario_id", "run_id", "run_purpose", "decision_event_id", "sim_time_ns",
+    "clock_epoch", "behavior", "preferred_side", "selected_class", "class_margin_m",
+    "speed_cap_mps", "rule_id", "valid_until_ns", "decision_config_sha256",
+    "trigger_matrix_sha256", "profile_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "scenario_id": {"enum": ["S0", "S1", "S2", "S3", "S3b", "S4", "S5", "S6-lidar-drop", "S6-camera-drop", "S7", "barrier_tuning"]},
+    "run_id": {"type": "string", "format": "uuid"},
+    "run_purpose": {"enum": ["demonstration", "development", "diagnostic"]},
+    "decision_event_id": {"type": "string", "format": "uuid"},
+    "sim_time_ns": {"type": "integer", "minimum": 0},
+    "clock_epoch": {"type": "integer", "minimum": 0},
+    "behavior": {"enum": ["FOLLOW_ROUTE", "CAUTION", "AVOID_LEFT", "AVOID_RIGHT", "STOP", "RESUME"]},
+    "preferred_side": {"enum": ["left", "right", "none"]},
+    "selected_class": {"type": ["string", "null"], "enum": ["barrier", "post", "gate", null]},
+    "class_margin_m": {"type": "number", "minimum": 0},
+    "speed_cap_mps": {"type": "number", "minimum": 0},
+    "rule_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_-]+$"},
+    "valid_until_ns": {"type": "integer", "minimum": 0},
+    "decision_config_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "trigger_matrix_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "profile_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "frozen_inputs_root_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"run_purpose": {"const": "demonstration"}}, "required": ["run_purpose"]},
+      "then": {"required": ["frozen_inputs_root_sha256"]}
+    }
+  ]
+}

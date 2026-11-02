@@ -15,7 +15,7 @@ setup(
     zip_safe=True,
     maintainer="Son Nguyen",
     maintainer_email="174254834+SoneNguyen@users.noreply.github.com",
-    description="Feature 007 multi-sensor evidence and attributed obstacle decisions",
+    description="Obstacle course multi-sensor evidence and attributed obstacle decisions",
     license="MIT",
     entry_points={
         "console_scripts": [

@@ -1,51 +1,75 @@
-schema_version: "1.0"
+schema_version: '1.0'
 decision_config_id: obstacle-course-decision-v1
 vehicle_profile:
   path: ros2_ws/src/car_bringup/config/obstacle_course/rc_vehicle_reference.yaml
-  sha256: 886c30481d02054ecbe6f3bf04eff196d06603e9f57efdef656cd2f371b31381
+  sha256: 73085cd0d6f31dc69b865023fee9e67576967a8733d69d9a414da85a4a1112ce
 camera:
-  source: hsv
-  lighting: obstacle_course_default
-  qualification_detector: true
+  lighting: world_default
   hsv_classes:
     barrier:
       ranges:
       - lower_hsv:
-          value: [0, 110, 75]
+          value:
+          - 0
+          - 110
+          - 75
           unit: OpenCV_HSV_0_179_0_255_0_255
-          provenance: Initial red barrier range for the Feature 007 development variant; freeze only after separate lighting checks.
+          provenance: Initial red barrier range for the Obstacle course development variant; freeze only
+            after separate lighting checks.
         upper_hsv:
-          value: [12, 255, 255]
+          value:
+          - 12
+          - 255
+          - 255
           unit: OpenCV_HSV_0_179_0_255_0_255
-          provenance: Initial red barrier range for the Feature 007 development variant; freeze only after separate lighting checks.
+          provenance: Initial red barrier range for the Obstacle course development variant; freeze only
+            after separate lighting checks.
       - lower_hsv:
-          value: [168, 110, 75]
+          value:
+          - 168
+          - 110
+          - 75
           unit: OpenCV_HSV_0_179_0_255_0_255
           provenance: Wraparound red hue range; development starting point only.
         upper_hsv:
-          value: [179, 255, 255]
+          value:
+          - 179
+          - 255
+          - 255
           unit: OpenCV_HSV_0_179_0_255_0_255
           provenance: Wraparound red hue range; development starting point only.
     post:
       ranges:
       - lower_hsv:
-          value: [7, 120, 90]
+          value:
+          - 7
+          - 120
+          - 90
           unit: OpenCV_HSV_0_179_0_255_0_255
-          provenance: Initial orange cone/post range under obstacle_course_default lighting.
+          provenance: Initial orange cone/post range under world_default lighting.
         upper_hsv:
-          value: [24, 255, 255]
+          value:
+          - 24
+          - 255
+          - 255
           unit: OpenCV_HSV_0_179_0_255_0_255
-          provenance: Initial orange cone/post range under obstacle_course_default lighting.
+          provenance: Initial orange cone/post range under world_default lighting.
     gate:
       ranges:
       - lower_hsv:
-          value: [92, 90, 65]
+          value:
+          - 92
+          - 90
+          - 65
           unit: OpenCV_HSV_0_179_0_255_0_255
-          provenance: Initial blue gate range under obstacle_course_default lighting.
+          provenance: Initial blue gate range under world_default lighting.
         upper_hsv:
-          value: [132, 255, 255]
+          value:
+          - 132
+          - 255
+          - 255
           unit: OpenCV_HSV_0_179_0_255_0_255
-          provenance: Initial blue gate range under obstacle_course_default lighting.
+          provenance: Initial blue gate range under world_default lighting.
   minimum_blob_area_px:
     value: 24
     unit: px^2
@@ -54,21 +78,21 @@ camera:
     value: 0.45
     unit: ratio
     provenance: HSV color-coverage score floor; development value, not a trained-model threshold.
-  detector_policy:
-    frozen_feature_001_diagnostic_only: true
-    qualification_source: hsv
-    actionable_frozen_label: cone
-    mapped_actionable_class: post
-    other_frozen_labels_actionable: false
+  same_class_merge_bearing_gap_rad:
+    value: 0.2
+    unit: rad
+    provenance: Merge adjacent same-color mesh fragments into one visible object when their camera bearings
+      are within this angular gap; keep separate objects outside this gap.
 thresholds:
   caution_distance_multiple_d_stop:
     value: 2.0
     unit: d_stop(v)
     provenance: Initial range for early speed reduction; tune only in tracked development configs.
   avoidance_distance_multiple_d_stop:
-    value: 1.0
+    value: 1.5
     unit: d_stop(v)
-    provenance: Initial avoidance trigger distance; tune only in tracked development configs.
+    provenance: Initial near-field avoidance trigger; kept below caution distance and outside the emergency
+      braking envelope so a feasible detour can be selected.
   stop_required_deceleration_fraction:
     value: 0.8
     unit: fraction_of_measured_braking_deceleration
@@ -85,7 +109,8 @@ thresholds:
     barrier:
       value: 0.5
       unit: W
-      provenance: Initial barrier clearance; obstacle edge separation is this multiple times wheel-inclusive vehicle width.
+      provenance: Initial barrier clearance; obstacle edge separation is this multiple times wheel-inclusive
+        vehicle width.
     post:
       value: 0.25
       unit: W
@@ -106,7 +131,7 @@ freshness:
   camera_timeout_s:
     value: 0.25
     unit: s
-    provenance: 15 Hz RC camera period plus transport allowance.
+    provenance: 15 Hz source; the adapter classifies alternate frames at 7.5 Hz and allows one missed sample.
   imu_timeout_s:
     value: 0.08
     unit: s
@@ -124,6 +149,11 @@ temporal:
     value: 3
     unit: scans
     provenance: Require consecutive approach evidence before a gate veto; initial development value.
+  camera_clear_consecutive_frames:
+    value: 8
+    unit: frames
+    provenance: Require at least half a second of clear 15 Hz camera evidence before releasing a camera-only
+      caution; development value.
   clear_consecutive_scans:
     value: 5
     unit: scans

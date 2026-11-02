@@ -8,23 +8,23 @@ vehicle_preset: rc_vehicle_reference
 entry_speed_mps:
   value: 0.35
   unit: m/s
-  provenance: Feature 007 fixed-seed scenario entry condition
+  provenance: RC vehicle profile entry speed for development showcase
   status: derived
 start_pose:
   x:
-    value: 0
+    value: 0.0
     unit: m
-    provenance: Feature 007 vehicle-relative course layout
+    provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
     status: derived
   y:
-    value: 0
+    value: 0.0
     unit: m
-    provenance: Feature 007 vehicle-relative course layout
+    provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
     status: derived
   yaw:
-    value: 0
+    value: 0.0
     unit: rad
-    provenance: Feature 007 vehicle-relative course layout
+    provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
     status: derived
 route:
   frame: vehicle_relative
@@ -32,94 +32,79 @@ route:
   - x:
       value: 0.0
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course fixed-seed centerline showcase, measured in vehicle-relative metres
       status: derived
     y:
-      value: 0
+      value: 0.0
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course fixed-seed centerline showcase, measured in vehicle-relative metres
       status: derived
     yaw:
-      value: 0
+      value: 0.0
       unit: rad
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Straight centerline tangent
       status: derived
   - x:
-      value: 0.9
+      value: 14.943321
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course fixed-seed centerline showcase, measured in vehicle-relative metres
       status: derived
     y:
-      value: 0
+      value: 0.0
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course fixed-seed centerline showcase, measured in vehicle-relative metres
       status: derived
     yaw:
-      value: 0
+      value: 0.0
       unit: rad
-      provenance: Feature 007 vehicle-relative course layout
-      status: derived
-  - x:
-      value: 1.8
-      unit: m
-      provenance: Feature 007 vehicle-relative course layout
-      status: derived
-    y:
-      value: 0
-      unit: m
-      provenance: Feature 007 vehicle-relative course layout
-      status: derived
-    yaw:
-      value: 0
-      unit: rad
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Straight centerline tangent
       status: derived
   length_m:
-    value: 1.8
+    value: 14.943321
     unit: m
-    provenance: sum of vehicle-relative route segment lengths
+    provenance: Straight centerline distance from start to course finish
     status: derived
   sizing:
     entry_speed_mps:
       value: 0.35
       unit: m/s
-      provenance: matches scenario entry speed
+      provenance: Matches development showcase entry speed
       status: derived
     approach_distance_m:
-      value: 0.25
+      value: 2.4
       unit: m
-      provenance: layout distance before the decision zone
+      provenance: Vehicle-relative lead-in to the first centered obstacle
       status: derived
     lateral_shift_m:
-      value: 0.25
+      value: 0.55
       unit: m
-      provenance: total lateral displacement per counted lane change
+      provenance: Maximum controller-requested clearance offset for each obstacle
       status: derived
-    lane_change_count: 1
+    lane_change_count: 8
     recovery_distance_m:
-      value: 0.25
+      value: 3.4
       unit: m
-      provenance: clear route distance after the decision zone
+      provenance: Clear centerline after the final gate including vehicle footprint
       status: derived
 obstacles:
-- entity_id: barrier_01
+- entity_id: barrier_stage_1
   class: barrier
   colour: red
   pose:
     x:
-      value: 0.75
+      value: 2.4
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
       status: derived
     y:
       value: 0
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
       status: derived
     yaw:
-      value: 0.0
+      value: 0
       unit: rad
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
       status: derived
   dimensions_m:
     length:
@@ -139,6 +124,117 @@ obstacles:
       status: derived
   mesh_or_fragment: barrier_red
   scan_plane_intersection: true
+- entity_id: cone_stage_2
+  class: post
+  colour: orange
+  pose:
+    x:
+      value: 5.2
+      unit: m
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
+      status: derived
+    y:
+      value: 0
+      unit: m
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
+      status: derived
+    yaw:
+      value: 0
+      unit: rad
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
+      status: derived
+  dimensions_m:
+    length:
+      value: 0.1068
+      unit: m
+      provenance: locked visual source or measured miniature obstacle
+      status: derived
+    width:
+      value: 0.1068
+      unit: m
+      provenance: locked visual source or measured miniature obstacle
+      status: derived
+    height:
+      value: 0.14
+      unit: m
+      provenance: locked high-detail visual scaled to cross the configured RC LiDAR scan plane
+      status: derived
+  mesh_or_fragment: post_orange
+  scan_plane_intersection: true
+- entity_id: vehicle_stage_3
+  class: generic_object
+  colour: silver
+  pose:
+    x:
+      value: 8.0
+      unit: m
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
+      status: derived
+    y:
+      value: 0
+      unit: m
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
+      status: derived
+    yaw:
+      value: 0
+      unit: rad
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
+      status: derived
+  dimensions_m:
+    length:
+      value: 0.45
+      unit: m
+      provenance: locked compact-SUV contact proxy dimensions in generic_obstacle.sdf
+      status: derived
+    width:
+      value: 0.22
+      unit: m
+      provenance: locked compact-SUV contact proxy dimensions in generic_obstacle.sdf
+      status: derived
+    height:
+      value: 0.18
+      unit: m
+      provenance: locked compact-SUV contact proxy dimensions in generic_obstacle.sdf
+      status: derived
+  mesh_or_fragment: generic_obstacle
+  scan_plane_intersection: true
+- entity_id: gate_stage_4
+  class: gate
+  colour: blue
+  pose:
+    x:
+      value: 11.2
+      unit: m
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
+      status: derived
+    y:
+      value: 0
+      unit: m
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
+      status: derived
+    yaw:
+      value: 0
+      unit: rad
+      provenance: Obstacle course fixed-seed centered obstacle showcase, measured in vehicle-relative metres
+      status: derived
+  dimensions_m:
+    length:
+      value: 0.27
+      unit: m
+      provenance: locked visual source or measured miniature obstacle
+      status: derived
+    width:
+      value: 0.036
+      unit: m
+      provenance: locked visual source or measured miniature obstacle
+      status: derived
+    height:
+      value: 0.54
+      unit: m
+      provenance: locked visual source or measured miniature obstacle
+      status: derived
+  mesh_or_fragment: gate_blue
+  scan_plane_intersection: true
 expected_behavior_sequence:
 - FOLLOW_ROUTE
 - CAUTION
@@ -147,15 +243,16 @@ expected_behavior_sequence:
 - FOLLOW_ROUTE
 expected_trigger_components:
 - lidar
-- camera
+- odometry
 contact_rule: no_non_ground_contact
-setup_sheet: docs/real-car-mapping/setup-sheets/S1.md
+setup_sheet: docs/implementation.md#setup-barrier-tuning
 run_timeout_s:
-  value: 20
+  value: 90
   unit: s
-  provenance: fixed demonstration timeout
+  provenance: Allows the low-speed 15 m visible demonstration to finish
   status: derived
 condition_tags:
+- continuous_showcase
 - development_variant
 - fixed_seed
 - vehicle_relative

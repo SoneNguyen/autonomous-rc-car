@@ -8,23 +8,23 @@ vehicle_preset: rc_vehicle_reference
 entry_speed_mps:
   value: 0.35
   unit: m/s
-  provenance: Feature 007 fixed-seed scenario entry condition
+  provenance: Obstacle course fixed-seed scenario entry condition
   status: derived
 start_pose:
   x:
     value: 0
     unit: m
-    provenance: Feature 007 vehicle-relative course layout
+    provenance: Obstacle course vehicle-relative course layout
     status: derived
   y:
     value: 0
     unit: m
-    provenance: Feature 007 vehicle-relative course layout
+    provenance: Obstacle course vehicle-relative course layout
     status: derived
   yaw:
     value: 0
     unit: rad
-    provenance: Feature 007 vehicle-relative course layout
+    provenance: Obstacle course vehicle-relative course layout
     status: derived
 route:
   frame: vehicle_relative
@@ -32,47 +32,47 @@ route:
   - x:
       value: 0.0
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course vehicle-relative course layout
       status: derived
     y:
       value: 0
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course vehicle-relative course layout
       status: derived
     yaw:
       value: 0
       unit: rad
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course vehicle-relative course layout
       status: derived
   - x:
       value: 0.425
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course vehicle-relative course layout
       status: derived
     y:
       value: 0
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course vehicle-relative course layout
       status: derived
     yaw:
       value: 0
       unit: rad
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course vehicle-relative course layout
       status: derived
   - x:
       value: 0.85
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course vehicle-relative course layout
       status: derived
     y:
       value: 0
       unit: m
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course vehicle-relative course layout
       status: derived
     yaw:
       value: 0
       unit: rad
-      provenance: Feature 007 vehicle-relative course layout
+      provenance: Obstacle course vehicle-relative course layout
       status: derived
   length_m:
     value: 0.85
@@ -108,7 +108,7 @@ expected_behavior_sequence:
 expected_trigger_components:
 - lidar
 contact_rule: no_non_ground_contact
-setup_sheet: docs/real-car-mapping/setup-sheets/S6-lidar-drop.md
+setup_sheet: docs/implementation.md#setup-s6-lidar-drop
 run_timeout_s:
   value: 20
   unit: s

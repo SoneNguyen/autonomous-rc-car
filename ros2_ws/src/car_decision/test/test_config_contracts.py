@@ -1,4 +1,4 @@
-"""Configuration matrix guardrails for Feature 007 decision inputs."""
+"""Configuration matrix guardrails for Obstacle course decision inputs."""
 
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ def test_camera_cannot_trigger_avoid_or_stop_alone():
 
 def test_decision_thresholds_have_units_and_provenance():
     config = _yaml(CONFIG / "decision.yaml")
-    assert config["camera"]["source"] == "hsv"
+    assert set(config["camera"]["hsv_classes"]) == {"barrier", "post", "gate"}
     assert config["vehicle_profile"]["sha256"]
     clearance = config["thresholds"]["class_clearance_vehicle_width_multiple"]
     assert set(clearance) == {"barrier", "post", "gate", "conservative_lidar_only"}
@@ -136,7 +136,7 @@ def _scenario():
         "expected_behavior_sequence": ["FOLLOW_ROUTE", "STOP"],
         "expected_trigger_components": ["lidar", "contact"],
         "contact_rule": "contact_expected_and_latched",
-        "setup_sheet": "docs/real-car-mapping/setup-sheets/S5.md",
+        "setup_sheet": "docs/implementation.md#setup-s5",
     }
 
 
@@ -191,6 +191,7 @@ def _run_report():
             "gazebo_version": "10.5.0",
             "profile_sha256": SHA,
             "scenario_sha256": SHA,
+            "decision_config_path": "ros2_ws/src/car_bringup/config/obstacle_course/decision.yaml",
             "decision_config_sha256": SHA,
             "trigger_matrix_sha256": SHA,
             "world_sha256": SHA,
@@ -208,6 +209,7 @@ def _valid_imu_evidence():
         "run_id": RUN_ID,
         "run_purpose": "diagnostic",
         "sequence": 0,
+        "source_sample_sequence": 0,
         "sim_time_ns": 100000000,
         "clock_epoch": 0,
         "freshness": {"state": "fresh", "age_s": 0.0, "timeout_s": 0.08},
@@ -272,7 +274,7 @@ def _planner_intent():
 
 def test_all_nine_json_schemas_are_valid_and_have_examples():
     for name in SCHEMA_NAMES:
-        schema_path = REPO / "docs/features/007-multi-sensor-obstacle-course/contracts" / name
+        schema_path = REPO / "ros2_ws/src/car_bringup/config/obstacle_course/contracts" / name
         schema = __import__("json").loads(schema_path.read_text(encoding="utf-8"))
         Draft202012Validator.check_schema(schema)
 
@@ -290,7 +292,7 @@ def test_all_nine_json_schemas_are_valid_and_have_examples():
     validate_report_consistency(_run_report())
 
 
-def test_conditional_schema_rules_for_camera_diagnostics_and_demonstration_roots():
+def test_conditional_schema_rules_for_demonstration_roots():
     evidence = _valid_imu_evidence()
     evidence["run_purpose"] = "demonstration"
     with pytest.raises(ContractValidationError, match="frozen_inputs_root_sha256"):
@@ -300,13 +302,6 @@ def test_conditional_schema_rules_for_camera_diagnostics_and_demonstration_roots
     intent.pop("frozen_inputs_root_sha256")
     with pytest.raises(ContractValidationError, match="frozen_inputs_root_sha256"):
         validate_instance("planner-intent.schema.json", intent)
-
-    decision = copy.deepcopy(_yaml(CONFIG / "decision.yaml"))
-    decision["camera"]["source"] = "frozen_feature_001_diagnostic"
-    decision["camera"]["qualification_detector"] = False
-    with pytest.raises(ContractValidationError, match="frozen_model_sha256"):
-        validate_instance("decision-config.schema.json", decision)
-
 
 def test_transition_and_evaluation_event_requirements_are_distinct():
     transition = _decision_event()

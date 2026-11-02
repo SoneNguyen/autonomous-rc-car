@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<sdf version="1.10">
+  <model name="obstacle_template">
+    <static>true</static>
+    <link name="obstacle_link">
+      <visual name="high_detail_gate_leaf">
+        <pose>0 0 0 0 0 1.57079632679</pose>
+        <geometry>
+          <mesh>
+            <uri>model://research/obstacle/security_grille_gate/security-grille-gate.glb</uri>
+            <scale>0.25 0.25 0.25</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="gate_contact">
+        <pose>0 0 0.26875 0 0 1.57079632679</pose>
+        <geometry><box><size>0.03575 0.27 0.5375</size></box></geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

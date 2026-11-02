@@ -1,4 +1,4 @@
-"""Unit tests for Feature 007 simulated braking measurements."""
+"""Unit tests for Obstacle course simulated braking measurements."""
 
 from __future__ import annotations
 

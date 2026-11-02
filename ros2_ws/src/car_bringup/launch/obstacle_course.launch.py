@@ -1,13 +1,15 @@
-"""Launch one deterministic RC sensor/actuation matrix scenario."""
+"""Launch a fixed-seed RC obstacle-course scenario and behavior demo."""
 
 from __future__ import annotations
 
-import hashlib
+import json
 import os
 from pathlib import Path
 import subprocess
+import sys
+import uuid
 
-from ament_index_python.packages import get_package_prefix, get_package_share_directory
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
@@ -16,268 +18,384 @@ from launch.actions import (
     OpaqueFunction,
     RegisterEventHandler,
     SetEnvironmentVariable,
-    Shutdown,
     TimerAction,
 )
-from launch.event_handlers import OnProcessExit, OnProcessStart
+from launch.event_handlers import OnProcessStart
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 import yaml
 
-from car_bringup.research_vehicle_overlay import create_matrix_vehicle_overlay
 
 
 GAZEBO_VERSION = "10.5.0"
-_ACTIVE_RUNTIME_OVERLAYS = []
 
+def _wslg_render_environment(headless: str):
+    """Select WSLg's D3D12 adapter for visible Gazebo launches when available."""
+    if headless != "false" or not Path("/mnt/wslg").is_dir():
+        return []
+    if not (os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")):
+        return []
 
-def _cleanup_runtime_overlays(_context, *_args, **_kwargs):
-    while _ACTIVE_RUNTIME_OVERLAYS:
-        _ACTIVE_RUNTIME_OVERLAYS.pop().cleanup()
-    return []
+    actions = [SetEnvironmentVariable(
+        "GALLIUM_DRIVER", os.environ.get("GALLIUM_DRIVER", "d3d12")
+    )]
+    adapter = os.environ.get("MESA_D3D12_DEFAULT_ADAPTER_NAME")
+    if not adapter:
+        try:
+            adapters = subprocess.run(
+                ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+                check=False, capture_output=True, text=True, timeout=3.0,
+            ).stdout.splitlines()
+        except (OSError, subprocess.TimeoutExpired):
+            adapters = []
+        if adapters:
+            adapter = adapters[0].strip()
+    if adapter:
+        actions.append(SetEnvironmentVariable("MESA_D3D12_DEFAULT_ADAPTER_NAME", adapter))
+    return actions
 
 
 def _repository_root(package_share: Path) -> Path:
-    for candidate in (package_share, *package_share.parents):
-        if (candidate / "simulation/worlds/rc_module_matrix.sdf").is_file():
+    source_file = Path(__file__).resolve()
+    candidates = (Path.cwd(), source_file.parent, *source_file.parents, package_share, *package_share.parents)
+    for candidate in candidates:
+        if (candidate / "simulation/worlds/obstacle_condensed.sdf").is_file():
             return candidate
     raise RuntimeError("repository root not found; keep the checkout on the WSL Linux filesystem")
 
 
-def _launch_setup(context, *_args, **_kwargs):
-    scenario_name = LaunchConfiguration("scenario").perform(context)
-    behavior = LaunchConfiguration("behavior").perform(context)
-    headless = LaunchConfiguration("headless").perform(context).lower()
-    gui_config = LaunchConfiguration("gui_config").perform(context).strip()
-    bridge_config = LaunchConfiguration("bridge_config").perform(context).strip()
-    sensor_set = LaunchConfiguration("sensor_set").perform(context).strip().lower()
-    quality_preset = LaunchConfiguration("quality_preset").perform(context).strip().lower()
-    if headless not in {"true", "false", "glx"}:
-        raise RuntimeError("headless must be true, false, or glx (server-only WSLg rendering)")
-    if behavior not in {"sensors", "camera", "command_path"}:
-        raise RuntimeError(f"unsupported matrix behavior: {behavior}")
-    if behavior == "command_path" and headless not in {"true", "glx"}:
-        raise RuntimeError("command-path runs must be server-only")
-    if gui_config and headless != "false":
-        raise RuntimeError("gui_config can only be used when headless:=false")
-    if sensor_set not in {"", "lidar", "camera", "imu", "contact", "none"}:
-        raise RuntimeError("sensor_set must be empty, lidar, camera, imu, contact, or none")
-    if quality_preset not in {"", "high", "low"}:
-        raise RuntimeError("quality_preset must be empty, high, or low")
-    if (sensor_set or quality_preset) and headless != "false":
-        raise RuntimeError("sensor_set and quality_preset overrides are restricted to visible GUI demos")
-    if not scenario_name or Path(scenario_name).is_absolute():
-        raise RuntimeError("scenario must be a relative matrix scenario path")
-    scenario_parts = Path(scenario_name).parts
-    if any(part in {".", ".."} for part in scenario_parts):
-        raise RuntimeError("scenario path cannot contain '.' or '..'")
+def _launch_obstacle_course_setup(context, *_args, **_kwargs):
+    control = LaunchConfiguration("control").perform(context).strip().lower()
+    scenario_id = LaunchConfiguration("scenario").perform(context).strip()
+    supplied_scenario_config = LaunchConfiguration("scenario_config").perform(context).strip()
+    supplied_decision_config = LaunchConfiguration("decision_config").perform(context).strip()
+    run_purpose = LaunchConfiguration("run_purpose").perform(context).strip().lower()
+    headless = LaunchConfiguration("headless").perform(context).strip().lower()
+    dashboard_enabled = LaunchConfiguration("dashboard").perform(context).strip().lower()
+    supplied_world = LaunchConfiguration("world_path").perform(context).strip()
+    supplied_run_id = LaunchConfiguration("run_id").perform(context).strip()
+    supplied_seed = LaunchConfiguration("seed").perform(context).strip()
+    supplied_output = LaunchConfiguration("run_output_dir").perform(context).strip()
+    input_manifest = LaunchConfiguration("input_manifest").perform(context).strip()
+    configured_root = LaunchConfiguration("frozen_inputs_root_sha256").perform(context).strip()
+    if control not in {"manual", "autonomous"}:
+        raise RuntimeError("control must be manual or autonomous")
+    if run_purpose not in {"diagnostic", "development", "demonstration"}:
+        raise RuntimeError("run_purpose must be diagnostic, development, or demonstration")
+    if headless not in {"true", "false"}:
+        raise RuntimeError("headless must be true or false")
+    if dashboard_enabled not in {"true", "false"}:
+        raise RuntimeError("dashboard must be true or false")
+    if not scenario_id or Path(scenario_id).name != scenario_id:
+        raise RuntimeError("scenario must be a tracked obstacle-course scenario ID such as S1")
 
     package_share = Path(get_package_share_directory("car_bringup"))
     repo = _repository_root(package_share)
-    config_share = package_share / "config/rc_module_matrix"
-    config_source = repo / "ros2_ws/src/car_bringup/config/rc_module_matrix"
-    scenario_path = None
-    for root in (config_share, config_source):
-        candidate = (root / f"{scenario_name}.yaml").resolve()
-        if candidate.is_relative_to(root.resolve()) and candidate.is_file():
-            scenario_path = candidate
-            break
-    if scenario_path is None:
-        raise RuntimeError(f"matrix scenario does not exist: {scenario_name}")
+    config_root = (repo / "ros2_ws/src/car_bringup/config/obstacle_course").resolve()
+    scenario_root = (config_root / "scenarios").resolve()
+    development_scenario_root = (config_root / "development/scenarios").resolve()
+    scenario_path = (
+        (repo / supplied_scenario_config).resolve()
+        if supplied_scenario_config
+        else (scenario_root / f"{scenario_id}.yaml").resolve()
+    )
+    is_development_scenario = scenario_path.is_relative_to(development_scenario_root)
+    if (
+        (not scenario_path.is_relative_to(scenario_root) and not is_development_scenario)
+        or not scenario_path.is_file()
+    ):
+        raise RuntimeError(f"unknown obstacle-course scenario {scenario_id!r}")
     scenario = yaml.safe_load(scenario_path.read_text(encoding="utf-8"))
-    if scenario.get("scenario_id") != scenario_name or scenario.get("split") not in {
-        "qualification", "pilot", "runtime"
-    }:
-        raise RuntimeError("runtime scenario identity or purpose is invalid")
-    if scenario.get("world") != "simulation/worlds/rc_module_matrix.sdf":
-        raise RuntimeError("matrix scenarios must use the research-asset world")
-    matrix_setup = scenario.get("matrix_setup", {})
+    if scenario.get("scenario_id") != scenario_id or scenario_path.stem != scenario_id:
+        raise RuntimeError("scenario ID must match the selected scenario config")
+    decision_config_path = (
+        (repo / supplied_decision_config).resolve()
+        if supplied_decision_config
+        else (config_root / "decision.yaml").resolve()
+    )
+    development_config_root = (config_root / "development").resolve()
+    is_development_decision = decision_config_path.is_relative_to(development_config_root)
+    if (
+        decision_config_path != (config_root / "decision.yaml").resolve()
+        and not is_development_decision
+    ) or not decision_config_path.is_file():
+        raise RuntimeError("decision_config must be the production config or a development config")
+    if is_development_scenario != is_development_decision:
+        raise RuntimeError("development scenarios must use a development decision config, and vice versa")
+    if is_development_scenario and run_purpose != "development":
+        raise RuntimeError("development configs require run_purpose:=development")
 
-    world_path = repo / "artifacts/rc-car-matrix/worlds" / (scenario_name.replace("/", "_") + ".sdf")
-    build = [
-        "python3", str(repo / "tools/build_rc_matrix_world.py"),
-        "--scenario", str(scenario_path),
-        "--lock", str(config_source / "research_assets.lock.yaml"),
-        "--output", str(world_path),
+    rc = yaml.safe_load(
+        (repo / "ros2_ws/src/car_bringup/config/rc_vehicle.yaml").read_text(encoding="utf-8")
+    )["presets"]["rc_car"]
+    run_id = supplied_run_id or str(uuid.uuid4())
+    try:
+        uuid.UUID(run_id)
+    except ValueError as exc:
+        raise RuntimeError("run_id must be a UUID") from exc
+    simulation_seed = int(supplied_seed) if supplied_seed else int(scenario["seed"])
+    if simulation_seed < 0:
+        raise RuntimeError("seed must be nonnegative")
+    frozen_root = configured_root
+    if input_manifest:
+        manifest_path = Path(input_manifest).expanduser().resolve()
+        if not manifest_path.is_file():
+            raise RuntimeError(f"frozen input manifest is missing: {manifest_path}")
+        subprocess.run([
+            sys.executable, str(repo / "tools/verify_obstacle_course_inputs.py"),
+            "--manifest", str(manifest_path),
+        ], cwd=repo, check=True)
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if frozen_root and frozen_root != manifest.get("root_sha256"):
+            raise RuntimeError("configured frozen root does not match the input manifest")
+        frozen_root = str(manifest["root_sha256"])
+    if run_purpose == "demonstration" and (not input_manifest or not frozen_root):
+        raise RuntimeError("demonstration runs require a verified input_manifest")
+    world_path = (
+        repo / "artifacts/obstacle-course/worlds" / f"{scenario_id}.sdf"
+        if not supplied_world else Path(supplied_world).expanduser().resolve()
+    )
+    if not supplied_world:
+        subprocess.run([
+            sys.executable, str(repo / "tools/generate_obstacle_course_world.py"),
+            "--scenario-config", str(scenario_path), "--output", str(world_path),
+            "--run-purpose", run_purpose,
+        ], cwd=repo, check=True)
+    elif not world_path.is_relative_to((repo / "artifacts/obstacle-course/worlds").resolve()):
+        raise RuntimeError("world_path must be inside artifacts/obstacle-course/worlds")
+    if not world_path.is_file():
+        raise RuntimeError(f"generated world is missing: {world_path}")
+
+    profile_output = repo / "artifacts/obstacle-course/config" / f"{scenario_id}.json"
+    subprocess.run([
+        sys.executable, str(repo / "tools/build_obstacle_course_profile.py"),
+        "--scenario-config", str(scenario_path), "--profile",
+        str(repo / "ros2_ws/src/car_bringup/config/obstacle_course/rc_vehicle_reference.yaml"),
+        "--decision-config", str(decision_config_path),
+        "--output", str(profile_output), "--run-purpose", run_purpose,
+    ], cwd=repo, check=True)
+    subprocess.run([
+        sys.executable, str(repo / "tools/validate_obstacle_course_config.py"), "--all",
+    ], cwd=repo, check=True)
+    subprocess.run([
+        sys.executable, str(repo / "tools/fetch_obstacle_course_assets.py"), "--verify-only",
+    ], cwd=repo, check=True)
+    subprocess.run([
+        sys.executable, str(repo / "tools/fetch_obstacle_course_assets.py"), "--lock",
+        str(repo / "ros2_ws/src/car_bringup/config/obstacle_course/research_vehicle.lock.yaml"),
+        "--output", str(repo / "artifacts/obstacle-course/assets"), "--verify-only",
+    ], cwd=repo, check=True)
+    subprocess.run([
+        sys.executable, str(repo / "tools/fetch_obstacle_course_assets.py"), "--lock",
+        str(repo / "ros2_ws/src/car_bringup/config/obstacle_course/research_assets.lock.yaml"),
+        "--output", str(repo / "artifacts/obstacle-course/assets"), "--verify-only",
+    ], cwd=repo, check=True)
+    subprocess.run([
+        sys.executable, str(repo / "tools/fetch_obstacle_course_assets.py"), "--lock",
+        str(repo / "ros2_ws/src/car_bringup/config/obstacle_course/assets.lock.yaml"),
+        "--output", str(repo / "artifacts/obstacle-course/assets"), "--verify-only",
+    ], cwd=repo, check=True)
+    resource_roots = [
+        repo / "simulation/models",
+        repo / "artifacts/obstacle-course/assets/models",
     ]
-    if quality_preset:
-        build.extend(["--quality-preset", quality_preset])
-    subprocess.run(build, cwd=repo, check=True)
-
-    vehicle_lock_path = config_source / "research_vehicle.lock.yaml"
-    vehicle_lock = yaml.safe_load(vehicle_lock_path.read_text(encoding="utf-8"))
-    vehicles = [asset for asset in vehicle_lock.get("assets", [])
-                if asset.get("role") == "controlled_vehicle_visual_only"]
-    if len(vehicles) != 1:
-        raise RuntimeError("research vehicle lock must identify exactly one visual-only vehicle")
-    vehicle = vehicles[0]
-    vehicle_mesh = (
-        repo / "artifacts/rc-car-matrix/assets/models/research" / vehicle["class_id"]
-        / vehicle["asset_id"] / vehicle["file_name"]
-    )
-    if not vehicle_mesh.is_file():
-        raise RuntimeError(
-            "research vehicle mesh is missing; run python3 tools/fetch_matrix_assets.py "
-            "--lock ros2_ws/src/car_bringup/config/rc_module_matrix/research_vehicle.lock.yaml"
-        )
-    if hashlib.sha256(vehicle_mesh.read_bytes()).hexdigest() != vehicle.get("file_sha256"):
-        raise RuntimeError("research vehicle mesh does not match its SHA-256 lock")
-    mesh_uri = f"model://research/{vehicle['class_id']}/{vehicle['asset_id']}/{vehicle['file_name']}"
-    mesh_scale = float(vehicle["dimensions"]["visual_scale_factor"]["value"])
-
-    quality = yaml.safe_load((config_source / "quality.yaml").read_text(encoding="utf-8"))
-    quality_id = scenario.get("quality_preset", scenario.get("setup", {}).get("quality_preset", "high"))
-    if quality_preset:
-        quality_id = quality_preset
-    if quality_id not in quality.get("presets", {}):
-        raise RuntimeError(f"unknown camera quality preset {quality_id!r}")
-    enabled_sensors = None
-    if sensor_set:
-        enabled_sensors = {
-            "lidar": {"lidar"},
-            "camera": {"camera"},
-            "imu": {"imu"},
-            "contact": {"contact"},
-            "none": set(),
-        }[sensor_set]
-    overlay = create_matrix_vehicle_overlay(
-        repo / "simulation/models/rc_car", quality["presets"][quality_id],
-        research_vehicle_mesh_uri=mesh_uri, research_vehicle_scale=mesh_scale,
-        enabled_sensors=enabled_sensors,
-    )
-    _ACTIVE_RUNTIME_OVERLAYS.append(overlay)
-
-    models = [str(overlay.models_dir), str(repo / "simulation/models"),
-              str(repo / "artifacts/rc-car-matrix/assets/models")]
     inherited = os.environ.get("GZ_SIM_RESOURCE_PATH", "")
-    resource_path = os.pathsep.join([*models, inherited] if inherited else models)
-    sdf_path = os.pathsep.join([*models, os.environ.get("SDF_PATH", "")]).rstrip(os.pathsep)
-
-    gz_args = ["sim", "--force-version", GAZEBO_VERSION, "-v", "3", "-r", "--seed", str(scenario["seed"])]
+    resource_path = os.pathsep.join(
+        [*(str(path) for path in resource_roots), inherited]
+        if inherited else [*(str(path) for path in resource_roots)]
+    )
+    sdf_path = os.pathsep.join(
+        [*(str(path) for path in resource_roots), os.environ.get("SDF_PATH", "")]
+    ).rstrip(os.pathsep)
+    sdf_environment = os.environ.copy()
+    sdf_environment["GZ_SIM_RESOURCE_PATH"] = resource_path
+    sdf_environment["SDF_PATH"] = sdf_path
+    subprocess.run(["gz", "sdf", "-k", str(world_path)], cwd=repo, env=sdf_environment, check=True)
+    gz_args = ["sim", "--force-version", GAZEBO_VERSION, "-v", "3", "-r", "--seed", str(simulation_seed)]
     if headless == "true":
         gz_args.extend(["-s", "--headless-rendering"])
-    elif headless == "glx":
-        # Use WSLg's accelerated GLX surface for sensors. Gazebo's --headless-rendering
-        # selects EGL device rendering, which may fall back to software under WSLg.
-        gz_args.append("-s")
-    elif gui_config:
-        gui_config_path = Path(gui_config).expanduser().resolve()
-        if not gui_config_path.is_file():
-            raise RuntimeError(f"GUI configuration does not exist: {gui_config_path}")
-        gz_args.extend(["--gui-config", str(gui_config_path)])
     gz_args.append(str(world_path))
+    # Keep Gazebo in this launch's process group. Detaching with `setsid` leaves
+    # the GUI child rendering after Ctrl+C and can pin a CPU core in WSLg.
     gazebo = ExecuteProcess(cmd=["gz", *gz_args], cwd=str(repo), output="screen", emulate_tty=True)
-    bridge_config_path = Path(bridge_config).expanduser().resolve() if bridge_config else config_share / "bridge.yaml"
-    if not bridge_config_path.is_file():
-        raise RuntimeError(f"matrix bridge configuration does not exist: {bridge_config_path}")
+
+    config_share = Path(get_package_share_directory("car_bringup")) / "config/obstacle_course"
+    bridge_path = config_share / "bridge.yaml"
+    if not bridge_path.is_file():
+        bridge_path = repo / "ros2_ws/src/car_bringup/config/obstacle_course/bridge.yaml"
+    if not bridge_path.is_file():
+        raise RuntimeError(f"Obstacle-course bridge file is missing: {bridge_path}")
     bridge = Node(
-        package="ros_gz_bridge", executable="parameter_bridge", name="matrix_bridge",
-        parameters=[{"config_file": str(bridge_config_path), "use_sim_time": True}],
-        output="screen",
+        package="ros_gz_bridge", executable="parameter_bridge", name="obstacle_course_bridge",
+        parameters=[{"config_file": str(bridge_path), "use_sim_time": True}],
+        prefix="setsid", output="screen",
     )
-
-    profile_path = package_share / "config/rc_vehicle.yaml"
-    sensor_tf = Node(
-        package="car_navigation", executable="sensor_tf_node", name="sensor_tf_node",
-        parameters=[{"use_sim_time": True, "profile_path": str(profile_path)}], output="screen",
+    set_pose_bridge = Node(
+        package="ros_gz_bridge", executable="parameter_bridge", name="obstacle_course_set_pose_bridge",
+        arguments=["/world/obstacle_course/set_pose@ros_gz_interfaces/srv/SetEntityPose"],
+        prefix="setsid", output="screen",
     )
-    matrix_nodes = [sensor_tf]
-    if behavior == "camera":
-        detector = Node(
-            package="car_navigation", executable="object_detection_node", name="object_detection_node",
+    run_output_dir = Path(supplied_output).expanduser().resolve() if supplied_output else (
+        repo / "artifacts/obstacle-course/runs" / run_id
+    )
+    runs_root = (repo / "artifacts/obstacle-course/runs").resolve()
+    if not run_output_dir.is_relative_to(runs_root):
+        raise RuntimeError("run_output_dir must be inside artifacts/obstacle-course/runs")
+    vehicle_visual = Node(
+        package="car_decision", executable="vehicle_visual_overlay", name="vehicle_visual_overlay",
+        parameters=[{
+            "use_sim_time": True,
+            "world_origin_z_m": 0.0675,
+        }], prefix="setsid", output="screen",
+    )
+    if control == "manual":
+        command_nodes = [Node(
+            package="car_decision", executable="manual_twist_adapter", name="manual_twist_adapter",
             parameters=[{
-                "use_sim_time": True, "profile_path": str(profile_path),
-                "model_path": str(repo / "models/rc_module_matrix/detector.onnx"),
-            }], output="screen",
+                "use_sim_time": True,
+                "wheelbase_m": float(rc["geometry"]["wheelbase_m"]["value"]),
+                "max_speed_mps": float(rc["steering"]["max_speed_mps"]["value"]),
+                "max_steering_angle_rad": float(rc["steering"]["effective_center_wheel_limit_rad"]["value"]),
+                "max_yaw_rate_radps": float(rc["steering"]["max_yaw_rate_radps"]["value"]),
+            }], prefix="setsid", output="screen",
+        )]
+    else:
+        decision_config = decision_config_path
+        trigger_matrix = repo / "ros2_ws/src/car_bringup/config/obstacle_course/trigger_matrix.yaml"
+        geometry_config = repo / "ros2_ws/src/car_bringup/config/obstacle_course/vehicle_geometry.yaml"
+        decision_node = Node(
+            package="car_decision", executable="decision_node", name="obstacle_course_decision",
+            parameters=[{
+                "use_sim_time": True,
+                "scenario_path": str(scenario_path),
+                "decision_path": str(decision_config),
+                "profile_path": str(profile_output),
+                "sensor_profile_path": str(repo / "ros2_ws/src/car_bringup/config/rc_vehicle.yaml"),
+                "trigger_matrix_path": str(trigger_matrix),
+                "run_id": run_id,
+                "run_purpose": run_purpose,
+                "frozen_inputs_root_sha256": frozen_root,
+            }], prefix="setsid", output="screen",
         )
-        matrix_nodes.append(detector)
-    elif behavior == "command_path":
-        rc = yaml.safe_load(profile_path.read_text(encoding="utf-8"))["presets"]["rc_car"]
-        sensor_remaps = []
-        if matrix_setup.get("fault_injection") == "suppress_lidar_after_sim_time":
-            relay = Node(
-                package="car_navigation", executable="matrix_lidar_fault_relay",
-                name="matrix_lidar_fault_relay", parameters=[{
-                    "use_sim_time": True,
-                    "drop_after_sim_s": float(matrix_setup["stale_after_s"]),
-                }], output="screen",
-            )
-            matrix_nodes.append(relay)
-            sensor_remaps = [("/scan", "/matrix/lidar_for_controller")]
-        controller = Node(
-            package="car_autonomy_nodes", executable="safe_drive_controller",
-            name="vehicle_controller_node", parameters=[{
-                "use_sim_time": True, "mode": "rc_navigation",
-                "wheelbase_m": rc["geometry"]["wheelbase_m"]["value"],
-                "max_steering_angle_rad": rc["steering"]["effective_center_wheel_limit_rad"]["value"],
-                "rc_max_speed_mps": rc["steering"]["max_speed_mps"]["value"],
-                "rc_max_yaw_rate_radps": rc["steering"]["max_yaw_rate_radps"]["value"],
-            }], remappings=sensor_remaps, output="screen",
+        planner = Node(
+            package="car_decision", executable="planner_intent_adapter", name="planner_intent_adapter",
+            parameters=[{
+                "use_sim_time": True,
+                "scenario_path": str(scenario_path),
+                "profile_path": str(profile_output),
+                "vehicle_geometry_path": str(geometry_config),
+                "decision_path": str(decision_config),
+            }], prefix="setsid", output="screen",
         )
-        matrix_nodes.append(controller)
-
-    start_bridge = RegisterEventHandler(OnProcessStart(
-        target_action=gazebo,
-        on_start=[LogInfo(msg="Simulator started; bringing up the matrix bridge"), bridge],
-    ))
-    start_nodes = RegisterEventHandler(OnProcessStart(
+        request_adapter = Node(
+            package="car_decision", executable="controller_request_adapter", name="controller_request_adapter",
+            parameters=[{
+                "use_sim_time": True,
+                "max_speed_mps": float(rc["steering"]["max_speed_mps"]["value"]),
+                "max_steering_angle_rad": float(rc["steering"]["effective_center_wheel_limit_rad"]["value"]),
+            }], prefix="setsid", output="screen",
+        )
+        command_nodes = [decision_node, planner, request_adapter]
+    controller = Node(
+        package="car_autonomy_nodes", executable="safe_drive_controller", name="vehicle_controller_node",
+        parameters=[{
+            "use_sim_time": True,
+            "mode": "rc_navigation",
+            "wheelbase_m": float(rc["geometry"]["wheelbase_m"]["value"]),
+            "max_steering_angle_rad": float(rc["steering"]["effective_center_wheel_limit_rad"]["value"]),
+            "rc_max_speed_mps": float(rc["steering"]["max_speed_mps"]["value"]),
+            "rc_max_yaw_rate_radps": float(rc["steering"]["max_yaw_rate_radps"]["value"]),
+        }], prefix="setsid", output="screen",
+    )
+    evidence_parameters = {
+        "use_sim_time": True,
+        "scenario_id": scenario_id,
+        "scenario_path": str(scenario_path),
+        "decision_path": str(decision_config_path),
+        "profile_path": str(profile_output),
+        "sensor_profile_path": str(repo / "ros2_ws/src/car_bringup/config/rc_vehicle.yaml"),
+        "run_id": run_id,
+        "run_purpose": run_purpose,
+        "frozen_inputs_root_sha256": frozen_root,
+    }
+    sensor_tf = Node(
+        package="car_navigation", executable="sensor_tf_node", name="obstacle_course_sensor_tf",
+        parameters=[{"use_sim_time": True, "profile_path": str(repo / "ros2_ws/src/car_bringup/config/rc_vehicle.yaml")}],
+        prefix="setsid", output="screen",
+    )
+    evidence_nodes = [
+        Node(package="car_decision", executable="lidar_evidence_node", name="lidar_evidence_node",
+             parameters=[evidence_parameters], prefix="setsid", output="screen"),
+        Node(package="car_decision", executable="camera_evidence_node", name="camera_evidence_node",
+             parameters=[evidence_parameters], prefix="setsid", output="screen"),
+        Node(package="car_decision", executable="imu_evidence_node", name="imu_evidence_node",
+             parameters=[evidence_parameters], prefix="setsid", output="screen"),
+        Node(package="car_decision", executable="odometry_evidence_node", name="odometry_evidence_node",
+             parameters=[evidence_parameters], prefix="setsid", output="screen"),
+        Node(package="car_decision", executable="contact_evidence_node", name="contact_evidence_node",
+             parameters=[evidence_parameters], prefix="setsid", output="screen"),
+        Node(package="car_decision", executable="fault_gate_node", name="fault_gate_node",
+             parameters=[{
+                 "use_sim_time": True,
+                 "scenario_id": scenario_id,
+                 "scenario_path": str(scenario_path),
+                 "run_id": run_id,
+                 "run_purpose": run_purpose,
+                 "frozen_inputs_root_sha256": evidence_parameters["frozen_inputs_root_sha256"],
+                 "seed": simulation_seed,
+                 "pose_service": "/world/obstacle_course/set_pose",
+             }], prefix="setsid", output="screen"),
+    ]
+    run_logger = Node(
+        package="car_decision", executable="run_logger", name="obstacle_course_run_logger",
+        parameters=[{
+            "use_sim_time": True,
+            "output_dir": str(run_output_dir),
+            "contract_dir": str(repo / "ros2_ws/src/car_bringup/config/obstacle_course/contracts"),
+            "run_id": run_id, "scenario_id": scenario_id, "run_purpose": run_purpose,
+            "seed": simulation_seed,
+            "frozen_inputs_root_sha256": frozen_root,
+        }], prefix="setsid", output="screen",
+    )
+    evidence_nodes.append(run_logger)
+    evidence_nodes.extend(command_nodes)
+    if dashboard_enabled == "true":
+        evidence_nodes.append(Node(
+            package="car_decision", executable="dashboard_node", name="obstacle_course_dashboard",
+            parameters=[{"host": "127.0.0.1", "port": 8765}], prefix="setsid", output="screen",
+        ))
+    start_bridge = RegisterEventHandler(OnProcessStart(target_action=gazebo, on_start=[bridge]))
+    start_course_nodes = RegisterEventHandler(OnProcessStart(
         target_action=bridge,
-        on_start=[LogInfo(msg=f"Matrix bridge started; behavior={behavior}"),
-                  TimerAction(period=1.0, actions=matrix_nodes)],
+        on_start=[TimerAction(period=1.0, actions=[
+            set_pose_bridge, sensor_tf, vehicle_visual, controller, *evidence_nodes
+        ])],
     ))
-    shutdown_handlers = [start_bridge, start_nodes]
-    for node in matrix_nodes:
-        if node.name == "vehicle_controller_node":
-            shutdown_handlers.append(RegisterEventHandler(OnProcessExit(
-                target_action=node,
-                on_exit=[Shutdown(reason="matrix command controller exited")],
-            )))
-    shutdown_handlers.append(RegisterEventHandler(OnProcessExit(
-        target_action=gazebo,
-        on_exit=[
-            OpaqueFunction(function=_cleanup_runtime_overlays),
-            Shutdown(reason="Gazebo exited; stopping matrix nodes"),
-        ],
-    )))
-    gui_render_environment = []
-    if headless == "false" and Path("/mnt/wslg").is_dir():
-        if os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"):
-            gui_render_environment.append(SetEnvironmentVariable(
-                "GALLIUM_DRIVER", os.environ.get("GALLIUM_DRIVER", "d3d12")
-            ))
-            adapter = os.environ.get("MESA_D3D12_DEFAULT_ADAPTER_NAME")
-            if not adapter:
-                try:
-                    adapters = subprocess.run(
-                        ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
-                        check=False, capture_output=True, text=True, timeout=3.0,
-                    ).stdout.splitlines()
-                except (OSError, subprocess.TimeoutExpired):
-                    adapters = []
-                if adapters:
-                    adapter = adapters[0].strip()
-            if adapter:
-                gui_render_environment.append(SetEnvironmentVariable(
-                    "MESA_D3D12_DEFAULT_ADAPTER_NAME", adapter
-                ))
     return [
-        *gui_render_environment,
+        *_wslg_render_environment(headless),
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", resource_path),
         SetEnvironmentVariable("SDF_PATH", sdf_path),
-        LogInfo(msg=f"Matrix scenario {scenario['scenario_id']} seed={scenario['seed']} research vehicle={vehicle['asset_id']}"),
-        *shutdown_handlers,
+        LogInfo(msg=f"Obstacle course {scenario_id} seed={simulation_seed} run_id={run_id} purpose={run_purpose} control={control}; controller is the only Gazebo command authority"),
+        start_bridge,
+        start_course_nodes,
         gazebo,
     ]
 
 
 def generate_launch_description():
     return LaunchDescription([
-        DeclareLaunchArgument("scenario", default_value="lidar/range-min-at"),
+        DeclareLaunchArgument("scenario", default_value="S0"),
         DeclareLaunchArgument("headless", default_value="true"),
-        DeclareLaunchArgument("behavior", default_value="sensors"),
-        DeclareLaunchArgument("gui_config", default_value=""),
-        DeclareLaunchArgument("bridge_config", default_value=""),
-        DeclareLaunchArgument("sensor_set", default_value=""),
-        DeclareLaunchArgument("quality_preset", default_value=""),
-        OpaqueFunction(function=_launch_setup),
+        DeclareLaunchArgument("control", default_value="manual"),
+        DeclareLaunchArgument("run_purpose", default_value="diagnostic"),
+        DeclareLaunchArgument("dashboard", default_value="false"),
+        DeclareLaunchArgument("scenario_config", default_value=""),
+        DeclareLaunchArgument("decision_config", default_value=""),
+        DeclareLaunchArgument("run_id", default_value=""),
+        DeclareLaunchArgument("seed", default_value=""),
+        DeclareLaunchArgument("run_output_dir", default_value=""),
+        DeclareLaunchArgument("input_manifest", default_value=""),
+        DeclareLaunchArgument("frozen_inputs_root_sha256", default_value=""),
+        DeclareLaunchArgument("world_path", default_value=""),
+        OpaqueFunction(function=_launch_obstacle_course_setup),
     ])

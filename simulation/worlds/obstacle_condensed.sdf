@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<sdf version="1.10">
+  <world name="obstacle_course">
+    <physics name="rc_course_1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics" />
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands" />
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster" />
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact" />
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <scene>
+      <ambient>0.45 0.45 0.45 1</ambient>
+      <background>0.52 0.70 0.92 1</background>
+      <shadows>true</shadows>
+      <grid>false</grid>
+      <origin_visual>false</origin_visual>
+    </scene>
+    <light type="directional" name="sun">
+      <pose>0 0 8 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <diffuse>0.85 0.85 0.85 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.4 0.2 -0.9</direction>
+    </light>
+    <model name="ground">
+      <static>true</static>
+      <link name="ground_link">
+        <collision name="ground_collision">
+          <geometry><plane><normal>0 0 1</normal><size>30 6</size></plane></geometry>
+        </collision>
+        <visual name="ground_visual">
+          <geometry><plane><normal>0 0 1</normal><size>30 6</size></plane></geometry>
+          <material><ambient>0.18 0.34 0.16 1</ambient><diffuse>0.18 0.34 0.16 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="course_road">
+      <static>true</static>
+      <link name="road_link">
+        <visual name="asphalt">
+          <pose>0 0 0.006 0 0 0</pose>
+          <geometry><box><size>28 1.45 0.012</size></box></geometry>
+          <material>
+            <pbr><metal><albedo_map>model://research/floors/floor_asphalt_001/Asphalt001_1K-JPG_Color.jpg</albedo_map><normal_map>model://research/floors/floor_asphalt_001/Asphalt001_1K-JPG_NormalGL.jpg</normal_map><roughness_map>model://research/floors/floor_asphalt_001/Asphalt001_1K-JPG_Roughness.jpg</roughness_map><roughness>1.0</roughness></metal></pbr>
+          </material>
+        </visual>
+        <visual name="left_edge">
+          <pose>0 0.68 0.014 0 0 0</pose>
+          <geometry><box><size>27.8 0.035 0.002</size></box></geometry>
+          <material><ambient>0.96 0.96 0.94 1</ambient><diffuse>0.96 0.96 0.94 1</diffuse></material>
+        </visual>
+        <visual name="right_edge">
+          <pose>0 -0.68 0.014 0 0 0</pose>
+          <geometry><box><size>27.8 0.035 0.002</size></box></geometry>
+          <material><ambient>0.96 0.96 0.94 1</ambient><diffuse>0.96 0.96 0.94 1</diffuse></material>
+        </visual>
+        <visual name="center_dash_0"><pose>0.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_1"><pose>1.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_2"><pose>2.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_3"><pose>3.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_4"><pose>4.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_5"><pose>5.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_6"><pose>6.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_7"><pose>7.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_8"><pose>8.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_9"><pose>9.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_10"><pose>10.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_11"><pose>11.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_12"><pose>12.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_13"><pose>13.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_14"><pose>14.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_15"><pose>15.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_16"><pose>16.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_17"><pose>17.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_18"><pose>18.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_19"><pose>19.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_20"><pose>20.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_21"><pose>21.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_22"><pose>22.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_23"><pose>23.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_24"><pose>24.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_25"><pose>25.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_26"><pose>26.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+        <visual name="center_dash_27"><pose>27.5 0 0.014 0 0 0</pose><geometry><box><size>0.30 0.025 0.002</size></box></geometry><material><ambient>0.95 0.78 0.08 1</ambient><diffuse>0.95 0.78 0.08 1</diffuse></material></visual>
+      </link>
+    </model>
+    <include>
+      <uri>model://rc_car</uri>
+      <name>gazebo_truck</name>
+      <pose>0 0 0.0675 0 0 0</pose>
+      <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+        <publish_model_pose>true</publish_model_pose>
+        <publish_link_pose>false</publish_link_pose>
+        <publish_visual_pose>false</publish_visual_pose>
+        <publish_collision_pose>false</publish_collision_pose>
+        <publish_sensor_pose>false</publish_sensor_pose>
+        <publish_nested_model_pose>false</publish_nested_model_pose>
+        <use_pose_vector_msg>false</use_pose_vector_msg>
+        <update_frequency>30</update_frequency>
+        <topic>/model/gazebo_truck/ground_truth_pose</topic>
+      </plugin>
+    </include>
+    <model name="gazebo_truck_visual">
+      <pose>0 0 0.0675 0 0 0</pose>
+      <static>true</static>
+      <link name="visual_link">
+        <visual name="research_truck_visual">
+          <pose>0 0 -0.0675 1.57079632679 0 1.57079632679</pose>
+          <geometry>
+            <mesh>
+              <uri>model://research/rc_vehicle/research_pickup_truck_01/pickup-original.glb</uri>
+              <scale>0.08 0.08 0.08</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

@@ -1,8 +1,0 @@
-Found Num EGL Devices: 1
-EGL Device: EGL_MESA_device_software EGL_EXT_device_drm_render_node #0
-Trying to init device: EGL_MESA_device_software EGL_EXT_device_drm_render_node #0...
-Created GL 4.5 context for device EGL_MESA_device_software EGL_EXT_device_drm_render_node #0
-GL_VENDOR = Microsoft Corporation
-GL_VERSION = 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3
-GL_RENDERER = D3D12 (NVIDIA RTX A2000 Laptop GPU)
-Device Name: D3D12 (NVIDIA RTX A2000 Laptop GPU)

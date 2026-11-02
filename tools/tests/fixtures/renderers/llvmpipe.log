@@ -1,4 +1,0 @@
-*** Starting GLX Subsystem ***
-GL_VENDOR = Mesa/X.org
-GL_VERSION = 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3
-GL_RENDERER = llvmpipe (LLVM 21.1.8, 256 bits)

@@ -359,7 +359,7 @@ presets:
             value: /camera/labels
             unit: topic
             status: simulation_ground_truth
-            source: ros_gz_bridge sensor_msgs/Image alias in rc_module_matrix/bridge.yaml.
+            source: ros_gz_bridge sensor_msgs/Image alias in obstacle_course/bridge.yaml.
           encoding:
             value: rgb8
             unit: sensor_msgs/Image encoding

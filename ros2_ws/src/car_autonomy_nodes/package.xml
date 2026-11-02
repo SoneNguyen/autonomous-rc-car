@@ -2,8 +2,8 @@
 <package format="3">
   <name>car_autonomy_nodes</name>
   <version>0.1.0</version>
-  <description>Simulation command controller used by the RC matrix.</description>
-  <maintainer email="maintainer@example.invalid">Autonomous Vehicle Simulation</maintainer>
+  <description>Bounded vehicle command controller for the RC obstacle-course simulation.</description>
+  <maintainer email="174254834+SoneNguyen@users.noreply.github.com">Son Nguyen</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
