@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import time
+
 import cv2
 from cv_bridge import CvBridge
 from sensor_msgs.msg import CompressedImage, Image
@@ -26,6 +28,8 @@ class CameraEvidenceNode(EvidenceNode):
         )
         self._processing_decimation = 2  # Keep HSV work at 7.5 Hz from the 15 Hz source.
         self._source_frame_count = 0
+        self._last_preview_wall_ns = 0
+        self._preview_period_ns = 200_000_000  # Five dashboard frames per second at most.
         self._source_topic = "/camera/image_raw"
         self._message_type = "sensor_msgs/msg/Image"
         self._subscription = self.create_subscription(
@@ -59,11 +63,14 @@ class CameraEvidenceNode(EvidenceNode):
         """Publish a small JPEG for the read-only dashboard, never the run log."""
         if self._preview_publisher.get_subscription_count() == 0:
             return
+        now_ns = time.monotonic_ns()
+        if now_ns - self._last_preview_wall_ns < self._preview_period_ns:
+            return
         height, width = image_bgr.shape[:2]
-        target_width = min(360, int(width))
+        target_width = min(320, int(width))
         target_height = max(1, round(height * target_width / max(1, width)))
         preview = cv2.resize(image_bgr, (target_width, target_height), interpolation=cv2.INTER_AREA)
-        ok, encoded = cv2.imencode(".jpg", preview, [cv2.IMWRITE_JPEG_QUALITY, 55])
+        ok, encoded = cv2.imencode(".jpg", preview, [cv2.IMWRITE_JPEG_QUALITY, 50])
         if not ok:
             return
         message = CompressedImage()
@@ -71,6 +78,7 @@ class CameraEvidenceNode(EvidenceNode):
         message.format = "jpeg"
         message.data = encoded.tobytes()
         self._preview_publisher.publish(message)
+        self._last_preview_wall_ns = now_ns
 
 def main(args=None) -> None:
     spin_node(CameraEvidenceNode, args)

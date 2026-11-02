@@ -246,6 +246,7 @@ def _launch_obstacle_course_setup(context, *_args, **_kwargs):
         parameters=[{
             "use_sim_time": True,
             "world_origin_z_m": 0.0675,
+            "world_pose_topic": "/vehicle/ground_truth_pose",
         }], prefix="setsid", output="screen",
     )
     if control == "manual":

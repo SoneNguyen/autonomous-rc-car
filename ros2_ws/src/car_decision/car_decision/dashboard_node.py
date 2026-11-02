@@ -77,7 +77,7 @@ function previewRow(parent,label,value){const row=node('div','preview-row');row.
 function releaseCameraFrame(){cameraPreviewGeneration++;cameraPreviewRunId=null;cameraFrameSequence=0;cameraFrameFailures=0;if(cameraFrameTimer)clearInterval(cameraFrameTimer);cameraFrameTimer=null;}
 function resetCameraPreviewForRun(runId){if(!runId||runId===cameraPreviewRunId)return;cameraPreviewRunId=runId;cameraPreviewGeneration++;cameraFrameSequence=0;cameraFrameFailures=0;const refs=$('#preview-layout')?.cameraRefs;if(refs?.canvas?.isConnected){const context=refs.canvas.getContext('2d');context?.clearRect(0,0,refs.canvas.width,refs.canvas.height);setText(refs.status,'Waiting for camera frame…');}}
 function closePreview(){activePreview=null;if(previewTimer)clearInterval(previewTimer);previewTimer=null;releaseCameraFrame();$('#preview').hidden=true;selected='all';$('#filter').value='all';render(latest);}
-function startCameraFramePolling(){if(cameraFrameTimer||paused||activePreview!=='camera')return;const refs=$('#preview-layout')?.cameraRefs;if(!refs)return;refreshCameraFrame(refs.canvas,refs.status);cameraFrameTimer=setInterval(()=>refreshCameraFrame(refs.canvas,refs.status),125);}
+function startCameraFramePolling(){if(cameraFrameTimer||paused||activePreview!=='camera')return;const refs=$('#preview-layout')?.cameraRefs;if(!refs)return;refreshCameraFrame(refs.canvas,refs.status);cameraFrameTimer=setInterval(()=>refreshCameraFrame(refs.canvas,refs.status),200);}
 function openPreview(component){releaseCameraFrame();activePreview=component;selected=component;$('#filter').value=component;const panel=$('#preview');panel.hidden=false;panel.replaceChildren();const head=node('div','preview-head');const close=node('button','','Close preview');close.type='button';close.addEventListener('click',closePreview);head.append(node('div','preview-title',`${component} preview`),close);panel.append(head,node('div','preview-meta','Live simulation evidence · read only'));const layout=node('div','preview-layout');layout.id='preview-layout';panel.append(layout);if(previewTimer)clearInterval(previewTimer);if(component==='camera'){const refs=mountCameraPreview(layout);setText(refs.status,'Waiting for camera frame…');startCameraFramePolling();}refreshPreview();previewTimer=paused?null:setInterval(refreshPreview,500);}
 function mountCameraPreview(layout){if(layout.dataset.cameraMounted==='true'&&layout.cameraRefs?.canvas?.isConnected)return layout.cameraRefs;const visual=node('div','');const canvas=node('canvas','camera-frame');canvas.setAttribute('role','img');canvas.setAttribute('aria-label','Live front camera image');canvas.width=640;canvas.height=480;const status=node('div','preview-meta camera-frame-status','Waiting for camera frame…');const details=node('div','preview-metrics');const evidenceStatus=node('div','preview-meta camera-evidence-status','Waiting for camera evidence…');const objectList=node('div','camera-object-list');const empty=node('div','preview-empty','No classified objects in the current frame.');objectList.append(empty);details.append(evidenceStatus,objectList);visual.append(canvas,status);layout.replaceChildren(visual,details);layout.dataset.cameraMounted='true';layout.cameraRefs={canvas,status,evidenceStatus,objectList,empty,objectRows:[]};return layout.cameraRefs;}
 async function refreshCameraFrame(canvas,status){if(!activePreview||activePreview!=='camera'||paused||cameraFrameRequest)return;const generation=cameraPreviewGeneration;const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),2000);cameraFrameRequest=true;let bitmap=null;try{const response=await fetch(`/camera.jpg?since=${cameraFrameSequence}`,{cache:'no-store',signal:controller.signal});if(generation!==cameraPreviewGeneration||!canvas.isConnected)return;if(response.status===304){cameraFrameFailures=0;return;}if(!response.ok){if(cameraFrameSequence)cameraFrameFailures++;if(!cameraFrameSequence)setText(status,'Waiting for camera frame…');else if(cameraFrameFailures>=3)setText(status,`Camera reconnecting · last frame ${cameraFrameSequence}`);return;}const sequence=Number(response.headers.get('X-Preview-Sequence')||0);if(sequence&&sequence<=cameraFrameSequence){cameraFrameFailures=0;return;}bitmap=await createImageBitmap(await response.blob());if(generation!==cameraPreviewGeneration||!canvas.isConnected||!activePreview||activePreview!=='camera'||paused)return;if(canvas.width!==bitmap.width)canvas.width=bitmap.width;if(canvas.height!==bitmap.height)canvas.height=bitmap.height;const context=canvas.getContext('2d',{alpha:false});context.drawImage(bitmap,0,0);if(sequence)cameraFrameSequence=sequence;cameraFrameFailures=0;setText(status,`Live frame ${sequence||cameraFrameSequence}`);}catch(_){if(generation!==cameraPreviewGeneration)return;cameraFrameFailures++;if(cameraFrameFailures>=3)setText(status,cameraFrameSequence?`Camera reconnecting · last frame ${cameraFrameSequence}`:'Waiting for camera frame…');}finally{clearTimeout(timeout);if(bitmap)bitmap.close();cameraFrameRequest=false;}}
@@ -441,7 +441,7 @@ def make_server(store: DashboardStore, metrics: LatencyMetrics, host: str = "127
                     if replay_ok:
                         cursor = last_id
                         for item in replay:
-                            self._send_event(item)
+                            self._send_event(item, measure_latency=False)
                             cursor = int(item["id"])
                     else:
                         state, cursor = store.snapshot_with_cursor()
@@ -451,12 +451,12 @@ def make_server(store: DashboardStore, metrics: LatencyMetrics, host: str = "127
                     if not pending:
                         self._send(None, {"type": "heartbeat", "latency": metrics.summary()})
                     for item in pending:
-                        self._send_event(item)
+                        self._send_event(item, measure_latency=True)
                         cursor = int(item["id"])
             except (BrokenPipeError, ConnectionResetError, TimeoutError, OSError):
                 return
 
-        def _send_event(self, item: dict[str, Any]) -> None:
+        def _send_event(self, item: dict[str, Any], *, measure_latency: bool) -> None:
             payload = item["payload"]
             kind = item["kind"]
             if kind == "state":
@@ -471,7 +471,7 @@ def make_server(store: DashboardStore, metrics: LatencyMetrics, host: str = "127
             else:
                 message = {"type": kind, **payload}
             self._send(int(item["id"]), message)
-            if kind == "decision":
+            if kind == "decision" and measure_latency:
                 event = payload
                 published = event.get("published_monotonic_ns")
                 if isinstance(published, int):

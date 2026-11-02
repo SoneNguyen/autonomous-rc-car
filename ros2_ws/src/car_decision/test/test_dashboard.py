@@ -71,7 +71,7 @@ def test_get_ui_and_post_returns_405():
             assert "updateCameraPreview" in body
             assert "cameraFrameSequence" in body
             assert "cameraFrameTimer=setInterval" in body
-            assert "refreshCameraFrame(refs.canvas,refs.status),125" in body
+            assert "refreshCameraFrame(refs.canvas,refs.status),200" in body
             assert "cameraPreviewRunId" in body
             assert "resetCameraPreviewForRun(record.run_id)" in body
             assert "resetCameraPreviewForRun(m.snapshot.run_id)" in body

@@ -140,6 +140,8 @@ python3 tools/run_obstacle_course.py \
 
 Gazebo opens the condensed road. Open <http://localhost:8765/> in a browser. The truck follows the route through the configured objects; click a dashboard component card to inspect its live evidence and select Camera to see the camera preview. Decision history shows the behavior, reason, and component attribution. The dashboard is read-only. Press Ctrl-C in the launch terminal to stop the run.
 
+After changing ROS nodes or launch files, stop an active run, rebuild using section 2, and start a new run. Running nodes keep the code they loaded at startup.
+
 For systems without a graphical desktop, run the same command with `--headless` instead of `--no-headless`. The dashboard remains available at localhost if a browser is available.
 
 ## 6. Run one scenario or the full demonstration
@@ -147,14 +149,26 @@ For systems without a graphical desktop, run the same command with `--headless` 
 Single scenario, headless:
 
 ```bash
+cd ~/src/gz-ws
+source /opt/ros/lyrical/setup.bash
+source ros2_ws/install/setup.bash
+export ROS_DOMAIN_ID=78
+export GZ_PARTITION=obstacle_course_demo
 python3 tools/run_obstacle_course.py --scenario S3b --quick --headless
 ```
 
 `--quick` is a one-repeat smoke check and cannot qualify a scenario. The available scenarios are `S0`, `S1`, `S2`, `S3`, `S3b`, `S4`, `S5`, `S6-lidar-drop`, `S6-camera-drop`, and `S7`.
 
+The runner also sources `/opt/ros/$ROS_DISTRO/setup.bash` (defaulting to `lyrical` if `ROS_DISTRO` is unset) and this checkout's install overlay for each launch subprocess. It checks that `ros2`, `gz`, and `car_bringup` are available before creating a run; if setup is missing, it prints the corresponding install/build step rather than a Python `FileNotFoundError`.
+
 Freeze every input before the ten-repeat demonstration:
 
 ```bash
+cd ~/src/gz-ws
+source /opt/ros/lyrical/setup.bash
+source ros2_ws/install/setup.bash
+export ROS_DOMAIN_ID=78
+export GZ_PARTITION=obstacle_course_demo
 python3 tools/freeze_obstacle_course_inputs.py \
   --output artifacts/obstacle-course/frozen-inputs/input-manifest.json
 python3 tools/verify_obstacle_course_inputs.py \

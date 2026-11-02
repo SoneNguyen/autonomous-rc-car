@@ -62,7 +62,11 @@ class VehicleVisualOverlay(Node):
     def __init__(self) -> None:
         super().__init__("vehicle_visual_overlay")
         self.declare_parameter("world_origin_z_m", 0.0675)
-        self.declare_parameter("world_pose_topic", "/world/obstacle_course/pose/info")
+        # Subscribe to the same PosePublisher stream used by odometry evidence.
+        # The world/pose/info topic is not bridged in this launch, which left
+        # the research-truck visual frozen at its initial pose while the
+        # collision vehicle and dashboard continued moving.
+        self.declare_parameter("world_pose_topic", "/vehicle/ground_truth_pose")
         self.declare_parameter("pose_service", "/world/obstacle_course/set_pose")
         self._world_z = float(self.get_parameter("world_origin_z_m").value)
         self._truck_pose: tuple[float, float, float] | None = None

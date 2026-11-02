@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import signal
 import subprocess
 import sys
@@ -24,6 +25,53 @@ from verify_obstacle_course_inputs import verify_manifest
 CONFIG = Path("ros2_ws/src/car_bringup/config/obstacle_course")
 SCENARIOS = ("S0", "S1", "S2", "S3", "S3b", "S4", "S5", "S6-lidar-drop", "S6-camera-drop", "S7")
 BEHAVIORS = {"FOLLOW_ROUTE", "CAUTION", "AVOID_LEFT", "AVOID_RIGHT", "STOP", "RESUME"}
+
+
+def _ros_runtime_paths() -> tuple[Path, Path]:
+    """Return the ROS base and this checkout's installed overlay setup files."""
+    distro = os.environ.get("ROS_DISTRO", "lyrical").strip() or "lyrical"
+    ros_setup = Path("/opt/ros") / distro / "setup.bash"
+    overlay_setup = REPO / "ros2_ws/install/setup.bash"
+    if not ros_setup.is_file():
+        raise RuntimeError(
+            f"ROS setup was not found at {ros_setup}. Install the documented ROS 2 "
+            "distribution, then see docs/quickstart.md sections 1–2."
+        )
+    if not overlay_setup.is_file():
+        raise RuntimeError(
+            f"workspace install was not found at {overlay_setup}. Build the workspace "
+            "as described in docs/quickstart.md section 2."
+        )
+    if shutil.which("bash") is None:
+        raise RuntimeError("bash is required to source the ROS and workspace setup files")
+    return ros_setup, overlay_setup
+
+
+def _ros_launch_command(ros_setup: Path, overlay_setup: Path, launch_args: list[str]) -> list[str]:
+    """Source ROS and this checkout in the child shell, independent of caller state."""
+    return [
+        "bash", "-c",
+        'set -e; source "$1"; source "$2"; shift 2; exec ros2 "$@"',
+        "obstacle-course-runner", str(ros_setup), str(overlay_setup), "launch", *launch_args,
+    ]
+
+
+def _check_ros_runtime(ros_setup: Path, overlay_setup: Path) -> None:
+    """Fail before making run artifacts if sourcing the built ROS overlay fails."""
+    command = [
+        "bash", "-c",
+        'set -e; source "$1"; source "$2"; command -v ros2 >/dev/null; '
+        'ros2 pkg prefix car_bringup >/dev/null; command -v gz >/dev/null',
+        "obstacle-course-preflight", str(ros_setup), str(overlay_setup),
+    ]
+    result = subprocess.run(command, cwd=REPO, capture_output=True, text=True, check=False)
+    if result.returncode:
+        detail = (result.stderr or result.stdout).strip()
+        raise RuntimeError(
+            "could not initialize ROS 2 and the car_bringup workspace overlay. "
+            "Rebuild using docs/quickstart.md section 2, then retry."
+            + (f"\n{detail}" if detail else "")
+        )
 
 
 def seed_for_repeat(base_seed: int, repeat_index: int) -> int:
@@ -273,21 +321,25 @@ def _route_end_is_stable(run_dir: Path, route_length_m: float) -> bool:
 
 def _run_one(scenario_path: Path, decision_config_path: Path, *, repeat_index: int, seed: int, run_purpose: str,
              frozen_root: str, manifest_path: Path | None,
-             wall_timeout_s: float, headless: bool) -> tuple[dict, dict]:
+             wall_timeout_s: float, headless: bool,
+             ros_setup: Path, overlay_setup: Path) -> tuple[dict, dict]:
     scenario = yaml.safe_load(scenario_path.read_text(encoding="utf-8"))
     run_id = str(uuid.uuid4())
     run_dir = REPO / "artifacts/obstacle-course/runs" / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
-    cmd = ["ros2", "launch", "car_bringup", "obstacle_course.launch.py", *
-           _scenario_launch_overrides(
-               scenario_path, decision_config_path, run_purpose=run_purpose,
-               headless=headless, seed=seed, run_id=run_id, run_dir=run_dir,
-           )]
+    launch_args = [
+        "car_bringup", "obstacle_course.launch.py",
+        *_scenario_launch_overrides(
+            scenario_path, decision_config_path, run_purpose=run_purpose,
+            headless=headless, seed=seed, run_id=run_id, run_dir=run_dir,
+        ),
+    ]
     if frozen_root:
-        cmd.append(f"frozen_inputs_root_sha256:={frozen_root}")
+        launch_args.append(f"frozen_inputs_root_sha256:={frozen_root}")
     if manifest_path is not None:
         manifest_arg = manifest_path if manifest_path.is_absolute() else (REPO / manifest_path)
-        cmd.append(f"input_manifest:={manifest_arg}")
+        launch_args.append(f"input_manifest:={manifest_arg}")
+    cmd = _ros_launch_command(ros_setup, overlay_setup, launch_args)
     process = subprocess.Popen(cmd, cwd=REPO, start_new_session=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     timed_out = False
     route_completed = False
@@ -455,6 +507,12 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("development configs require --run-purpose development")
         if not scenario_path.is_relative_to((REPO / CONFIG / "scenarios").resolve()) and not is_development_scenario:
             parser.error(f"scenario config must be in the production or development scenario directory: {scenario_path}")
+    try:
+        ros_setup, overlay_setup = _ros_runtime_paths()
+        _check_ros_runtime(ros_setup, overlay_setup)
+    except RuntimeError as exc:
+        print(f"run_obstacle_course: {exc}", file=sys.stderr)
+        return 2
     mode = "quick" if args.quick else ("all" if args.all else ("single" if len(scenario_paths) == 1 and args.repeats == 1 else "scenario"))
     aggregate_status = 0
     for scenario_path in scenario_paths:
@@ -473,6 +531,7 @@ def main(argv: list[str] | None = None) -> int:
                 run_purpose=purpose, frozen_root=frozen_root,
                 manifest_path=args.manifest,
                 wall_timeout_s=args.wall_timeout_s, headless=args.headless,
+                ros_setup=ros_setup, overlay_setup=overlay_setup,
             )
             repeat_reports.append(repeat)
             last_details = details
