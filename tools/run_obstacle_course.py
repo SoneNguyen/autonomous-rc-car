@@ -19,6 +19,7 @@ import uuid
 import yaml
 
 from freeze_obstacle_course_inputs import REPO, root_hash_for_inputs
+from validate_obstacle_course_config import validate_instance
 from verify_obstacle_course_inputs import verify_manifest
 
 
@@ -29,8 +30,7 @@ BEHAVIORS = {"FOLLOW_ROUTE", "CAUTION", "AVOID_LEFT", "AVOID_RIGHT", "STOP", "RE
 
 def _ros_runtime_paths() -> tuple[Path, Path]:
     """Return the ROS base and this checkout's installed overlay setup files."""
-    distro = os.environ.get("ROS_DISTRO", "lyrical").strip() or "lyrical"
-    ros_setup = Path("/opt/ros") / distro / "setup.bash"
+    ros_setup = Path("/opt/ros/jazzy/setup.bash")
     overlay_setup = REPO / "ros2_ws/install/setup.bash"
     if not ros_setup.is_file():
         raise RuntimeError(
@@ -56,12 +56,12 @@ def _ros_launch_command(ros_setup: Path, overlay_setup: Path, launch_args: list[
     ]
 
 
-def _check_ros_runtime(ros_setup: Path, overlay_setup: Path) -> None:
+def _check_ros_runtime(ros_setup: Path, overlay_setup: Path) -> dict[str, str]:
     """Fail before making run artifacts if sourcing the built ROS overlay fails."""
     command = [
         "bash", "-c",
         'set -e; source "$1"; source "$2"; command -v ros2 >/dev/null; '
-        'ros2 pkg prefix car_bringup >/dev/null; command -v gz >/dev/null',
+        'ros2 pkg prefix car_bringup >/dev/null; exec python3 -m car_bringup.runtime',
         "obstacle-course-preflight", str(ros_setup), str(overlay_setup),
     ]
     result = subprocess.run(command, cwd=REPO, capture_output=True, text=True, check=False)
@@ -72,6 +72,7 @@ def _check_ros_runtime(ros_setup: Path, overlay_setup: Path) -> None:
             "Rebuild using docs/quickstart.md section 2, then retry."
             + (f"\n{detail}" if detail else "")
         )
+    return json.loads(result.stdout)
 
 
 def seed_for_repeat(base_seed: int, repeat_index: int) -> int:
@@ -185,19 +186,13 @@ def _source_identity(
     decision_config_path: Path,
     profile_path: Path,
     world_path: Path,
+    runtime: dict[str, str],
 ) -> dict:
-    import platform
-    ros = os.environ.get("ROS_DISTRO", "unknown")
-    gazebo = subprocess.run(["gz", "sim", "--versions"], capture_output=True, text=True, check=False).stdout.strip()
-    try:
-        ubuntu = next(line.split("=", 1)[1].strip().strip('"') for line in Path("/etc/os-release").read_text().splitlines() if line.startswith("VERSION_ID="))
-    except (OSError, StopIteration):
-        ubuntu = platform.platform()
     matrix = REPO / CONFIG / "trigger_matrix.yaml"
     import subprocess as sp
     revision = sp.run(["git", "rev-parse", "HEAD"], cwd=REPO, text=True, capture_output=True, check=False).stdout.strip() or "working-tree"
     return {
-        "ubuntu": ubuntu, "ros_distro": ros, "gazebo_version": gazebo,
+        **runtime,
         "profile_sha256": json.loads(profile_path.read_text())["profile_sha256"],
         "scenario_sha256": _sha(scenario_path),
         "decision_config_sha256": _sha(decision_config_path),
@@ -216,6 +211,7 @@ def _scenario_launch_overrides(
     seed: int,
     run_id: str,
     run_dir: Path,
+    dashboard: bool | None = None,
 ) -> list[str]:
     scenario = yaml.safe_load(scenario_path.read_text(encoding="utf-8"))
     overrides = [
@@ -225,7 +221,8 @@ def _scenario_launch_overrides(
         f"headless:={'true' if headless else 'false'}", f"seed:={seed}", f"run_id:={run_id}",
         f"run_output_dir:={run_dir}",
     ]
-    if not headless:
+    dashboard_enabled = not headless if dashboard is None else dashboard
+    if dashboard_enabled:
         overrides.append("dashboard:=true")
     return overrides
 
@@ -322,7 +319,7 @@ def _route_end_is_stable(run_dir: Path, route_length_m: float) -> bool:
 def _run_one(scenario_path: Path, decision_config_path: Path, *, repeat_index: int, seed: int, run_purpose: str,
              frozen_root: str, manifest_path: Path | None,
              wall_timeout_s: float, headless: bool,
-             ros_setup: Path, overlay_setup: Path) -> tuple[dict, dict]:
+             ros_setup: Path, overlay_setup: Path, dashboard: bool | None = None) -> tuple[dict, dict]:
     scenario = yaml.safe_load(scenario_path.read_text(encoding="utf-8"))
     run_id = str(uuid.uuid4())
     run_dir = REPO / "artifacts/obstacle-course/runs" / run_id
@@ -331,7 +328,7 @@ def _run_one(scenario_path: Path, decision_config_path: Path, *, repeat_index: i
         "car_bringup", "obstacle_course.launch.py",
         *_scenario_launch_overrides(
             scenario_path, decision_config_path, run_purpose=run_purpose,
-            headless=headless, seed=seed, run_id=run_id, run_dir=run_dir,
+            headless=headless, seed=seed, run_id=run_id, run_dir=run_dir, dashboard=dashboard,
         ),
     ]
     if frozen_root:
@@ -456,6 +453,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--wall-timeout-s", type=float, default=35.0)
     parser.add_argument("--headless", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument(
+        "--dashboard", action=argparse.BooleanOptionalAction, default=None,
+        help="Show the browser dashboard. Defaults to enabled with the Gazebo GUI.",
+    )
     args = parser.parse_args(argv)
     purpose = args.run_purpose or ("diagnostic" if args.quick else "demonstration")
     if args.repeats < 1 or args.wall_timeout_s <= 0:
@@ -509,7 +510,7 @@ def main(argv: list[str] | None = None) -> int:
             parser.error(f"scenario config must be in the production or development scenario directory: {scenario_path}")
     try:
         ros_setup, overlay_setup = _ros_runtime_paths()
-        _check_ros_runtime(ros_setup, overlay_setup)
+        runtime = _check_ros_runtime(ros_setup, overlay_setup)
     except RuntimeError as exc:
         print(f"run_obstacle_course: {exc}", file=sys.stderr)
         return 2
@@ -531,7 +532,7 @@ def main(argv: list[str] | None = None) -> int:
                 run_purpose=purpose, frozen_root=frozen_root,
                 manifest_path=args.manifest,
                 wall_timeout_s=args.wall_timeout_s, headless=args.headless,
-                ros_setup=ros_setup, overlay_setup=overlay_setup,
+                ros_setup=ros_setup, overlay_setup=overlay_setup, dashboard=args.dashboard,
             )
             repeat_reports.append(repeat)
             last_details = details
@@ -545,20 +546,11 @@ def main(argv: list[str] | None = None) -> int:
         report_dir.mkdir(parents=True, exist_ok=False)
         identity = _source_identity(
             scenario_path, decision_config_path,
-            last_details["profile_path"], last_details["world_path"],
+            last_details["profile_path"], last_details["world_path"], runtime,
         )
         report = _write_report(scenario, repeat_reports, mode, purpose, frozen_root, identity, report_dir)
         report["report_path"] = f"artifacts/obstacle-course/runs/{report_dir.name}/report.json"
-        schema = json.loads((REPO / "ros2_ws/src/car_bringup/config/obstacle_course/contracts/run-report.schema.json").read_text())
-        import jsonschema
-        from referencing import Registry, Resource
-        fault_schema = json.loads((REPO / "ros2_ws/src/car_bringup/config/obstacle_course/contracts/fault-event.schema.json").read_text())
-        registry = Registry().with_resource(
-            "fault-event.schema.json", Resource.from_contents(fault_schema)
-        )
-        jsonschema.Draft202012Validator(
-            schema, format_checker=jsonschema.FormatChecker(), registry=registry
-        ).validate(report)
+        validate_instance("run-report.schema.json", report)
         path = report_dir / "report.json"
         path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(json.dumps({"report": str(path.relative_to(REPO)), "status": report["status"], "qualified": report["qualified"]}, sort_keys=True), flush=True)

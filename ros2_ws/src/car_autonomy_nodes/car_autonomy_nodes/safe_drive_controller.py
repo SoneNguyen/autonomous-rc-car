@@ -661,7 +661,10 @@ def _authority_monitor(node: SafeDriveController) -> None:
 
 
 def main(args=None) -> int:
-    valid, reason = verify_gazebo_command_authority()
+    try:
+        valid, reason = verify_gazebo_command_authority()
+    except KeyboardInterrupt:
+        return 0
     if not valid:
         print(f"refusing autonomous controller start: {reason}", file=sys.stderr, flush=True)
         return 2

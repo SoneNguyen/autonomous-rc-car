@@ -11,6 +11,7 @@ assets:
   license: CC0-1.0
   license_url: https://www.innerscene.com/tools/library/terms
   file_name: pickup-original.glb
+  repository_file: assets/locked/pickup-original.glb
   file_sha256: c73afda8399ac408c7e66377a87d0ca3eb7663560e3a4d0522cf4fc23ca5d525
   dimensions:
     source_bounds_m:

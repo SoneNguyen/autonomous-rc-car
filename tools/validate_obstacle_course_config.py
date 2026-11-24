@@ -10,8 +10,7 @@ import math
 from pathlib import Path
 import sys
 
-from jsonschema import Draft202012Validator, FormatChecker
-from referencing import Registry, Resource
+from jsonschema import Draft202012Validator, FormatChecker, RefResolver
 import yaml
 
 
@@ -60,25 +59,23 @@ def _schema(name: str) -> dict:
     return schema
 
 
-def _contract_registry() -> Registry:
-    """Build a local-only registry for relative contract references."""
-    registry = Registry()
-    for name in SCHEMA_NAMES:
-        path = (REPO / CONTRACTS / name).resolve()
-        schema = json.loads(path.read_text(encoding="utf-8"))
-        # Absolute file identifiers keep resolution local and make network
-        # retrieval impossible for this repository's contract set.
-        schema["$id"] = path.as_uri()
-        registry = registry.with_resource(path.as_uri(), Resource.from_contents(schema))
-    return registry
+class _OfflineResolver(RefResolver):
+    def resolve_remote(self, uri):
+        raise ContractValidationError(f"unknown local contract reference: {uri}")
 
 
 def validate_instance(name: str, instance: dict) -> None:
-    """Validate one instance, resolving local schema references without network access."""
+    """Validate with the Ubuntu 24.04 jsonschema package and local contracts."""
     schema = _schema(name)
-    schema["$id"] = (REPO / CONTRACTS / name).resolve().as_uri()
+    root = (REPO / CONTRACTS).resolve()
+    schema["$id"] = (root / name).as_uri()
+    store = {
+        (root / contract).as_uri(): _schema(contract)
+        for contract in SCHEMA_NAMES if contract != name
+    }
+    resolver = _OfflineResolver.from_schema(schema, store=store)
     validator = Draft202012Validator(
-        schema, registry=_contract_registry(), format_checker=FormatChecker()
+        schema, resolver=resolver, format_checker=FormatChecker()
     )
     errors = sorted(validator.iter_errors(instance), key=lambda error: list(map(str, error.absolute_path)))
     if errors:

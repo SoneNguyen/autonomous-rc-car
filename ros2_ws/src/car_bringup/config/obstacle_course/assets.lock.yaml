@@ -88,3 +88,18 @@ assets:
       - 0.5375
       unit: m
       provenance: derived from source bounds and scale
+- asset_id: floor_asphalt_001
+  class_id: floor_texture
+  source: ambientCG
+  author: ambientCG
+  revision: Asphalt001_1K-JPG
+  page_url: https://ambientcg.com/view?id=Asphalt001
+  download_url: https://ambientcg.com/get?file=Asphalt001_1K-JPG.zip
+  license: CC0-1.0
+  license_url: https://docs.ambientcg.com/license/
+  archive_file: Asphalt001_1K-JPG.zip
+  archive_sha256: 52c4f470e381c3ffee442880ad21f3b1dd5d70886c5bf566fa83f91746ae0f51
+  members:
+    Asphalt001_1K-JPG_Color.jpg: 9282585546a4cad22f78cf171242466f236faad943b39b82cfc67a393860fd58
+    Asphalt001_1K-JPG_NormalGL.jpg: 6012bdeb7e2039ffb2dda9b145132e52cb9590b26e3c5eed9e86bacc277fb45e
+    Asphalt001_1K-JPG_Roughness.jpg: bb8c8a3858a1dfea73825006d1a6477c0918bbd25b855f3f0afad04fe0282a8a

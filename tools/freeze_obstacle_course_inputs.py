@@ -30,6 +30,7 @@ RUNTIME_PATHS = (
     Path("tools/check_obstacle_course_sizing.py"),
     Path("tools/freeze_obstacle_course_inputs.py"), Path("tools/verify_obstacle_course_inputs.py"),
     Path("tools/run_obstacle_course.py"),
+    Path("ros2_ws/src/car_bringup/car_bringup/runtime.py"),
     Path("ros2_ws/src/car_decision/setup.py"), Path("ros2_ws/src/car_decision/package.xml"),
     Path("ros2_ws/src/car_bringup/launch/obstacle_course.launch.py"),
     Path("ros2_ws/src/car_autonomy_nodes/car_autonomy_nodes/safe_drive_controller.py"),
@@ -84,6 +85,10 @@ def _locked_asset_hashes() -> dict[str, str]:
             if asset.get("file_name", "").lower().endswith(".glb"):
                 key = (cache / "models/research" / asset["class_id"] / asset["asset_id"] / asset["file_name"]).as_posix()
                 result[key] = asset["file_sha256"]
+            if asset.get("class_id") == "floor_texture":
+                directory = cache / "models/research/floors" / asset["asset_id"]
+                for name, digest in asset.get("members", {}).items():
+                    result[(directory / name).as_posix()] = digest
     return result
 
 
@@ -126,6 +131,7 @@ def collect_input_paths() -> list[Path]:
                     candidate = REPO / model_root / name
                     if candidate.is_file():
                         paths.add(model_root / name)
+    paths.update(map(Path, _locked_asset_hashes()))
     return sorted(paths, key=lambda item: item.as_posix())
 
 

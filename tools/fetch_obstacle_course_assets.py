@@ -7,6 +7,7 @@ import hashlib
 from pathlib import Path, PurePosixPath
 import shutil
 import sys
+from tempfile import NamedTemporaryFile
 import urllib.request
 import zipfile
 from typing import Any
@@ -78,6 +79,27 @@ def _download(url: str, destination: Path, *, referer_url: str | None = None) ->
     request = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(request, timeout=60) as response, destination.open("wb") as output:
         shutil.copyfileobj(response, output)
+
+
+def _install_verified_file(
+    destination: Path, expected: str, *, source: Path | None,
+    url: str | None, referer_url: str | None,
+) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with NamedTemporaryFile(dir=destination.parent, prefix=".asset-", delete=False) as stream:
+        temporary = Path(stream.name)
+    try:
+        if source is not None:
+            verify_sha256(source, expected)
+            shutil.copyfile(source, temporary)
+        elif url:
+            _download(url, temporary, referer_url=referer_url)
+        else:
+            raise AssetLockError(f"no source for locked file: {destination}")
+        verify_sha256(temporary, expected)
+        temporary.replace(destination)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def _safe_destination(root: Path, member: str) -> Path:
@@ -182,11 +204,24 @@ def fetch_assets(lock_path: Path, output: Path, verify_only: bool = False) -> li
                 archive = archive_dir / asset["archive_file"]
             if not archive.is_file():
                 if verify_only:
-                    raise AssetLockError(f"locked texture archive is missing: {asset['archive_file']}")
-                archive = archive_dir / asset["archive_file"]
-                _download(asset["download_url"], archive)
+                    raise AssetLockError(f"locked archive is missing: {asset['archive_file']}")
+                _install_verified_file(
+                    archive, asset["archive_sha256"], source=None,
+                    url=asset["download_url"], referer_url=asset.get("page_url"),
+                )
             verify_sha256(archive, asset["archive_sha256"])
             destination_root = output / "models" / "research" / "floors" / asset["asset_id"]
+            if asset.get("members"):
+                for name, expected in asset["members"].items():
+                    destination = _safe_destination(destination_root, name)
+                    try:
+                        verify_sha256(destination, expected)
+                    except AssetLockError:
+                        if verify_only:
+                            raise
+                        _extract_one(archive, name, destination, expected)
+                    installed.append(destination)
+                continue
             if not destination_root.exists() or not any(destination_root.rglob("*")):
                 if verify_only:
                     raise AssetLockError(f"locked texture extraction is missing: {destination_root}")
@@ -196,20 +231,23 @@ def fetch_assets(lock_path: Path, output: Path, verify_only: bool = False) -> li
         if not asset.get("file_sha256") or asset.get("member_path"):
             continue
         destination = output / "models" / "research" / asset["class_id"] / asset["asset_id"] / asset["file_name"]
-        if not destination.is_file():
-            if verify_only:
-                raise AssetLockError(f"locked extracted file is missing: {destination}")
-            cached = _cache_candidate(cache, asset["file_sha256"])
-            if cached is not None:
-                destination.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(cached, destination)
+        expected = asset["file_sha256"]
+        repository_file = asset.get("repository_file")
+        try:
+            verify_sha256(destination, expected)
+        except AssetLockError:
+            if verify_only or (destination.is_file() and not repository_file):
+                raise
+            if repository_file:
+                source = _safe_destination(REPO_ROOT, repository_file)
             else:
-                _download(
-                    asset["download_url"],
-                    destination,
-                    referer_url=asset.get("page_url"),
-                )
-        verify_sha256(destination, asset["file_sha256"])
+                source = _cache_candidate(cache, expected)
+            metadata = sources.get(asset.get("source_id"), {})
+            _install_verified_file(
+                destination, expected, source=source,
+                url=asset.get("download_url") or metadata.get("download_url"),
+                referer_url=asset.get("page_url") or metadata.get("page_url"),
+            )
         installed.append(destination)
 
     return installed

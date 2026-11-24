@@ -25,34 +25,7 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 import yaml
 
-
-
-GAZEBO_VERSION = "10.5.0"
-
-def _wslg_render_environment(headless: str):
-    """Select WSLg's D3D12 adapter for visible Gazebo launches when available."""
-    if headless != "false" or not Path("/mnt/wslg").is_dir():
-        return []
-    if not (os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")):
-        return []
-
-    actions = [SetEnvironmentVariable(
-        "GALLIUM_DRIVER", os.environ.get("GALLIUM_DRIVER", "d3d12")
-    )]
-    adapter = os.environ.get("MESA_D3D12_DEFAULT_ADAPTER_NAME")
-    if not adapter:
-        try:
-            adapters = subprocess.run(
-                ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
-                check=False, capture_output=True, text=True, timeout=3.0,
-            ).stdout.splitlines()
-        except (OSError, subprocess.TimeoutExpired):
-            adapters = []
-        if adapters:
-            adapter = adapters[0].strip()
-    if adapter:
-        actions.append(SetEnvironmentVariable("MESA_D3D12_DEFAULT_ADAPTER_NAME", adapter))
-    return actions
+from car_bringup.runtime import harmonic_version
 
 
 def _repository_root(package_share: Path) -> Path:
@@ -178,9 +151,6 @@ def _launch_obstacle_course_setup(context, *_args, **_kwargs):
         sys.executable, str(repo / "tools/validate_obstacle_course_config.py"), "--all",
     ], cwd=repo, check=True)
     subprocess.run([
-        sys.executable, str(repo / "tools/fetch_obstacle_course_assets.py"), "--verify-only",
-    ], cwd=repo, check=True)
-    subprocess.run([
         sys.executable, str(repo / "tools/fetch_obstacle_course_assets.py"), "--lock",
         str(repo / "ros2_ws/src/car_bringup/config/obstacle_course/research_vehicle.lock.yaml"),
         "--output", str(repo / "artifacts/obstacle-course/assets"), "--verify-only",
@@ -211,7 +181,7 @@ def _launch_obstacle_course_setup(context, *_args, **_kwargs):
     sdf_environment["GZ_SIM_RESOURCE_PATH"] = resource_path
     sdf_environment["SDF_PATH"] = sdf_path
     subprocess.run(["gz", "sdf", "-k", str(world_path)], cwd=repo, env=sdf_environment, check=True)
-    gz_args = ["sim", "--force-version", GAZEBO_VERSION, "-v", "3", "-r", "--seed", str(simulation_seed)]
+    gz_args = ["sim", "--force-version", harmonic_version(), "-v", "3", "-r", "--seed", str(simulation_seed)]
     if headless == "true":
         gz_args.extend(["-s", "--headless-rendering"])
     gz_args.append(str(world_path))
@@ -373,7 +343,6 @@ def _launch_obstacle_course_setup(context, *_args, **_kwargs):
         ])],
     ))
     return [
-        *_wslg_render_environment(headless),
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", resource_path),
         SetEnvironmentVariable("SDF_PATH", sdf_path),
         LogInfo(msg=f"Obstacle course {scenario_id} seed={simulation_seed} run_id={run_id} purpose={run_purpose} control={control}; controller is the only Gazebo command authority"),

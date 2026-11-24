@@ -22,6 +22,7 @@ assets:
   license: CC0-1.0
   license_url: https://www.innerscene.com/tools/library/terms
   file_name: vehicle_compact_suv_01.glb
+  repository_file: assets/locked/vehicle_compact_suv_01.glb
   file_sha256: 634f6d8723d3d00a3265416620b2e1da3d229ca003fdbc2412895d55d08850c1
   dimensions:
     source_bounds_m:

@@ -16,7 +16,6 @@ import json
 import math
 import os
 from pathlib import Path
-import re
 import signal
 import statistics
 import subprocess
@@ -226,43 +225,11 @@ def _generate_probe_world(config: dict, output: Path) -> None:
     tree.write(output, encoding="utf-8", xml_declaration=True)
 
 
-def _version(command: list[str]) -> str:
-    try:
-        result = subprocess.run(command, check=False, capture_output=True, text=True, timeout=8)
-    except (OSError, subprocess.TimeoutExpired):
-        return "unavailable"
-    return (result.stdout + result.stderr).strip().splitlines()[0] if (result.stdout or result.stderr) else "unavailable"
-
-
-def _pinned_runtime_identity(seed: int) -> str:
-    ros_distro = os.environ.get("ROS_DISTRO", "")
-    bridge_version = ""
-    try:
-        completed = subprocess.run(
-            ["ros2", "pkg", "xml", "ros_gz_bridge"], check=True,
-            capture_output=True, text=True, timeout=8,
-        )
-        match = re.search(r"<version>([^<]+)</version>", completed.stdout)
-        bridge_version = match.group(1).strip() if match else ""
-    except (OSError, subprocess.SubprocessError):
-        pass
-    gazebo_version = _version(["gz", "sim", "--versions"])
-    if ros_distro != "lyrical" or bridge_version != "3.0.10" or "10.5.0" not in gazebo_version:
-        raise RuntimeError(
-            "runtime pin mismatch: expected ROS lyrical / ros_gz_bridge 3.0.10 / "
-            f"Gazebo Sim 10.5.0, observed ROS={ros_distro or 'unset'}, "
-            f"bridge={bridge_version or 'unavailable'}, Gazebo={gazebo_version}"
-        )
-    return (
-        f"Gazebo Sim 10.5.0; ROS 2 {ros_distro}; ros_gz_bridge {bridge_version}; "
-        f"physics=source-world; seed={seed}"
-    )
-
-
 def _run_simulation(config: dict, profile_path: Path, scenario_path: Path,
                     output_path: Path, repeats: int) -> dict:
     # Imported only after verifying the environment was sourced.
     import rclpy
+    from car_bringup.runtime import runtime_identity
     from ackermann_msgs.msg import AckermannDriveStamped
     from diagnostic_msgs.msg import DiagnosticStatus
     from nav_msgs.msg import Odometry
@@ -282,7 +249,13 @@ def _run_simulation(config: dict, profile_path: Path, scenario_path: Path,
         "controller": sha256_file(REPO / CONTROLLER_SOURCE),
         "source_world": sha256_file(REPO / config["world"]["source_path"]),
     }
-    sim_identity = _pinned_runtime_identity(int(config["seed"]))
+    runtime = runtime_identity()
+    gazebo_version = runtime["gazebo_version"]
+    sim_identity = (
+        f"Gazebo Sim {gazebo_version}; ROS 2 {runtime['ros_distro']}; "
+        f"ros_gz_bridge {runtime['ros_gz_bridge_version']}; "
+        f"physics=source-world; seed={int(config['seed'])}"
+    )
     world_output = REPO / config["world"]["generated_output"]
     _generate_probe_world(config, world_output)
     generated_world_hash = sha256_file(world_output)
@@ -327,7 +300,7 @@ def _run_simulation(config: dict, profile_path: Path, scenario_path: Path,
 
     world_arg = str(world_output.relative_to(REPO))
     start("gazebo", [
-        "gz", "sim", "--force-version", "10.5.0", "-s", "--headless-rendering",
+        "gz", "sim", "--force-version", gazebo_version, "-s", "--headless-rendering",
         "-r", "--seed", str(int(config["seed"])), world_arg,
     ])
     bridge = REPO / BRIDGE_CONFIG

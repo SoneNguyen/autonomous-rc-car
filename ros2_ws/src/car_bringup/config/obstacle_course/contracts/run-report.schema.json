@@ -39,6 +39,7 @@
         "ubuntu": {"type": "string"},
         "ros_distro": {"type": "string"},
         "gazebo_version": {"type": "string"},
+        "ros_gz_bridge_version": {"type": "string"},
         "profile_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
         "scenario_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
         "decision_config_path": {"type": "string", "pattern": "^ros2_ws/src/car_bringup/config/obstacle_course/.*decision\\.yaml$"},

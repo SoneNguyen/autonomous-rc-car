@@ -1,6 +1,41 @@
 # RC obstacle course: implementation and status
 
-This document describes the working multi-sensor vehicle demo, its behavior rules, run inputs, asset sources, and verification status. Fresh setup and commands are in the [Quickstart](quickstart.md). The supported OS is Ubuntu 26.04, either native or under WSL2. The recorded dynamics measurements were collected under WSL2; native Ubuntu uses the same ROS/Gazebo packages and source configuration but has not had an independent GUI run recorded here.
+The demo targets Ubuntu 24.04 with ROS 2 Jazzy and Gazebo Harmonic. See the
+[Quickstart](quickstart.md) for native Ubuntu and WSL2 setup. The recorded
+dynamics and earlier scenario results below came from Ubuntu 26.04 WSL2 with
+ROS 2 Lyrical and Gazebo Jetty 10.5.0. Treat them as historical measurements
+pending separate Harmonic qualification.
+
+## Ubuntu 24.04 migration check
+
+The four ROS packages built on WSL2 Ubuntu 24.04 with ROS 2 Jazzy, Gazebo Sim
+8.15.0, and ros_gz_bridge 1.0.25. All three asset locks and all ten production
+scenario configurations verified. The headless S3b smoke run produced camera
+and odometry evidence and recorded one Gazebo Twist publisher. It logged a
+contact with the opening blocker and stopped before the expected LiDAR
+sequence completed. A separate headless S0 launch served the dashboard and
+a live 320 x 240 camera JPEG, then shut down cleanly. Scenario qualification remains open.
+
+## Quick portability check
+
+Five S0 smoke runs on the same Ubuntu 24.04 WSL2 host used seed 70001.
+The table reports the median of Gazebo's real-time-factor samples after
+dropping the first ten positive samples. Each row is a short observation.
+A factor of 1.0 is real time.
+
+| Mode | Median real-time factor | First browser camera frame |
+| --- | ---: | ---: |
+| Headless | 0.81 |  |
+| Headless with dashboard | 0.75 | 9.3 s |
+| Headless with dashboard, software rendering and four logical CPUs | 0.42 | 15.1 s |
+| WSLg GUI, default Mesa driver (llvmpipe) | 0.44 |  |
+| WSLg GUI, Mesa D3D12 on RTX A2000 | 0.46 |  |
+
+Every run produced FOLLOW_ROUTE and recorded only ground contact. D3D12
+selected the RTX A2000 and the GUI run completed. Ogre also logged
+fixed-function material warnings in that run. Native Ubuntu and other hosts
+still need their own smoke check. Use the browser dashboard or headless mode
+from the [Quickstart](quickstart.md) when the full viewport renders slowly.
 
 ## What runs
 
